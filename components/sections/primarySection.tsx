@@ -1,5 +1,6 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow, weight } from '~/theme';
 
 interface PrimarySectionProps {
   title: string;
@@ -20,22 +21,22 @@ export default function PrimarySection({ title, children }: PrimarySectionProps)
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    backgroundColor: colors.primaryLight,
+    borderRadius: border.radius,
+    padding: padding.fourty,
+    shadowColor: colors.primaryDark,
+    shadowOpacity: shadow.opacity,
+    shadowRadius: shadow.radius,
     shadowOffset: { width: 0, height: 5 },
-    elevation: 2,
+    elevation: shadow.elevation,
   },
   title: {
-    fontSize: 20,
+    fontSize: fontSize.title,
     fontWeight: '500',
-    color: '#1E3A5F',
-    marginBottom: 14,
+    color: colors.mainColor,
+    marginBottom: margin.sectionBottom,
   },
   content: {
-    gap: 20,
+    gap: gap.terty,
   },
 });

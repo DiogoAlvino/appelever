@@ -1,4 +1,5 @@
 import { TextInput, StyleSheet, View, TextInputProps, Text } from 'react-native';
+import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
 
 interface PrimaryInputProps extends TextInputProps {
   label?: string;
@@ -22,16 +23,16 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   label: {
-    fontSize: 18,
-    color: '#5B5A5A',
-    marginBottom: 8,
+    fontSize: fontSize.label,
+    color: colors.primaryDark,
+    marginBottom: margin.bottom,
   },
   input: {
-    height: 50,
-    backgroundColor: '#F0F6FF',
-    paddingHorizontal: 17,
-    borderRadius: 10,
-    fontSize: 16,
-    color: '#000',
+    height: heigth.input,
+    backgroundColor: colors.bgInput,
+    paddingHorizontal: padding.horizontal,
+    borderRadius: border.radius,
+    fontSize: fontSize.placeholder,
+    color: colors.primaryDark,
   },
 });

@@ -1,5 +1,5 @@
-import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent } from 'react-native';
+import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
 
 interface MainButtonProps {
   title: string;
@@ -28,25 +28,25 @@ export default function MainButton({ title, onPress, type = 'primary' }: MainBut
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#173A64',
-    borderRadius: 10,
-    height: 60,
+    backgroundColor: colors.mainColor,
+    borderRadius: border.radius,
+    height: heigth.button,
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    marginVertical: 12,
+    marginVertical: margin.vertical,
   },
   text: {
-    color: '#FFFFFF',
-    fontSize: 20,
+    color: colors.primaryLight,
+    fontSize: fontSize.title,
     fontWeight: '500',
   },
   secondaryButton: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#173A64',
+    backgroundColor: colors.primaryLight,
+    borderWidth: border.width,
+    borderColor: colors.mainColor,
   },
   secondaryText: {
-    color: '#173A64',
+    color: colors.mainColor,
   },
 });
