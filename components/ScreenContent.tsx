@@ -1,6 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import EditScreenInfo from './EditScreenInfo';
+import PrimaryInput from './inputs/primaryInput';
+import { useState } from 'react';
+import PrimarySection from './sections/primarySection';
+import MainButton from './buttons/mainButton';
 
 type ScreenContentProps = {
   title: string;
@@ -8,13 +11,18 @@ type ScreenContentProps = {
   children?: React.ReactNode;
 };
 
-export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
+export const ScreenContent = ({ }: ScreenContentProps) => {
+  const [equipamento, setEquipamento] = useState('');
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.separator} />
-      <EditScreenInfo path={path} />
-      {children}
+      <PrimarySection title="Identificação e localização">
+        <PrimaryInput label="Identificação do equipamento" placeholder="Informe" />
+        <PrimaryInput label="Localização do equipamento" placeholder="Informe" />
+      </PrimarySection>
+      <MainButton title="Cadastrar" onPress={() => console.log('Botão clicado!')} />
+      <MainButton title="Cancelar" type='secondary' onPress={() => console.log('Botão clicado!')} />
+
     </View>
   );
 };
