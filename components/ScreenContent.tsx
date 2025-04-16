@@ -11,6 +11,8 @@ import SecondarySection from './sections/secondarySection';
 
 import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import PrimaryList from './lists/primaryList';
+import PrimaryQuestion from './questions/primaryQuestion';
 
 type ScreenContentProps = {
   title: string;
@@ -62,6 +64,23 @@ export const ScreenContent = ({ }: ScreenContentProps) => {
         <PrimaryInput label="Identificação do equipamento" placeholder="Informe" />
         <PrimaryInput label="Localização do equipamento" placeholder="Informe" />
       </PrimarySection>
+      <PrimaryList title="1. Quadro de comando"
+        helperEnabled helperTitle="1. Quadro de comando"
+        helperDescription="O quadro de comando é o painel elétrico que controla o funcionamento do elevador. É também conhecido como painel elétrico de comando.">
+        <PrimaryQuestion
+          title="Item 10.1"
+          description="Proteção contra falha à terra em um circuito..."
+          selectedOption={null}
+          onSelect={(value) => console.log('Selecionado:', value)}
+        />
+        <PrimaryQuestion
+          title="Item 10.2"
+          description="Proteção contra inversão de fase no circuito..."
+          selectedOption={null}
+          onSelect={(value) => console.log('Selecionado:', value)}
+        />
+      </PrimaryList>
+
       <MainButton title="Cadastrar" onPress={() => console.log('Botão clicado!')} />
       <MainButton title="Cancelar" type='secondary' onPress={() => console.log('Botão clicado!')} />
 
