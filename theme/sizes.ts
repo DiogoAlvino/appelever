@@ -1,7 +1,8 @@
 export const fontSize = {
   title: 20,
   label: 18,
-  placeholder: 16
+  placeholder: 16,
+  text: 12,
 };
 
 export const weight = {
@@ -16,6 +17,7 @@ export const weight = {
 
 export const border = {
   radius: 10,
+  search: 25,
   width: 1,
 
 };
@@ -28,6 +30,7 @@ export const heigth = {
   full: '100%',
   input: 50,
   button: 60,
+  search: 45,
 }
 
 export const shadow = {

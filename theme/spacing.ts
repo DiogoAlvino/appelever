@@ -6,6 +6,9 @@ export const margin = {
     bottom: 8,
     vertical: 5,
     sectionBottom: 20,
+    right: 8,
+    top: 8,
+    
 }
 
 export const padding = {
@@ -16,6 +19,7 @@ export const padding = {
     top: 10,
     bottom: 10,
     horizontal: 17,
+    search: 12,
 };
 
 export const gap = {
