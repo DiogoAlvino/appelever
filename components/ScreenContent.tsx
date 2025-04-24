@@ -8,11 +8,15 @@ import BlockButton from './buttons/blockButton';
 import SearchInput from './inputs/searchInput';
 import ReportSection from './sections/reportSection';
 import SecondarySection from './sections/secondarySection';
+import AlertMessage from './messages/alertMessage';
 
 import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import PrimaryList from './lists/primaryList';
 import PrimaryQuestion from './questions/primaryQuestion';
+import { colors, fontSize } from '~/theme';
+import QuestionsList from './lists/questionsList';
+import { questions } from '~/data/questions';
 
 type ScreenContentProps = {
   title: string;
@@ -22,17 +26,28 @@ type ScreenContentProps = {
 
 export const ScreenContent = ({ }: ScreenContentProps) => {
   const [equipamento, setEquipamento] = useState('');
+  const [respostas, setRespostas] = useState<{ [id: string]: 'sim' | 'nao' | 'na' | null }>({});
+
+  const handleResponder = (id: string, value: 'sim' | 'nao' | 'na') => {
+    setRespostas((prev) => ({ ...prev, [id]: value }));
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <SearchInput onSearch={(value) => console.log('Buscar por:', value)} />
+      <AlertMessage
+        type="error"
+        message="Itens a serem verificados quanto à conformidade com a ABNT NBR 16858-1"
+      />
+
       <SecondarySection
         icon={<Feather name="sun" size={20} color="#173A64" />}
         title="Equipamento para inspeção"
-        text1="Nome do equipamento"
-        text2="IP ou Numero de Identificação"
         onPress={() => "/modal"}
-      />
+      >
+        <Text style={styles.text}>Nome do equipamento</Text>
+        <Text style={styles.text}>IP ou Numero de Identificação</Text>
+      </SecondarySection>
 
       <View style={styles.containerButtons}>
         <BlockButton
@@ -67,22 +82,12 @@ export const ScreenContent = ({ }: ScreenContentProps) => {
       <PrimaryList title="1. Quadro de comando"
         helperEnabled helperTitle="1. Quadro de comando"
         helperDescription="O quadro de comando é o painel elétrico que controla o funcionamento do elevador. É também conhecido como painel elétrico de comando.">
-        <PrimaryQuestion
-          title="Item 10.1"
-          description="Proteção contra falha à terra em um circuito..."
-          selectedOption={null}
-          onSelect={(value) => console.log('Selecionado:', value)}
-        />
-        <PrimaryQuestion
-          title="Item 10.2"
-          description="Proteção contra inversão de fase no circuito..."
-          selectedOption={null}
-          onSelect={(value) => console.log('Selecionado:', value)}
+        <QuestionsList
+          questoes={questions}
+          respostas={respostas}
+          onResponder={handleResponder}
         />
       </PrimaryList>
-
-      <MainButton title="Cadastrar" onPress={() => console.log('Botão clicado!')} />
-      <MainButton title="Cancelar" type='secondary' onPress={() => console.log('Botão clicado!')} />
 
     </ScrollView>
   );
@@ -93,9 +98,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  containerButtons:{
+  containerButtons: {
     flexDirection: 'row',
-    gap:  28
+    gap: 28
   },
   separator: {
     backgroundColor: '#d1d5db',
@@ -106,5 +111,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  text: {
+    fontSize: fontSize.placeholder,
+    color: colors.primaryDark,
   },
 });

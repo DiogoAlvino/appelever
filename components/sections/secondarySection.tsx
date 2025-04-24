@@ -6,24 +6,28 @@ import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow, 
 interface SecondarySectionProps {
   icon: React.ReactNode;
   title: string;
-  text1: string;
-  text2: string;
+  children: React.ReactNode;
   onPress?: (event: GestureResponderEvent) => void;
+  showChevron?: boolean;
 }
 
-export default function SecondarySection({ icon, title, text1, text2, onPress }: SecondarySectionProps) {
+export default function SecondarySection({ icon, title, children, onPress, showChevron = true }: SecondarySectionProps) {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.8}>
+    <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.icon}>{icon}</View>
         <View style={styles.textContainer}>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.text}>{text1}</Text>
-          <Text style={styles.text}>{text2}</Text>
+          {children}
         </View>
       </View>
-      <Feather name="chevron-right" size={20} color="#173A64" />
-    </TouchableOpacity>
+
+      {showChevron && (
+        <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+          <Feather name="chevron-right" size={20} color="#173A64" />
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 

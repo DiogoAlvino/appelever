@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import PrimaryHelper from '../helpers/primaryHelper';
+import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow } from '~/theme';
 
 interface PrimaryListProps {
     title: string;
@@ -30,13 +31,13 @@ export default function PrimaryList({
                     <Text style={styles.title}>{title}</Text>
                     {helperEnabled && (
                         <TouchableOpacity onPress={() => setShowHelper(true)}>
-                            <Feather name="help-circle" size={16} color="#173A64" style={{ marginLeft: 6 }} />
+                            <Feather name="help-circle" size={20} color="#173A64" style={{ marginLeft: 6 }} />
                         </TouchableOpacity>
                     )}
                 </View>
 
                 <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-                    <Feather name={expanded ? 'x' : 'chevron-down'} size={20} color="#173A64" />
+                    <Feather name={expanded ? 'x' : 'chevron-down'} size={25} color="#173A64" />
                 </TouchableOpacity>
             </View>
 
@@ -59,13 +60,16 @@ export default function PrimaryList({
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 12,
+        backgroundColor: colors.primaryLight,
+        borderRadius: border.radius,
+        padding: 15,
         marginVertical: 8,
         elevation: 1,
         width: "100%",
-        gap: 12,
+        shadowColor: colors.primaryDark,
+        shadowOpacity: shadow.opacity,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: shadow.radius,
     },
     titleContainer: {
         flexDirection: 'row',
@@ -76,11 +80,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        width: "100%"
     },
     title: {
-        fontSize: 16,
-        color: '#173A64',
-        fontWeight: 'bold',
+        fontSize: fontSize.title,
+        color: colors.mainColor,
+        fontWeight: '500',
     },
     content: {
         marginTop: 12,

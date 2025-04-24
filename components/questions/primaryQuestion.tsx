@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow } from '~/theme';
+
 
 interface PrimaryQuestionProps {
   title: string;
@@ -37,26 +39,27 @@ export default function PrimaryQuestion({ title, description, selectedOption, on
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: colors.primaryLight,
+    borderRadius: border.radius,
     padding: 12,
     marginBottom: 12,
     elevation: 1,
   },
   itemTitle: {
-    fontWeight: 'bold',
-    fontSize: 14,
-    color: '#173A64',
+    fontWeight: '500',
+    fontSize: fontSize.label,
+    color: colors.mainColor,
     marginBottom: 4,
   },
   description: {
-    fontSize: 14,
-    color: '#333',
+    fontSize: fontSize.placeholder,
+    color: colors.primaryDark,
     marginBottom: 8,
   },
   optionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    width: '100%'
   },
   option: {
     flexDirection: 'row',
@@ -68,14 +71,15 @@ const styles = StyleSheet.create({
     height: 14,
     borderRadius: 7,
     borderWidth: 1,
-    borderColor: '#173A64',
+    borderColor: colors.mainColor,
     marginRight: 6,
   },
   circleSelected: {
-    backgroundColor: '#173A64',
+    backgroundColor: colors.mainColor,
   },
   optionText: {
-    color: '#173A64',
-    fontSize: 14,
+    color: colors.mainColor,
+    fontSize: fontSize.placeholder,
+    fontWeight: '500',
   },
 });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, Dimensions, Pressable } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow } from '~/theme';
 
 interface PrimaryHelperProps {
   imageSource?: any;
@@ -38,7 +39,6 @@ export default function PrimaryHelper({
   );
 }
 
-
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
+    backgroundColor: colors.primaryLight,
+    borderRadius: border.radius,
     padding: 20,
     width: screenWidth * 0.85,
     maxHeight: screenHeight * 0.7,
@@ -64,9 +64,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#173A64',
+    fontSize: fontSize.title,
+    fontWeight: '500',
+    color: colors.mainColor,
     flex: 1,
     marginRight: 10,
   },
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   description: {
-    fontSize: 14,
-    color: '#444',
+    fontSize: fontSize.label,
+    color: colors.primaryDark,
   },
 });
