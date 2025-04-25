@@ -2,29 +2,55 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, GestureResponderEvent } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow, weight } from '~/theme';
+import CheckBox from '../inputs/CheckBox';
 
 interface SecondarySectionProps {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   title: string;
   children: React.ReactNode;
   onPress?: (event: GestureResponderEvent) => void;
   showChevron?: boolean;
+  showCheckbox?: boolean;
+  checked?: boolean;
+  onCheckChange?: (checked: boolean) => void;
+  disabled?: boolean;
+  backgroundColor?: string;
 }
 
-export default function SecondarySection({ icon, title, children, onPress, showChevron = true }: SecondarySectionProps) {
+export default function SecondarySection({
+  icon,
+  title,
+  children,
+  onPress,
+  showChevron = true,
+  showCheckbox = false,
+  checked = false,
+  onCheckChange,
+  disabled,
+  backgroundColor
+}: SecondarySectionProps) {
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.icon}>{icon}</View>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{title}</Text>
-          {children}
+    <View style={[
+      styles.container,
+      { backgroundColor: backgroundColor || colors.primaryLight, opacity: disabled ? 0.9 : 1 }
+    ]}>
+      <View style={styles.leftSection}>
+        {showCheckbox && (
+          <CheckBox checked={checked} onPress={() => onCheckChange?.(!checked)} />
+        )}
+
+        <View style={styles.content}>
+          <View style={styles.icon}>{icon}</View>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{title}</Text>
+            {children}
+          </View>
         </View>
       </View>
 
       {showChevron && (
         <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-          <Feather name="chevron-right" size={20} color="#173A64" />
+          <Feather name="chevron-right" size={25} color="#173A64" />
         </TouchableOpacity>
       )}
     </View>
@@ -45,7 +71,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: shadow.radius,
     marginVertical: margin.vertical,
-    width: "100%"
+    width: '100%',
+  },
+  leftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+  },
+  checkbox: {
+    marginRight: 12,
+    marginTop: 4,
   },
   content: {
     flexDirection: 'row',
@@ -65,8 +100,14 @@ const styles = StyleSheet.create({
     color: colors.mainColor,
     marginBottom: 2,
   },
-  text: {
-    fontSize: fontSize.placeholder,
-    color: colors.primaryDark,
+  checkboxBox: {
+    width: 22,
+    height: 22,
+    borderWidth: 1.5,
+    borderColor: colors.primaryDark,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12
   },
 });

@@ -16,7 +16,8 @@ import PrimaryList from './lists/primaryList';
 import PrimaryQuestion from './questions/primaryQuestion';
 import { colors, fontSize } from '~/theme';
 import QuestionsList from './lists/questionsList';
-import { questions } from '~/data/questions';
+import { equipment, questions } from '~/data/questions';
+import EquipmentList from './lists/equipamentList';
 
 type ScreenContentProps = {
   title: string;
@@ -27,6 +28,11 @@ type ScreenContentProps = {
 export const ScreenContent = ({ }: ScreenContentProps) => {
   const [equipamento, setEquipamento] = useState('');
   const [respostas, setRespostas] = useState<{ [id: string]: 'sim' | 'nao' | 'na' | null }>({});
+  const [checked, setChecked] = useState(false);
+
+  const handleChecked = () => {
+    setChecked(prev => !prev);
+  }
 
   const handleResponder = (id: string, value: 'sim' | 'nao' | 'na') => {
     setRespostas((prev) => ({ ...prev, [id]: value }));
@@ -40,10 +46,15 @@ export const ScreenContent = ({ }: ScreenContentProps) => {
         message="Itens a serem verificados quanto à conformidade com a ABNT NBR 16858-1"
       />
 
+      <EquipmentList equipaments={equipment} />
+
       <SecondarySection
         icon={<Feather name="sun" size={20} color="#173A64" />}
         title="Equipamento para inspeção"
         onPress={() => "/modal"}
+        showCheckbox={true}
+        checked={checked}
+        onCheckChange={handleChecked}
       >
         <Text style={styles.text}>Nome do equipamento</Text>
         <Text style={styles.text}>IP ou Numero de Identificação</Text>
