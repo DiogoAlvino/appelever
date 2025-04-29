@@ -18,6 +18,7 @@ import { colors, fontSize } from '~/theme';
 import QuestionsList from './lists/questionsList';
 import { equipment, questions } from '~/data/questions';
 import EquipmentList from './lists/equipamentList';
+import PrimarySelect from './inputs/primarySelect';
 
 type ScreenContentProps = {
   title: string;
@@ -29,6 +30,7 @@ export const ScreenContent = ({ }: ScreenContentProps) => {
   const [equipamento, setEquipamento] = useState('');
   const [respostas, setRespostas] = useState<{ [id: string]: 'sim' | 'nao' | 'na' | null }>({});
   const [checked, setChecked] = useState(false);
+  const [modelo, setModelo] = useState<string | undefined>(undefined);
 
   const handleChecked = () => {
     setChecked(prev => !prev);
@@ -45,6 +47,7 @@ export const ScreenContent = ({ }: ScreenContentProps) => {
         type="error"
         message="Itens a serem verificados quanto à conformidade com a ABNT NBR 16858-1"
       />
+
 
       <EquipmentList equipaments={equipment} />
 
@@ -89,6 +92,13 @@ export const ScreenContent = ({ }: ScreenContentProps) => {
       <PrimarySection title="Identificação e localização">
         <PrimaryInput label="Identificação do equipamento" placeholder="Informe" />
         <PrimaryInput label="Localização do equipamento" placeholder="Informe" />
+        <PrimarySelect
+          label="Modelo"
+          placeholder="Selecione o item"
+          options={['Modelo A', 'Modelo B', 'Modelo C']}
+          selected={modelo}
+          onSelect={(value) => setModelo(value)}
+        />
       </PrimarySection>
       <PrimaryList title="1. Quadro de comando"
         helperEnabled helperTitle="1. Quadro de comando"

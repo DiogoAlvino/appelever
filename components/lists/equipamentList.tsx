@@ -38,6 +38,9 @@ export default function EquipmentList({ equipaments }: EquipmentListProps) {
             backgroundColor={isDisabled ? '#f1f1f1' : colors.primaryLight}
           >
             <Text style={{ color: isDisabled ? '#888' : colors.primaryDark }}>
+              {equip.id}
+            </Text>
+            <Text style={{ color: isDisabled ? '#888' : colors.primaryDark }}>
               {equip.address}
             </Text>
           </SecondarySection>

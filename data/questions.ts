@@ -11,18 +11,18 @@ export const questions = [
 
 export const equipment = [
     {
-        name: "NOME EQUIPAMENTO",
+        name: "Nome do equipamento",
         id: "id equipamento 1",
-        address: "ENDEREÇO TEST"
+        address: "Endereço x"
     },
     {
-        name: "NOME EQUIPAMENTO 1",
+        name: "Nome do equipamento",
         id: "id equipamento 2",
-        address: "ENDEREÇO TEST"
+        address: "Endereço x"
     },
     {
-        name: "NOME EQUIPAMENTO 2",
+        name: "Nome do equipamento",
         id: "id equipamento 3",
-        address: "ENDEREÇO TEST"
+        address: "Endereço x"
     },
 ]
