@@ -18,6 +18,7 @@ import { equipment, questions } from '~/data/questions';
 import EquipmentList from './lists/equipamentList';
 import PrimarySelect from './inputs/primarySelect';
 import MenuButton from './buttons/menuButton';
+import PrimaryChart from './charts/primaryChart';
 
 type ScreenContentProps = {
   title: string;
@@ -41,13 +42,13 @@ export const ScreenContent = ({ }: ScreenContentProps) => {
   
   return (
     <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+      <PrimaryChart/>
       <MenuButton/>
       <SearchInput onSearch={(value) => console.log('Buscar por:', value)} />
       <AlertMessage
         type="error"
         message="Itens a serem verificados quanto à conformidade com a ABNT NBR 16858-1"
       />
-
 
       <EquipmentList equipaments={equipment} />
 
