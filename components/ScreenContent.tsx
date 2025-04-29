@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import PrimaryInput from './inputs/primaryInput';
 import { useState } from 'react';
 import PrimarySection from './sections/primarySection';
-import MainButton from './buttons/mainButton';
 import BlockButton from './buttons/blockButton';
 import SearchInput from './inputs/searchInput';
 import ReportSection from './sections/reportSection';
@@ -13,12 +12,12 @@ import AlertMessage from './messages/alertMessage';
 import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import PrimaryList from './lists/primaryList';
-import PrimaryQuestion from './questions/primaryQuestion';
 import { colors, fontSize } from '~/theme';
 import QuestionsList from './lists/questionsList';
 import { equipment, questions } from '~/data/questions';
 import EquipmentList from './lists/equipamentList';
 import PrimarySelect from './inputs/primarySelect';
+import MenuButton from './buttons/menuButton';
 
 type ScreenContentProps = {
   title: string;
@@ -39,9 +38,10 @@ export const ScreenContent = ({ }: ScreenContentProps) => {
   const handleResponder = (id: string, value: 'sim' | 'nao' | 'na') => {
     setRespostas((prev) => ({ ...prev, [id]: value }));
   };
-
+  
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+      <MenuButton/>
       <SearchInput onSearch={(value) => console.log('Buscar por:', value)} />
       <AlertMessage
         type="error"
