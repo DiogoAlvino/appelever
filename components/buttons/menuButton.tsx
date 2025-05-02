@@ -52,10 +52,7 @@ export default function MenuButton() {
 
 const styles = StyleSheet.create({
   fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    zIndex: 10,
+   flex: 1
   },
   fabInner: {
     width: 60,
