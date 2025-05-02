@@ -1,18 +1,12 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
 import MainButton from '~/components/buttons/mainButton';
 import PrimaryInput from '~/components/inputs/primaryInput';
 import PrimarySelect from '~/components/inputs/primarySelect';
 import PrimarySection from '~/components/sections/primarySection';
 
-type EquipmentRegistrationProps = {
-  title: string;
-  path: string;
-  children?: React.ReactNode;
-};
-
-export const EquipmentRegistration = ({}: EquipmentRegistrationProps) => {
+export default function EquipmentRegistration() {
   const [modelo, setModelo] = useState<string | undefined>(undefined);
 
   return (
@@ -52,7 +46,7 @@ export const EquipmentRegistration = ({}: EquipmentRegistrationProps) => {
       <MainButton title="Cancelar" type="secondary" />
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
