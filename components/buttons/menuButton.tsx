@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
+import { useRouter } from 'expo-router';
 
 
 const options = [
@@ -12,9 +13,19 @@ const options = [
 
 export default function MenuButton() {
   const [modalVisible, setModalVisible] = useState(false);
+  const router = useRouter();
 
   const handleOptionPress = (option: string) => {
-    console.log('Opção selecionada:', option);
+    if (option === 'Conta'){
+      console.log('Abrir modal de conta');
+    };
+    if (option === 'Configurações'){
+      console.log('Abrir modal ou pagina');
+    };
+    if (option === 'Sair da conta'){
+      router.replace('/login');
+    };
+
     setModalVisible(false);
   };
 

@@ -7,6 +7,7 @@ export const colors = {
     bgDanger: '#FFB2B2',
     bgInput: '#F0F6FF',
     bgScreen: '#F5FAFF',
-    bgMenu: '#6D8ABD'
+    bgMenu: '#6D8ABD',
+    bgLink: '#007bff',
 };
   
