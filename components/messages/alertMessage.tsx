@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
     shadowColor: colors.primaryDark,
     shadowOpacity: shadow.opacity,
     shadowRadius: shadow.radius,

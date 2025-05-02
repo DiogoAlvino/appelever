@@ -3,6 +3,7 @@ export const fontSize = {
   label: 18,
   placeholder: 16,
   text: 12,
+  dash: 26,
 };
 
 export const weight = {

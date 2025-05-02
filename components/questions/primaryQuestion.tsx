@@ -67,9 +67,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   circle: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: 22,
+    height: 22,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.mainColor,
     marginRight: 6,

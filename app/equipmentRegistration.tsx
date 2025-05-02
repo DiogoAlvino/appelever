@@ -1,26 +1,31 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import MainButton from '~/components/buttons/mainButton';
 import PrimaryInput from '~/components/inputs/primaryInput';
 import PrimarySelect from '~/components/inputs/primarySelect';
 import PrimarySection from '~/components/sections/primarySection';
+import { colors } from '~/theme';
 
 export default function EquipmentRegistration() {
   const [modelo, setModelo] = useState<string | undefined>(undefined);
 
   return (
     <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
-      <PrimarySection title="Dados Iniciais">
+      <PrimarySection title="Local de Instalação">
         <PrimaryInput label="Edificação" placeholder="Informe" />
         <PrimaryInput label="Endereço" placeholder="Informe" />
+      </PrimarySection>
+
+      <PrimarySection title="Responsável Técnico">
         <PrimaryInput label="Responsável" placeholder="Informe" />
         <PrimaryInput label="Função" placeholder="Informe" />
         <PrimaryInput label="Telefone" placeholder="Informe" />
         <PrimaryInput label="E-mail" placeholder="Informe" />
       </PrimarySection>
 
-      <PrimarySection title="Informações Gerais do Equipamento">
+
+      <PrimarySection title="Dados do Equipamento">
         <PrimaryInput label="Data da Instalação" placeholder="Informe" />
         <PrimaryInput label="Identificação do Equipamento" placeholder="Informe" />
         <PrimaryInput label="Fabricante" placeholder="Informe" />
@@ -32,18 +37,38 @@ export default function EquipmentRegistration() {
           selected={modelo}
           onSelect={(value) => setModelo(value)}
         />
-        <PrimaryInput label="Empresa Conservadora" placeholder="Informe" />
-        <PrimaryInput label="CNPJ" placeholder="Informe" />
         <PrimaryInput label="Capacidade Nominal (kg)" placeholder="Informe" />
         <PrimaryInput label="Lotacão" placeholder="Informe" />
         <PrimaryInput label="Velocidade nominal (m/s)" placeholder="Informe" />
-        <PrimaryInput label="Tipo de Uso (Residencial, Comercial, Público)" placeholder="Informe" />
+        <PrimarySelect
+          label="Tipo de uso"
+          placeholder="Selecione o item"
+          options={['Residencial', 'Comercial', 'Público']}
+          selected={modelo}
+          onSelect={(value) => setModelo(value)}
+        />
         <PrimaryInput label="Número de paradas" placeholder="Informe" />
-        <PrimaryInput label="Casa de Máquinas (Existente, Não Existente)" placeholder="Informe" />
+        <PrimarySelect
+          label="Casa de Máquinas"
+          placeholder="Selecione o item"
+          options={['Existente', 'Não Existente']}
+          selected={modelo}
+          onSelect={(value) => setModelo(value)}
+        />
       </PrimarySection>
 
-      <MainButton title="Cadastrar" type="primary" />
-      <MainButton title="Cancelar" type="secondary" />
+
+
+      <PrimarySection title="Empresa Conservadora">
+        <PrimaryInput label="Empresa Conservadora" placeholder="Informe" />
+        <PrimaryInput label="CNPJ" placeholder="Informe" />
+ 
+      </PrimarySection>
+      
+      <View style={styles.buttons}>
+        <MainButton title="Cadastrar" type="primary" />
+        <MainButton title="Cancelar" type="secondary" />
+      </View>
     </ScrollView>
   );
 }
@@ -53,5 +78,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 20,
+    paddingHorizontal: 5,
+    paddingTop: 10, 
+    backgroundColor: colors.bgScreen,
   },
+  buttons: {
+    width:"100%",
+    gap: 10
+  }
 });

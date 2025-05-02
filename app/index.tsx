@@ -13,6 +13,10 @@ export default function HomePage() {
         router.push("/equipmentRegistration")
     }
 
+    function goToNormativeInpection(){
+        router.push("/normativeInspection")
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
             <View style={styles.card}>
@@ -21,7 +25,7 @@ export default function HomePage() {
                     <Text>Outro butão aq</Text>
 
                 </View>
-                <Text style={styles.cardTitle}>Olá usuario</Text>
+                <Text style={styles.cardTitle}>Olá, usuario!</Text>
             </View>
             <View style={styles.services}>
                 <Text style={styles.servicesTitle}>Serviços</Text>
@@ -34,7 +38,7 @@ export default function HomePage() {
                     <BlockButton
                         icon={<MaterialCommunityIcons name="checkbox-marked-outline" size={36} color="#fff" />}
                         label="Inspeção Normativa"
-                        onPress={() => console.log('Botão clicado')}
+                        onPress={goToNormativeInpection}
                     />
                     <BlockButton
                         icon={<MaterialCommunityIcons name="format-list-bulleted" size={36} color="#fff" />}
@@ -62,27 +66,30 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         gap: 20,
+        flexDirection: "column",
+        backgroundColor: colors.bgScreen,
+        height: "100%",
     },
     card: {
-        flex: 1,
         backgroundColor: colors.mainColor,
         width: "100%",
-        height: 170,
-        alignItems: "center",
-        justifyContent: "flex-start",
-        padding: 20,
+        height: 180,
+     
+        justifyContent: "space-between",
+        paddingHorizontal: 20,
+        paddingVertical: 26
     },
     cardButtons: {
-        flex: 1,
         flexDirection: "row",
         width: "100%",
-        justifyContent: "space-around",
+        justifyContent: "space-between",
         alignItems: "center"
     },
     cardTitle: {
         color: "white",
-        fontSize: fontSize.title,
+        fontSize: fontSize.dash,
         justifyContent: "flex-start",
+        fontWeight: "400",
     },
     services: {
         width: "100%",

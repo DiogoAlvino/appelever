@@ -34,7 +34,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    marginVertical: margin.vertical,
   },
   text: {
     color: colors.primaryLight,
