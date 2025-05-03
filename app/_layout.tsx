@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 export default function RootLayout() {
   return (
       <Stack >
-        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false, headerTitle: 'Menu' }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="singUp" options={{ headerShown: false }} />
         <Stack.Screen name="equipmentRegistration" options={{ title: 'Cadastro de Equipamento' }} />
