@@ -7,9 +7,11 @@ import AlertMessage from "~/components/messages/alertMessage";
 import SecondarySection from "~/components/sections/secondarySection";
 import { questions } from "~/data/questions";
 import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
+import { useLocalSearchParams } from "expo-router";
 
 
-export default function NormativeInspection() {
+export default function EquipmentPage() {
+    const { equipmentId } = useLocalSearchParams();
     const [respostas, setRespostas] = useState<{ [id: string]: 'sim' | 'nao' | 'na' | null }>({});
 
     const handleResponder = (id: string, value: 'sim' | 'nao' | 'na') => {

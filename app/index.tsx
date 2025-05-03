@@ -14,7 +14,7 @@ export default function HomePage() {
     }
 
     function goToNormativeInpection(){
-        router.push("/normativeInspection")
+        router.push("/equipments")
     }
 
     function goToInspectionList(){
