@@ -26,3 +26,16 @@ export const equipment = [
         address: "Endereço x"
     },
 ]
+
+export const inspections = [
+    {
+        id: "01",
+        date: "2025-02-01",
+        name: "chave de fenda"
+    },
+    {
+        id: "02",
+        date: "2025-05-13",
+        name: "chave de roda"
+    }
+]

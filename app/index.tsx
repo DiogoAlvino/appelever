@@ -17,6 +17,10 @@ export default function HomePage() {
         router.push("/normativeInspection")
     }
 
+    function goToInspectionList(){
+        router.push("/inspections")
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
             <View style={styles.card}>
@@ -43,7 +47,7 @@ export default function HomePage() {
                     <BlockButton
                         icon={<MaterialCommunityIcons name="format-list-bulleted" size={36} color="#fff" />}
                         label="Lista de inspeções"
-                        onPress={() => console.log('Botão clicado')}
+                        onPress={goToInspectionList}
                     />
                     <BlockButton
                         icon={<MaterialCommunityIcons name="text-box-search-outline" size={36} color="#fff" />}
