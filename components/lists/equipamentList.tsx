@@ -3,6 +3,7 @@ import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import SecondarySection from '../sections/secondarySection';
 import { colors } from '~/theme/colors';
+import { router } from 'expo-router';
 
 interface EquipmentItem {
   id: string;
@@ -17,6 +18,14 @@ interface EquipmentListProps {
 }
 
 export default function EquipmentList({ equipaments, selectedId, onSelect }: EquipmentListProps) {
+  
+  const handleViewEquipment = (equipmentId: string) => {
+    router.push({
+      pathname: '/equipmentForm/[equipmentId]',
+      params: { equipmentId },
+    });
+  };
+  
   return (
     <View style={styles.wrapper}>
       {equipaments.map((equip) => {
@@ -28,6 +37,7 @@ export default function EquipmentList({ equipaments, selectedId, onSelect }: Equ
             key={equip.id}
             icon={null}
             title={equip.name}
+            onPress={() => handleViewEquipment(equip.id)}
             showCheckbox
             checked={isSelected}
             onCheckChange={() => !isDisabled && onSelect(equip.id)}
@@ -46,6 +56,6 @@ const styles = StyleSheet.create({
   wrapper: {
     width: '100%',
     alignItems: 'center',
-    gap: 20,
+    gap: 10,
   },
 });

@@ -13,6 +13,7 @@ export default function Equipments() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const handleCancel = () => setSelectedId(null);
+
   const handleInspect = () => {
     if (selectedId) {
       router.push({
@@ -21,6 +22,7 @@ export default function Equipments() {
       });
     }
   };
+
 
   return (
     <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
