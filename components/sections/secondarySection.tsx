@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     gap: gap.primary,
   },
   title: {
-    fontSize: fontSize.title,
+    fontSize: fontSize.label,
     fontWeight: '500',
     color: colors.mainColor,
     marginBottom: 2,

@@ -77,13 +77,13 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20,
-    paddingHorizontal: 5,
-    paddingTop: 10, 
-    backgroundColor: colors.bgScreen,
+    gap: 10,
+    paddingHorizontal: 10,
+    paddingTop: 10,
   },
   buttons: {
     width:"100%",
-    gap: 10
+    gap: 10,
+    paddingBottom: 26
   }
 });

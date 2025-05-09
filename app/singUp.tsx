@@ -24,7 +24,7 @@ export default function SingUp(){
             <View style={styles.cardInputs}>
                 <PrimaryInput label="Nome" placeholder="Digite seu nome" />
                 <PrimarySelect
-                          label="Tipo de uso"
+                          label="Função"
                           placeholder="Selecione o item"
                           options={['Estudante', 'Técnico']}
                           selected={ocupacao}
@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 20,
         flexDirection: "column",
-        backgroundColor: colors.bgScreen,
     },
     card: {
         width: "100%",
@@ -78,6 +77,7 @@ const styles = StyleSheet.create({
         width:"100%",
         gap: 10,
         paddingTop: 10,
+        paddingBottom: 25
     },
     cardLink: {
         flexDirection: "row",

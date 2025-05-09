@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 20,
         flexDirection: "column",
-        backgroundColor: colors.bgScreen,
     },
     card: {
         width: "100%",

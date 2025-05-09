@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
+import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow } from '~/theme';
 import { useRouter } from 'expo-router';
 
 
@@ -33,7 +33,7 @@ export default function MenuButton() {
     <>
       <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)}>
         <View style={styles.fabInner}>
-          <Feather name="menu" size={24} color="#fff" />
+          <Feather name="menu" size={25} color="#173A64" />
         </View>
       </TouchableOpacity>
 
@@ -63,16 +63,17 @@ export default function MenuButton() {
 
 const styles = StyleSheet.create({
   fab: {
-   flex: 1
+   flex: 1,
   },
   fabInner: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: colors.bgMenu,
+    backgroundColor: colors.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 1,
+  
   },
   modalHeader: {
     flexDirection: 'row',

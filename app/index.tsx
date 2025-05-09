@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { ScrollView, View, StyleSheet, Text } from "react-native";
+import { ScrollView, View, StyleSheet, Text, ImageBackground } from "react-native";
 import BlockButton from "~/components/buttons/blockButton";
 import MenuButton from "~/components/buttons/menuButton";
 import PrimaryChart from "~/components/charts/primaryChart";
@@ -23,14 +23,12 @@ export default function HomePage() {
 
     return (
         <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
-            <View style={styles.card}>
+            <ImageBackground source={require('~/assets/bg-login.png')} style={styles.card}>
                 <View style={styles.cardButtons}>
                     <MenuButton />
-                    <Text>Outro butão aq</Text>
-
                 </View>
                 <Text style={styles.cardTitle}>Olá, usuario!</Text>
-            </View>
+            </ImageBackground>
             <View style={styles.services}>
                 <Text style={styles.servicesTitle}>Serviços</Text>
                 <View style={styles.servicesButtons}>
@@ -71,29 +69,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 20,
         flexDirection: "column",
-        backgroundColor: colors.bgScreen,
-        height: "100%",
     },
     card: {
         backgroundColor: colors.mainColor,
         width: "100%",
-        height: 180,
-     
-        justifyContent: "space-between",
-        paddingHorizontal: 20,
-        paddingVertical: 26
+        height: 250,
+        justifyContent: "space-around",
     },
     cardButtons: {
         flexDirection: "row",
         width: "100%",
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
+        paddingVertical: 20,
+        paddingHorizontal: 20
     },
     cardTitle: {
         color: "white",
         fontSize: fontSize.dash,
         justifyContent: "flex-start",
         fontWeight: "400",
+        paddingHorizontal: 20,
     },
     services: {
         width: "100%",

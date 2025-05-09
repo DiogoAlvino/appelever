@@ -3,9 +3,9 @@ import { useLocalSearchParams } from "expo-router";
 import { ScrollView, StyleSheet, View, Text } from "react-native";
 import SecondarySection from "~/components/sections/secondarySection";
 import { colors, fontSize } from '~/theme';
-import { equipment as equipmentList } from '~/data/questions'; // ajuste o caminho
+import { equipment as equipmentList } from '~/data/questions';
 
-export default function equipamentForm() {
+export default function EquipmentForm() {
     const { equipmentId } = useLocalSearchParams();
     const selectedEquipment = equipmentList.find(eq => eq.id === equipmentId);
 
@@ -40,7 +40,7 @@ export default function equipamentForm() {
             </SecondarySection>
 
             <SecondarySection
-                icon={<Feather name="tool" size={20} color="#173A64" />}
+                icon={<Feather name="tag" size={20} color="#173A64" />}
                 title="Dados do equipamento"
                 showChevron={false}
             >
@@ -96,12 +96,11 @@ export default function equipamentForm() {
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
-        paddingHorizontal: 5,
+        paddingHorizontal: 10,
         flexDirection: "column",
         gap: 10,
-        backgroundColor: colors.bgScreen,
-        height: "100%",
         paddingVertical: 5,
+        paddingBottom: 25   
     },
     text: {
         fontSize: fontSize.placeholder,

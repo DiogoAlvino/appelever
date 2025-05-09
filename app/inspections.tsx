@@ -21,10 +21,9 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20,
-    paddingHorizontal: 5,
+    gap: 10,
+    paddingHorizontal: 10,
     paddingTop: 10,
-    backgroundColor: colors.bgScreen,
   },
   buttons: {
     width: '100%',

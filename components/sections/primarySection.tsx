@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     elevation: shadow.elevation,
   },
   title: {
-    fontSize: fontSize.title,
+    fontSize: fontSize.label,
     fontWeight: '500',
     color: colors.mainColor,
     marginBottom: margin.sectionBottom,
