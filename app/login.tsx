@@ -1,13 +1,26 @@
 import { Link, router } from "expo-router";
+import { createUserWithEmailAndPassword, User } from "firebase/auth";
+import { useState } from "react";
 import { ScrollView, Text, View, StyleSheet, ImageBackground } from "react-native";
 import MainButton from "~/components/buttons/mainButton";
 import PrimaryInput from "~/components/inputs/primaryInput";
-import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
+import { colors, fontSize } from '~/theme';
+import { auth } from "~/utils/firebase";
 
-export default function Login(){
+export default function Login() {
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
 
-    function goToHomepage(){
-            router.push("/")
+    const handleLogin = () => {
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                console.log(user);
+                router.push("/");
+            })
+            .catch((error) => {
+                console.log(error.message);
+            });
     }
 
     return (
@@ -19,15 +32,28 @@ export default function Login(){
                 </View>
             </ImageBackground>
             <View style={styles.cardInputs}>
-                <PrimaryInput label="Email" placeholder="Digite seu email" />
-                <PrimaryInput label="Senha" placeholder="Digite sua senha" />
+                <PrimaryInput
+                    label="Email"
+                    placeholder="Digite seu email"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                />
+                <PrimaryInput
+                    label="Senha"
+                    placeholder="Digite sua senha"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                />
                 <View style={styles.cardLink}>
                     <Text>Não possui uma conta?</Text>
-                    <Link href="/singUp" style={styles.linkText}>Cadastra-se aqui!</Link>
+                    <Link href="/signUp" style={styles.linkText}>Cadastra-se aqui!</Link>
                 </View>
-            <View style={styles.buttons}>
-                    <MainButton title="Acessar" type="primary" onPress={goToHomepage}/>
-                  </View>
+                <View style={styles.buttons}>
+                    <MainButton title="Acessar" type="primary" onPress={handleLogin} />
+                </View>
             </View>
         </ScrollView>
     )
@@ -42,19 +68,17 @@ const styles = StyleSheet.create({
     card: {
         width: "100%",
         height: 370,
-        justifyContent:"flex-end",
-        alignItems:"flex-end",
+        justifyContent: "flex-end",
+        alignItems: "flex-end",
         paddingVertical: 26,
     },
     cardTexts: {
         paddingHorizontal: 20,
-
     },
     cardText: {
         fontSize: fontSize.title,
         color: colors.primaryLight,
         fontWeight: "500"
-
     },
     cardInputs: {
         width: "100%",
@@ -63,7 +87,7 @@ const styles = StyleSheet.create({
         paddingTop: 26,
     },
     buttons: {
-        width:"100%",
+        width: "100%",
         gap: 10
     },
     cardLink: {
@@ -76,6 +100,5 @@ const styles = StyleSheet.create({
         color: colors.bgLink,
         textDecorationLine: 'underline',
         fontWeight: '500',
-      },
-
+    },
 });
