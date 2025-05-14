@@ -6,7 +6,7 @@ import PrimaryInput from "~/components/inputs/primaryInput";
 import PrimarySelect from "~/components/inputs/primarySelect";
 import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
 
-export default function SingUp(){
+export default function SignUp(){
     const [ocupacao, setOcupacao] = useState<string | undefined>(undefined);
     
     function goToLogin(){
