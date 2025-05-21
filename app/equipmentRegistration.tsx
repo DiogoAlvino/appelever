@@ -1,120 +1,78 @@
-import { useState } from 'react';
 import { ScrollView, StyleSheet, View, Alert } from 'react-native';
-import { addDoc, collection } from 'firebase/firestore';
+import { saveEquipment } from '~/services/equipmentService';
 
 import MainButton from '~/components/buttons/mainButton';
 import PrimaryInput from '~/components/inputs/primaryInput';
 import PrimarySelect from '~/components/inputs/primarySelect';
 import PrimarySection from '~/components/sections/primarySection';
-import { colors } from '~/theme';
-import { auth, db } from '~/utils/firebase';
+
+import { useEquipmentForm } from '~/hooks/useEquipmentForm';
 
 export default function EquipmentRegistration() {
-  // Estados dos campos
-  const [edificacao, setEdificacao] = useState('');
-  const [endereco, setEndereco] = useState('');
+  const {
+    local,
+    setLocal,
+    responsavel,
+    setResponsavel,
+    detalhesEquipamento,
+    setDetalhesEquipamento,
+    empresaConservadora,
+    setEmpresaConservadora,
+    getFormData,
+    resetForm,
+  } = useEquipmentForm();
 
-  const [responsavel, setResponsavel] = useState('');
-  const [funcao, setFuncao] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [email, setEmail] = useState('');
-
-  const [dataInstalacao, setDataInstalacao] = useState('');
-  const [identificacaoEquipamento, setIdentificacaoEquipamento] = useState('');
-  const [fabricante, setFabricante] = useState('');
-  const [cnpjEquipamento, setCnpjEquipamento] = useState('');
-  const [modelo, setModelo] = useState('');
-  const [capacidade, setCapacidade] = useState('');
-  const [lotacao, setLotacao] = useState('');
-  const [velocidade, setVelocidade] = useState('');
-  const [tipoDeUso, setTipoDeUso] = useState('');
-  const [casaDeMaquinas, setCasaDeMaquinas] = useState('');
-  const [numeroParadas, setNumeroParadas] = useState('');
-
-  const [empresaConservadora, setEmpresaConservadora] = useState('');
-  const [cnpjEmpresa, setCnpjEmpresa] = useState('');
-
-  const handleAddEquipamento = async () => {
+  const handleSave = async () => {
     try {
-      await addDoc(collection(db, 'equipamentos'), {
-        dataCriacao: new Date(),
-        usuario: auth.currentUser,
-        responsavel: {
-          nome: responsavel,
-          funcao,
-          telefone,
-          email,
-        },
-        local: {
-          edificacao,
-          cep: '',
-          cidade: '',
-          estado: '',
-          logradouro: endereco,
-          numero: '',
-          complemento: '',
-        },
-        detalhes_equipamento: {
-          dataInstalacao,
-          identificacaoEquipamento,
-          fabricante,
-          cnpj: cnpjEquipamento,
-          modelo,
-          capacidadeNominal: parseFloat(capacidade) || 0,
-          tipoDeUso,
-          numeroDeParadas: parseInt(numeroParadas) || 0,
-          casaDeMaquinas: casaDeMaquinas === 'Existente',
-        },
-        empresa_conservadora: {
-          razaoSocial: empresaConservadora,
-          cnpj: cnpjEmpresa,
-        },
-        uploads: [],
-      });
-
-      Alert.alert("Sucesso", "Equipamento cadastrado com sucesso.");
+      await saveEquipment(getFormData());
+      Alert.alert('Sucesso', 'Equipamento cadastrado com sucesso.');
+      resetForm();
     } catch (error) {
       console.error(error);
-      Alert.alert("Erro", "Não foi possível cadastrar o equipamento.");
+      Alert.alert('Erro', 'Não foi possível cadastrar o equipamento.');
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+    <ScrollView contentContainerStyle={styles.container}>
       <PrimarySection title="Local de Instalação">
-        <PrimaryInput label="Edificação" placeholder="Informe" value={edificacao} onChangeText={setEdificacao} />
-        <PrimaryInput label="Endereço" placeholder="Informe" value={endereco} onChangeText={setEndereco} />
+        <PrimaryInput label="Edificação" value={local.edificacao} onChangeText={(text) => setLocal({ ...local, edificacao: text })} placeholder="Informe" />
+        <PrimaryInput label="CEP" value={local.cep} onChangeText={(text) => setLocal({ ...local, cep: text })} placeholder="Informe" />
+        <PrimaryInput label="Logradouro" value={local.logradouro} onChangeText={(text) => setLocal({ ...local, logradouro: text })} placeholder="Informe" />
+        <PrimaryInput label="Número" value={local.numero} onChangeText={(text) => setLocal({ ...local, numero: text })} placeholder="Informe" />
+        <PrimaryInput label="Complemento" value={local.complemento} onChangeText={(text) => setLocal({ ...local, complemento: text })} placeholder="Informe" />
+        <PrimaryInput label="Bairro" value={local.bairro} onChangeText={(text) => setLocal({ ...local, bairro: text })} placeholder="Informe" />
+        <PrimaryInput label="Cidade" value={local.cidade} onChangeText={(text) => setLocal({ ...local, cidade: text })} placeholder="Informe" />
+        <PrimaryInput label="Estado" value={local.estado} onChangeText={(text) => setLocal({ ...local, estado: text })} placeholder="Informe" />
       </PrimarySection>
 
       <PrimarySection title="Responsável Técnico">
-        <PrimaryInput label="Responsável" placeholder="Informe" value={responsavel} onChangeText={setResponsavel} />
-        <PrimaryInput label="Função" placeholder="Informe" value={funcao} onChangeText={setFuncao} />
-        <PrimaryInput label="Telefone" placeholder="Informe" value={telefone} onChangeText={setTelefone} />
-        <PrimaryInput label="E-mail" placeholder="Informe" value={email} onChangeText={setEmail} />
+        <PrimaryInput label="Responsável" value={responsavel.nome} onChangeText={(text) => setResponsavel({ ...responsavel, nome: text })} placeholder="Informe" />
+        <PrimaryInput label="Função" value={responsavel.funcao} onChangeText={(text) => setResponsavel({ ...responsavel, funcao: text })} placeholder="Informe" />
+        <PrimaryInput label="Telefone" value={responsavel.telefone} onChangeText={(text) => setResponsavel({ ...responsavel, telefone: text })} placeholder="Informe" />
+        <PrimaryInput label="E-mail" value={responsavel.email} onChangeText={(text) => setResponsavel({ ...responsavel, email: text })} placeholder="Informe" />
       </PrimarySection>
 
       <PrimarySection title="Dados do Equipamento">
-        <PrimaryInput label="Data da Instalação" placeholder="Informe" value={dataInstalacao} onChangeText={setDataInstalacao} />
-        <PrimaryInput label="Identificação do Equipamento" placeholder="Informe" value={identificacaoEquipamento} onChangeText={setIdentificacaoEquipamento} />
-        <PrimaryInput label="Fabricante" placeholder="Informe" value={fabricante} onChangeText={setFabricante} />
-        <PrimaryInput label="CNPJ" placeholder="Informe" value={cnpjEquipamento} onChangeText={setCnpjEquipamento} />
-        <PrimarySelect label="Modelo" placeholder="Selecione" options={['Modelo A', 'Modelo B', 'Modelo C']} selected={modelo} onSelect={setModelo} />
-        <PrimaryInput label="Capacidade Nominal (kg)" placeholder="Informe" value={capacidade} onChangeText={setCapacidade} />
-        <PrimaryInput label="Lotação" placeholder="Informe" value={lotacao} onChangeText={setLotacao} />
-        <PrimaryInput label="Velocidade nominal (m/s)" placeholder="Informe" value={velocidade} onChangeText={setVelocidade} />
-        <PrimarySelect label="Tipo de uso" placeholder="Selecione" options={['Residencial', 'Comercial', 'Público']} selected={tipoDeUso} onSelect={setTipoDeUso} />
-        <PrimaryInput label="Número de paradas" placeholder="Informe" value={numeroParadas} onChangeText={setNumeroParadas} />
-        <PrimarySelect label="Casa de Máquinas" placeholder="Selecione" options={['Existente', 'Não Existente']} selected={casaDeMaquinas} onSelect={setCasaDeMaquinas} />
+        <PrimaryInput label="Data da Instalação" value={detalhesEquipamento.dataInstalacao.toISOString().split('T')[0]} onChangeText={(text) => setDetalhesEquipamento({ ...detalhesEquipamento, dataInstalacao: new Date(text) })} placeholder="Informe" />
+        <PrimaryInput label="Identificação" value={detalhesEquipamento.identificacaoEquipamento} onChangeText={(text) => setDetalhesEquipamento({ ...detalhesEquipamento, identificacaoEquipamento: text })} placeholder="Informe" />
+        <PrimaryInput label="Fabricante" value={detalhesEquipamento.fabricante} onChangeText={(text) => setDetalhesEquipamento({ ...detalhesEquipamento, fabricante: text })} placeholder="Informe" />
+        <PrimaryInput label="CNPJ" value={detalhesEquipamento.cnpj} onChangeText={(text) => setDetalhesEquipamento({ ...detalhesEquipamento, cnpj: text })} placeholder="Informe" />
+        <PrimarySelect label="Modelo" selected={detalhesEquipamento.modelo} onSelect={(value) => setDetalhesEquipamento({ ...detalhesEquipamento, modelo: value })} placeholder="Selecione" options={['Modelo A', 'Modelo B', 'Modelo C']} />
+        <PrimaryInput label="Capacidade Nominal" value={String(detalhesEquipamento.capacidadeNominal)} onChangeText={(text) => setDetalhesEquipamento({ ...detalhesEquipamento, capacidadeNominal: parseFloat(text) || 0 })} placeholder="Informe" />
+        <PrimarySelect label="Tipo de uso" selected={detalhesEquipamento.tipoDeUso} onSelect={(value) => setDetalhesEquipamento({ ...detalhesEquipamento, tipoDeUso: value })} placeholder="Selecione" options={['Residencial', 'Comercial', 'Público']} />
+        <PrimaryInput label="Número de paradas" value={String(detalhesEquipamento.numeroDeParadas)} onChangeText={(text) => setDetalhesEquipamento({ ...detalhesEquipamento, numeroDeParadas: parseInt(text) || 0 })} placeholder="Informe" />
+        <PrimarySelect label="Casa de Máquinas" selected={detalhesEquipamento.casaDeMaquinas ? 'Existente' : 'Não Existente'} onSelect={(value) => setDetalhesEquipamento({ ...detalhesEquipamento, casaDeMaquinas: value === 'Existente' })} placeholder="Selecione" options={['Existente', 'Não Existente']} />
       </PrimarySection>
 
       <PrimarySection title="Empresa Conservadora">
-        <PrimaryInput label="Empresa Conservadora" placeholder="Informe" value={empresaConservadora} onChangeText={setEmpresaConservadora} />
-        <PrimaryInput label="CNPJ" placeholder="Informe" value={cnpjEmpresa} onChangeText={setCnpjEmpresa} />
+        <PrimaryInput label="Empresa Conservadora" value={empresaConservadora.razaoSocial} onChangeText={(text) => setEmpresaConservadora({ ...empresaConservadora, razaoSocial: text })} placeholder="Informe" />
+        <PrimaryInput label="CNPJ" value={empresaConservadora.cnpj} onChangeText={(text) => setEmpresaConservadora({ ...empresaConservadora, cnpj: text })} placeholder="Informe" />
       </PrimarySection>
 
       <View style={styles.buttons}>
-        <MainButton title="Cadastrar" type="primary" onPress={handleAddEquipamento} />
-        <MainButton title="Cancelar" type="secondary" />
+        <MainButton title="Cadastrar" type="primary" onPress={handleSave} />
+        <MainButton title="Cancelar" type="secondary" onPress={resetForm} />
       </View>
     </ScrollView>
   );
@@ -129,8 +87,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   buttons: {
-    width: "100%",
+    width: '100%',
     gap: 10,
-    paddingBottom: 26
-  }
+    paddingBottom: 26,
+  },
 });
