@@ -1,14 +1,14 @@
-// Equipments.tsx
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 
 import MainButton from '~/components/buttons/mainButton';
 import SearchInput from '~/components/inputs/searchInput';
 import EquipmentList from '~/components/lists/equipamentList';
-import { equipment } from '~/data/questions';
+import { useEquipments } from '~/hooks/useEquipments';
 
 export default function Equipments() {
+  const { equipments, loading, reload } = useEquipments();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const handleCancel = () => setSelectedId(null);
@@ -22,16 +22,23 @@ export default function Equipments() {
     }
   };
 
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', flex: 1 }]}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
-      <SearchInput onSearch={() => { }} />
+      <SearchInput onSearch={reload} />
       <View style={styles.bar}>
         <Text>Filtro</Text>
-        <Text>Total: 1</Text>
+        <Text>Total: {equipments.length}</Text>
       </View>
       <EquipmentList
-        equipaments={equipment}
+        equipaments={equipments}
         selectedId={selectedId}
         onSelect={(id) => setSelectedId((prev) => (prev === id ? null : id))}
       />
@@ -61,7 +68,6 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: "100%",
-
-  }
+    width: '100%',
+  },
 });
