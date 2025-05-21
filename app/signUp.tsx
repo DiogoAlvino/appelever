@@ -1,6 +1,7 @@
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, Text, View, StyleSheet, ImageBackground } from "react-native";
+import { Button } from "~/components/Button";
 import MainButton from "~/components/buttons/mainButton";
 import PrimaryInput from "~/components/inputs/primaryInput";
 import PrimarySelect from "~/components/inputs/primarySelect";
@@ -22,14 +23,13 @@ export default function SignUp(){
                 </View>
             </ImageBackground>
             <View style={styles.cardInputs}>
+                <Button
+                    title="Cadastrar com o Google"
+                    accessibilityLabel="Learn more about this purple button"
+                />
+
+                <Text> Ou crie uma conta conosco abaixo </Text>
                 <PrimaryInput label="Nome" placeholder="Digite seu nome" />
-                <PrimarySelect
-                          label="Função"
-                          placeholder="Selecione o item"
-                          options={['Estudante', 'Técnico']}
-                          selected={ocupacao}
-                          onSelect={(value) => setOcupacao(value)}
-                        />
                 <PrimaryInput label="Email" placeholder="Digite seu email" />
                 <PrimaryInput label="Senha" placeholder="Digite sua senha" />
                 <PrimaryInput label="Confirme sua senha" placeholder="Confirme sua senha" />
