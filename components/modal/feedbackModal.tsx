@@ -4,9 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 
 interface FeedbackModalProps {
   visible: boolean;
-  type: 'loading' | 'success' | 'error' | 'info';
+  type: 'loading' | 'success' | 'error' | 'info' | 'confirm';
   message?: string;
   onClose?: () => void;
+  onConfirm?: () => void;
   showCloseButton?: boolean;
 }
 
@@ -15,6 +16,7 @@ export default function FeedbackModal({
   type,
   message,
   onClose,
+  onConfirm,
   showCloseButton = true,
 }: FeedbackModalProps) {
   const getIcon = () => {
@@ -25,6 +27,8 @@ export default function FeedbackModal({
         return <Ionicons name="close-circle" size={60} color="red" />;
       case 'info':
         return <Ionicons name="information-circle" size={60} color="#007bff" />;
+      case 'confirm':
+        return <Ionicons name="help-circle" size={60} color="#173A64" />;
       default:
         return <ActivityIndicator size="large" color="#173A64" />;
     }
@@ -37,10 +41,28 @@ export default function FeedbackModal({
           {getIcon()}
           {message && <Text style={styles.message}>{message}</Text>}
 
-          {type !== 'loading' && showCloseButton && (
-            <TouchableOpacity style={styles.button} onPress={onClose}>
-              <Text style={styles.buttonText}>Fechar</Text>
-            </TouchableOpacity>
+          {type === 'confirm' ? (
+            <View style={styles.buttonsRow}>
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: 'red' }]}
+                onPress={onConfirm}
+              >
+                <Text style={styles.buttonText}>Sim</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={onClose}
+              >
+                <Text style={styles.buttonText}>Não</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            type !== 'loading' &&
+            showCloseButton && (
+              <TouchableOpacity style={styles.button} onPress={onClose}>
+                <Text style={styles.buttonText}>Fechar</Text>
+              </TouchableOpacity>
+            )
           )}
         </View>
       </View>
@@ -68,8 +90,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
   },
-  button: {
+  buttonsRow: {
+    flexDirection: 'row',
+    gap: 10,
     marginTop: 10,
+  },
+  button: {
     backgroundColor: '#173A64',
     paddingHorizontal: 20,
     paddingVertical: 8,
