@@ -9,6 +9,7 @@ import PrimarySection from '~/components/sections/primarySection';
 import { useEquipmentForm } from '~/hooks/useEquipmentForm';
 import { useState } from 'react';
 import FeedbackModal from '~/components/modal/feedbackModal';
+import { router } from 'expo-router';
 
 export default function EquipmentRegistration() {
   const {
@@ -46,10 +47,17 @@ export default function EquipmentRegistration() {
     setFeedbackVisible(true);
 
     try {
-      await saveEquipment(getFormData());
+      const docRef = await saveEquipment(getFormData());
 
       setFeedbackType('success');
       setFeedbackMessage('Equipamento cadastrado com sucesso!');
+
+      setTimeout(() => {
+        setFeedbackVisible(false);
+        resetForm();
+        router.push(`/equipmentForm/${docRef.id}`);
+      }, 1000);
+
       resetForm();
     } catch (error) {
       console.error(error);
