@@ -7,6 +7,8 @@ import PrimarySelect from '~/components/inputs/primarySelect';
 import PrimarySection from '~/components/sections/primarySection';
 
 import { useEquipmentForm } from '~/hooks/useEquipmentForm';
+import { useState } from 'react';
+import FeedbackModal from '~/components/modal/feedbackModal';
 
 export default function EquipmentRegistration() {
   const {
@@ -25,21 +27,34 @@ export default function EquipmentRegistration() {
     errors,
   } = useEquipmentForm();
 
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<'loading' | 'success' | 'error'>('loading');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+
   const handleSave = async () => {
     const { valid } = validateForm();
 
     if (!valid) {
-      Alert.alert('Atenção', 'Preencha corretamente os campos destacados');
+      setFeedbackType('error');
+      setFeedbackMessage('Preencha corretamente os campos destacados');
+      setFeedbackVisible(true);
       return;
     }
 
+    setFeedbackType('loading');
+    setFeedbackMessage('Salvando equipamento...');
+    setFeedbackVisible(true);
+
     try {
       await saveEquipment(getFormData());
-      Alert.alert('Sucesso', 'Equipamento cadastrado com sucesso.');
+
+      setFeedbackType('success');
+      setFeedbackMessage('Equipamento cadastrado com sucesso!');
       resetForm();
     } catch (error) {
       console.error(error);
-      Alert.alert('Erro', 'Não foi possível cadastrar o equipamento.');
+      setFeedbackType('error');
+      setFeedbackMessage('Não foi possível cadastrar o equipamento.');
     }
   };
 
@@ -84,6 +99,14 @@ export default function EquipmentRegistration() {
         <MainButton title="Cadastrar" type="primary" onPress={handleSave} />
         <MainButton title="Cancelar" type="secondary" onPress={resetForm} />
       </View>
+
+      <FeedbackModal
+        visible={feedbackVisible}
+        type={feedbackType}
+        message={feedbackMessage}
+        onClose={() => setFeedbackVisible(false)}
+      />
+
     </ScrollView>
   );
 }
