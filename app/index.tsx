@@ -5,6 +5,7 @@ import BlockButton from "~/components/buttons/blockButton";
 import MenuButton from "~/components/buttons/menuButton";
 import PrimaryChart from "~/components/charts/primaryChart";
 import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
+import { auth } from "~/utils/firebase";
 
 
 export default function HomePage() {
@@ -27,7 +28,7 @@ export default function HomePage() {
                 <View style={styles.cardButtons}>
                     <MenuButton />
                 </View>
-                <Text style={styles.cardTitle}>Olá, usuario!</Text>
+                <Text style={styles.cardTitle}>Olá, {auth.currentUser?.displayName || 'usuário'}!</Text>
             </ImageBackground>
             <View style={styles.services}>
                 <Text style={styles.servicesTitle}>Serviços</Text>

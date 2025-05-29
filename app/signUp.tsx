@@ -1,47 +1,61 @@
-import { Link, router } from "expo-router";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { router } from "expo-router";
 import { useState } from "react";
-import { ScrollView, Text, View, StyleSheet, ImageBackground } from "react-native";
-import { Button } from "~/components/Button";
+import { ScrollView, Text, View, StyleSheet, ImageBackground, Alert } from "react-native";
 import MainButton from "~/components/buttons/mainButton";
 import PrimaryInput from "~/components/inputs/primaryInput";
-import PrimarySelect from "~/components/inputs/primarySelect";
-import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
+import { colors, fontSize } from '~/theme';
+import { auth } from "~/utils/firebase";
 
-export default function SignUp(){
-    const [ocupacao, setOcupacao] = useState<string | undefined>(undefined);
-    
-    function goToLogin(){
-            router.push("/login")
-    }
+export default function SignUp() {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
+    const handleSignUp = () => {
+        if (password !== confirmPassword) {
+            Alert.alert("Erro", "As senhas não coincidem.");
+            return;
+        }
+
+        createUserWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+            const user = userCredential.user;
+
+            await updateProfile(user, {
+                displayName: name
+            });
+
+            router.push("/");
+        })
+        .catch(error => {
+            console.error("Erro ao criar usuário:", error.message);
+            Alert.alert("Erro", error.message);
+        });
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
             <ImageBackground source={require('~/assets/bg-login.png')} style={styles.card} resizeMode="cover">
                 <View style={styles.cardTexts}>
-                    <Text style={styles.cardText}>Faça seu cadsatro</Text>
+                    <Text style={styles.cardText}>Faça seu cadastro</Text>
                 </View>
             </ImageBackground>
             <View style={styles.cardInputs}>
-                <Button
-                    title="Cadastrar com o Google"
-                    accessibilityLabel="Learn more about this purple button"
-                />
+                <Text>Ou crie uma conta conosco abaixo</Text>
+                <PrimaryInput label="Nome" placeholder="Digite seu nome" value={name} onChangeText={setName} />
+                <PrimaryInput label="Email" placeholder="Digite seu email" value={email} onChangeText={setEmail} />
+                <PrimaryInput label="Senha" placeholder="Digite sua senha" value={password} onChangeText={setPassword} />
+                <PrimaryInput label="Confirme sua senha" placeholder="Confirme sua senha" value={confirmPassword} onChangeText={setConfirmPassword} />
 
-                <Text> Ou crie uma conta conosco abaixo </Text>
-                <PrimaryInput label="Nome" placeholder="Digite seu nome" />
-                <PrimaryInput label="Email" placeholder="Digite seu email" />
-                <PrimaryInput label="Senha" placeholder="Digite sua senha" />
-                <PrimaryInput label="Confirme sua senha" placeholder="Confirme sua senha" />
-
-    
-            <View style={styles.buttons}>
-                <MainButton title="Cadastrar" type="primary" onPress={goToLogin}/>
-                <MainButton title="Cancelar" type="secondary" />
-            </View>
+                <View style={styles.buttons}>
+                    <MainButton title="Cadastrar" type="primary" onPress={handleSignUp} />
+                    <MainButton title="Cancelar" type="secondary" onPress={() => router.push("/login")} />
+                </View>
             </View>
         </ScrollView>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -53,19 +67,17 @@ const styles = StyleSheet.create({
     card: {
         width: "100%",
         height: 170,
-        justifyContent:"flex-end",
-        alignItems:"flex-end",
+        justifyContent: "flex-end",
+        alignItems: "flex-end",
         paddingVertical: 26,
     },
     cardTexts: {
         paddingHorizontal: 20,
-
     },
     cardText: {
         fontSize: fontSize.title,
         color: colors.primaryLight,
         fontWeight: "500"
-
     },
     cardInputs: {
         width: "100%",
@@ -74,21 +86,9 @@ const styles = StyleSheet.create({
         paddingTop: 26,
     },
     buttons: {
-        width:"100%",
+        width: "100%",
         gap: 10,
         paddingTop: 10,
         paddingBottom: 25
     },
-    cardLink: {
-        flexDirection: "row",
-        gap: 5,
-        justifyContent: "center",
-        paddingBottom: 15
-    },
-    linkText: {
-        color: colors.bgLink,
-        textDecorationLine: 'underline',
-        fontWeight: '500',
-      },
-
 });
