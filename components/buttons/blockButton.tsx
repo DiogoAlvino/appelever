@@ -24,13 +24,13 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     marginVertical: margin.vertical,
-    width: 80,
+    width: 72,
   },
   iconContainer: {
     backgroundColor: colors.mainColor,
     borderRadius: border.radius,
-    height: 80,
-    width: 80,
+    height: 72,
+    width: 72,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: colors.primaryDark,

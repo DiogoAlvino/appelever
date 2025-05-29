@@ -43,11 +43,10 @@ export default function SignUp() {
                 </View>
             </ImageBackground>
             <View style={styles.cardInputs}>
-                <Text>Ou crie uma conta conosco abaixo</Text>
                 <PrimaryInput label="Nome" placeholder="Digite seu nome" value={name} onChangeText={setName} />
                 <PrimaryInput label="Email" placeholder="Digite seu email" value={email} onChangeText={setEmail} />
-                <PrimaryInput label="Senha" placeholder="Digite sua senha" value={password} onChangeText={setPassword} />
-                <PrimaryInput label="Confirme sua senha" placeholder="Confirme sua senha" value={confirmPassword} onChangeText={setConfirmPassword} />
+                <PrimaryInput label="Senha" placeholder="Digite sua senha" type="password" value={password} onChangeText={setPassword} />
+                <PrimaryInput label="Confirme sua senha" placeholder="Confirme sua senha" type="password" value={confirmPassword} onChangeText={setConfirmPassword} />
 
                 <View style={styles.buttons}>
                     <MainButton title="Cadastrar" type="primary" onPress={handleSignUp} />

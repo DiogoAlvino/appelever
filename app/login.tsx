@@ -41,6 +41,7 @@ export default function Login() {
                 <PrimaryInput
                     label="Senha"
                     placeholder="Digite sua senha"
+                    type="password"
                     value={password}
                     onChangeText={setPassword}
                 />

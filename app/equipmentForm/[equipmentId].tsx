@@ -191,15 +191,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: '#ccc',
     backgroundColor: '#fff',
+    shadowColor: 'gray',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 10,
   },
 
   menuButton: {
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 10
   },
 
   menuText: {

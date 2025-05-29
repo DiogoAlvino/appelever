@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modal: {
-    width: 280,
+    width: 350,
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 24,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#173A64',
     paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingVertical: 13,
     borderRadius: 8,
   },
   buttonText: {

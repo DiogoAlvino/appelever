@@ -1,13 +1,44 @@
-// app/_layout.tsx  ou app/layout.tsx
-import { Stack } from 'expo-router';
-import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { Stack, router, usePathname } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet, ActivityIndicator, View } from 'react-native';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '~/utils/firebase';
 
 export default function RootLayout() {
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Usuário logado
+        if (pathname === "/login" || pathname === "/signUp") {
+          router.replace("/");
+        }
+      } else {
+        // Não logado
+        if (pathname !== "/login" && pathname !== "/signUp") {
+          router.replace("/login");
+        }
+      }
+      setCheckingAuth(false);
+    });
+
+    return unsubscribe;
+  }, [pathname]);
+
+  if (checkingAuth) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
       <Stack
         screenOptions={{

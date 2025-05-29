@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList } from 'react
 import { Feather } from '@expo/vector-icons';
 import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow } from '~/theme';
 import { useRouter } from 'expo-router';
+import { signOut } from "firebase/auth";
+import { auth } from "~/utils/firebase";
+
 
 
 const options = [
@@ -15,19 +18,27 @@ export default function MenuButton() {
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
 
-  const handleOptionPress = (option: string) => {
-    if (option === 'Conta'){
+  const handleOptionPress = async (option: string) => {
+    if (option === 'Conta') {
       console.log('Abrir modal de conta');
-    };
-    if (option === 'Configurações'){
+    }
+  
+    if (option === 'Configurações') {
       console.log('Abrir modal ou pagina');
-    };
-    if (option === 'Sair da conta'){
-      router.replace('/login');
-    };
-
+    }
+  
+    if (option === 'Sair da conta') {
+      try {
+        await signOut(auth); // encerra a sessão
+        router.replace('/login'); // redireciona para login
+      } catch (error) {
+        console.error("Erro ao sair da conta:", error);
+      }
+    }
+  
     setModalVisible(false);
   };
+  
 
   return (
     <>

@@ -31,17 +31,19 @@ export default function Equipments() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
-      <SearchInput onSearch={reload} />
-      <View style={styles.bar}>
-        <Text>Filtro</Text>
-        <Text>Total: {equipments.length}</Text>
-      </View>
-      <EquipmentList
-        equipaments={equipments}
-        selectedId={selectedId}
-        onSelect={(id) => setSelectedId((prev) => (prev === id ? null : id))}
-      />
+    <View style={styles.page}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <SearchInput onSearch={reload} />
+        <View style={styles.bar}>
+          <Text>Filtro</Text>
+          <Text>Total: {equipments.length}</Text>
+        </View>
+        <EquipmentList
+          equipaments={equipments}
+          selectedId={selectedId}
+          onSelect={(id) => setSelectedId((prev) => (prev === id ? null : id))}
+        />
+      </ScrollView>
 
       {selectedId && (
         <View style={styles.buttonGroup}>
@@ -49,25 +51,33 @@ export default function Equipments() {
           <MainButton title="Cancelar" onPress={handleCancel} type="secondary" />
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    position: 'relative',
+  },
   container: {
     alignItems: 'center',
     gap: 15,
     paddingHorizontal: 10,
     paddingTop: 10,
-  },
-  buttonGroup: {
-    marginTop: 20,
-    width: '100%',
-    gap: 10,
+    paddingBottom: 100, // espaço para não esconder conteúdo atrás do botão
   },
   bar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+  },
+  buttonGroup: {
+    width: "100%",
+    position: 'absolute',
+    padding: 10,
+    bottom: 1,
+    gap: 10,
+    backgroundColor: 'white',
   },
 });
