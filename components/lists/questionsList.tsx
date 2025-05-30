@@ -1,24 +1,96 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import PrimaryQuestion from '../questions/primaryQuestion';
+import PrimaryHelper from '../helpers/primaryHelper';
+import { Feather } from '@expo/vector-icons';
 
-interface questionsListProps {
-    questoes: { id: string; description: string }[];
-    respostas: { [id: string]: 'sim' | 'nao' | 'na' | null };
-    onResponder: (id: string, value: 'sim' | 'nao' | 'na') => void;
+interface QuestionsListProps {
+  questoes: {
+    id: string;
+    verification: string;
+    priority: string;
+    risk: string;
+    mitigation: string;
+  }[];
+  respostas: { [id: string]: 'sim' | 'nao' | 'na' | null };
+  onResponder: (id: string, value: 'sim' | 'nao' | 'na' | null) => void;
 }
 
-export default function questionsList({ questoes, respostas, onResponder }: questionsListProps) {
-    return (
-        <>
-            {questoes.map((q) => (
-                <PrimaryQuestion
-                    key={q.id}
-                    title={`Item ${q.id}`}
-                    description={q.description}
-                    selectedOption={respostas[q.id] || null}
-                    onSelect={(value) => onResponder(q.id, value)}
-                />
-            ))}
-        </>
-    );
+const getPriorityColor = (priority: string) => {
+  switch (priority.toLowerCase()) {
+    case 'alto':
+      return '#FF4D4F';
+    case 'medio':
+    case 'médio':
+      return '#FAAD14';
+    case 'baixo':
+      return '#52C41A';
+    default:
+      return '#D9D9D9';
+  }
+};
+
+export default function QuestionsList({ questoes, respostas, onResponder }: QuestionsListProps) {
+  const [helperVisible, setHelperVisible] = useState(false);
+  const [helperContent, setHelperContent] = useState({ title: '', description: '' });
+
+  const abrirHelper = (risk: string, mitigation: string) => {
+    setHelperContent({
+      title: 'Risco e Mitigação',
+      description: `Risco: ${risk}\nMitigação: ${mitigation}`,
+    });
+    setHelperVisible(true);
+  };
+
+  return (
+    <>
+      {questoes.map((q) => {
+        const color = getPriorityColor(q.priority);
+
+        return (
+          <PrimaryQuestion
+            key={q.id}
+            title={
+              <View style={styles.titleContainer}>
+                <Text style={styles.titleText}>{`Item ${q.id}`}</Text>
+                <View style={[styles.priorityDot, { backgroundColor: color }]} />
+                <TouchableOpacity onPress={() => abrirHelper(q.risk, q.mitigation)}>
+                  <Feather name="help-circle" size={18} color="#173A64" />
+                </TouchableOpacity>
+              </View>
+            }
+            description={q.verification}
+            selectedOption={respostas[q.id] || null}
+            onSelect={(value) =>
+              onResponder(q.id, respostas[q.id] === value ? null : value)
+            }
+          />
+        );
+      })}
+
+      <PrimaryHelper
+        visible={helperVisible}
+        onClose={() => setHelperVisible(false)}
+        title={helperContent.title}
+        description={helperContent.description}
+      />
+    </>
+  );
 }
+
+const styles = StyleSheet.create({
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  titleText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  priorityDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+});

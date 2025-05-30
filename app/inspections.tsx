@@ -4,7 +4,6 @@ import SearchInput from '~/components/inputs/searchInput';
 import InspectionList from '~/components/lists/inspectionList';
 import PrimarySection from '~/components/sections/primarySection';
 import SecondarySection from '~/components/sections/secondarySection';
-import { inspections } from '~/data/questions';
 
 import { colors } from '~/theme';
 

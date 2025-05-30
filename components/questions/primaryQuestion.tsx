@@ -4,7 +4,7 @@ import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow }
 
 
 interface PrimaryQuestionProps {
-  title: string;
+  title: React.ReactNode;
   description: string;
   selectedOption: 'sim' | 'nao' | 'na' | null;
   onSelect: (value: 'sim' | 'nao' | 'na') => void;

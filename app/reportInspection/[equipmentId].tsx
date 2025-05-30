@@ -3,7 +3,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { ScrollView, StyleSheet, View, Text } from "react-native";
 import SecondarySection from "~/components/sections/secondarySection";
 import { colors, fontSize } from '~/theme';
-import { equipment as equipmentList } from '~/data/questions';
 
 export default function ReportInspection() {
     const { equipmentId } = useLocalSearchParams<{ equipmentId: string }>();

@@ -1,15 +1,13 @@
 import Feather from "@expo/vector-icons/build/Feather";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from "react-native";
-import PrimaryList from "~/components/lists/primaryList";
-import QuestionsList from "~/components/lists/questionsList";
 import AlertMessage from "~/components/messages/alertMessage";
 import SecondarySection from "~/components/sections/secondarySection";
-import { questions } from "~/data/questions";
 import { colors, fontSize } from '~/theme';
 import { router, useLocalSearchParams } from "expo-router";
 import MainButton from "~/components/buttons/mainButton";
 import { useEquipmentById } from '~/hooks/useEquipmentById';
+import InspectionSection from "~/components/sections/inspectionSection";
 
 export default function EquipmentPage() {
   const { equipmentId } = useLocalSearchParams<{ equipmentId: string }>();
@@ -19,12 +17,12 @@ export default function EquipmentPage() {
 
   const handleReport = () => {
     router.push({
-      pathname: '/reportInspection/[equipmentId]',
+      pathname: '/equipments',
       params: { equipmentId },
     });
   };
 
-  const handleResponder = (id: string, value: 'sim' | 'nao' | 'na') => {
+  const handleResponder = (id: string, value: 'sim' | 'nao' | 'na' | null) => {
     setRespostas((prev) => ({ ...prev, [id]: value }));
   };
 
@@ -71,15 +69,10 @@ export default function EquipmentPage() {
         message="Selecione pelos menos 1 item abaixo para finalizar a inspeção"
       />
 
-      <PrimaryList title="1. Quadro de comando"
-        helperEnabled helperTitle="1. Quadro de comando"
-        helperDescription="O quadro de comando é o painel elétrico que controla o funcionamento do elevador. É também conhecido como painel elétrico de comando.">
-        <QuestionsList
-          questoes={questions}
-          respostas={respostas}
-          onResponder={handleResponder}
-        />
-      </PrimaryList>
+      <InspectionSection
+        respostas={respostas}
+        onResponder={handleResponder}
+      />
 
       {Object.values(respostas).some(res => res !== null && res !== undefined) && (
         <MainButton title="Finalizar" onPress={handleReport} />
