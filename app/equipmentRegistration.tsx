@@ -1,5 +1,6 @@
 import { ScrollView, StyleSheet, View, Alert } from 'react-native';
 import { saveEquipment, updateEquipment, fetchEquipmentById } from '~/services/equipmentService';
+import FileUpload from '~/components/inputs/fileUpload';
 
 import MainButton from '~/components/buttons/mainButton';
 import PrimaryInput from '~/components/inputs/primaryInput';
@@ -145,6 +146,13 @@ export default function EquipmentRegistration() {
         <PrimaryInput label="Empresa Conservadora" value={empresaConservadora.razaoSocial} onChangeText={(text) => { setEmpresaConservadora({ ...empresaConservadora, razaoSocial: text }); clearFieldError('razaoSocial'); }} placeholder="Informe" error={!!errors.razaoSocial} errorMessage={errors.razaoSocial} />
         <PrimaryInput label="CNPJ" value={empresaConservadora.cnpj} onChangeText={(text) => { setEmpresaConservadora({ ...empresaConservadora, cnpj: text }); clearFieldError('cnpjEmpresa'); }} placeholder="Informe" error={!!errors.cnpjEmpresa} errorMessage={errors.cnpjEmpresa} mask="99.999.999/9999-99" />
       </PrimarySection>
+
+      <PrimarySection title="Arquivos Relacionados">
+        <FileUpload/>
+      
+      </PrimarySection>
+
+      
 
       <View style={styles.buttons}>
         <MainButton title={mode === 'edit' ? 'Salvar Alterações' : 'Cadastrar'} type="primary" onPress={handleSave} />
