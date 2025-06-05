@@ -53,11 +53,11 @@ export default function EquipmentPage() {
     <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
       <SecondarySection
         icon={<Feather name="tag" size={20} color="#173A64" />}
-        title="Equipamento para inspeção"
+        title={`${selectedEquipment.detalhes_equipamento?.identificacaoEquipamento}`}
         onPress={() => handleViewEquipment(equipmentId)}
       >
-        <Text style={styles.text}>{selectedEquipment.detalhes_equipamento?.identificacaoEquipamento}</Text>
         <Text style={styles.text}>{selectedEquipment.id}</Text>
+        <Text style={styles.text}>{selectedEquipment.local?.edificacao}</Text>
       </SecondarySection>
 
       <AlertMessage

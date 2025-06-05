@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow } from '~/theme';
-
+import FileUpload from '../inputs/fileUpload';
 
 interface PrimaryQuestionProps {
   title: React.ReactNode;
@@ -33,6 +33,7 @@ export default function PrimaryQuestion({ title, description, selectedOption, on
         <Option label="Não" value="nao" />
         <Option label="NA" value="na" />
       </View>
+        {selectedOption && <FileUpload />}
     </View>
   );
 }
@@ -43,13 +44,15 @@ const styles = StyleSheet.create({
     borderRadius: border.radius,
     padding: 12,
     marginBottom: 12,
-    elevation: 1,
-  },
+    borderWidth: 1,
+    borderColor: colors.bgInfo,
+  },  
   itemTitle: {
     fontWeight: '500',
     fontSize: fontSize.label,
     color: colors.mainColor,
     marginBottom: 4,
+    paddingBottom: 10
   },
   description: {
     fontSize: fontSize.placeholder,
@@ -59,7 +62,7 @@ const styles = StyleSheet.create({
   optionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '100%'
+    width: '100%',
   },
   option: {
     flexDirection: 'row',

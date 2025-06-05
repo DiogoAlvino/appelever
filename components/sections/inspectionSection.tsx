@@ -39,6 +39,7 @@ export default function InspectionSection({ respostas, onResponder }: Inspection
             helperEnabled
             helperTitle={`${numero}. ${titulo}`}
             helperDescription={`Descrição do item ${titulo}`}
+            
           >
             <QuestionsList
               questoes={lista}

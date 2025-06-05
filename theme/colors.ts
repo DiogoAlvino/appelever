@@ -9,5 +9,6 @@ export const colors = {
     bgScreen: '#F5FAFF',
     bgMenu: '#6D8ABD',
     bgLink: '#007bff',
+    bgGray: '#F9F9F9',
 };
   

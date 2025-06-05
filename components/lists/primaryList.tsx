@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
         width: "100%"
     },
     title: {
-        fontSize: fontSize.title,
+        fontSize: fontSize.label,
         color: colors.mainColor,
         fontWeight: '500',
     },

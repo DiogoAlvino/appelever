@@ -52,13 +52,16 @@ export default function QuestionsList({ questoes, respostas, onResponder }: Ques
             key={q.id}
             title={
               <View style={styles.titleContainer}>
-                <Text style={styles.titleText}>{`Item ${q.id}`}</Text>
-                <View style={[styles.priorityDot, { backgroundColor: color }]} />
+                <View style={styles.titleLeft}>
+                  <Text style={styles.titleText}>{`Item ${q.id}`}</Text>
+                  <View style={[styles.priorityDot, { backgroundColor: color }]} />
+                </View>
+            
                 <TouchableOpacity onPress={() => abrirHelper(q.risk, q.mitigation)}>
-                  <Feather name="help-circle" size={18} color="#173A64" />
+                  <Feather name="help-circle" size={20} color="#173A64" />
                 </TouchableOpacity>
               </View>
-            }
+            }            
             description={q.verification}
             selectedOption={respostas[q.id] || null}
             onSelect={(value) =>
@@ -82,6 +85,13 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+    width: "100%",
+  },
+  titleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
   },
   titleText: {
@@ -89,8 +99,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   priorityDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 15,
+    height: 15,
+    borderRadius: 10,
   },
 });
+
