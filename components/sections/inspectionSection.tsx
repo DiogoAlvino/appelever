@@ -32,6 +32,10 @@ export default function InspectionSection({ respostas, onResponder }: Inspection
         const numero = index + 1;
         const titulo = TITULOS[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
+        const listaComIds = lista.map((q) => ({ ...q, id: `${key}_${q.id}` }));
+
+        const respondido = listaComIds.some((q) => respostas[q.id]);
+
         return (
           <PrimaryList
             key={key}
@@ -39,10 +43,10 @@ export default function InspectionSection({ respostas, onResponder }: Inspection
             helperEnabled
             helperTitle={`${numero}. ${titulo}`}
             helperDescription={`Descrição do item ${titulo}`}
-            
+            respondido={respondido} // <- aqui
           >
             <QuestionsList
-              questoes={lista}
+              questoes={listaComIds}
               respostas={respostas}
               onResponder={onResponder}
             />

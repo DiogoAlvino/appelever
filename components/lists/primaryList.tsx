@@ -11,6 +11,7 @@ interface PrimaryListProps {
     helperTitle?: string;
     helperImage?: any;
     helperDescription?: string;
+    respondido?: boolean;
 }
 
 export default function PrimaryList({
@@ -20,12 +21,13 @@ export default function PrimaryList({
     helperTitle = '',
     helperImage,
     helperDescription = '',
+    respondido = false
 }: PrimaryListProps) {
     const [expanded, setExpanded] = useState(false);
     const [showHelper, setShowHelper] = useState(false);
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, respondido && styles.respondido]}>
             <View style={styles.header}>
                 <View style={styles.titleContainer}>
                     <Text style={styles.title}>{title}</Text>
@@ -89,4 +91,8 @@ const styles = StyleSheet.create({
     content: {
         marginTop: 12,
     },
+    respondido: {
+        borderLeftWidth: 6,
+        borderLeftColor: '#4CAF50', // Verde
+      },
 });
