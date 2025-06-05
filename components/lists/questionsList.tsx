@@ -32,13 +32,28 @@ const getPriorityColor = (priority: string) => {
 
 export default function QuestionsList({ questoes, respostas, onResponder }: QuestionsListProps) {
   const [helperVisible, setHelperVisible] = useState(false);
-  const [helperContent, setHelperContent] = useState({ title: '', description: '' });
+  const [helperContent, setHelperContent] = useState<{ title: string; description: React.ReactNode }>({
+    title: '',
+    description: '',
+  });
+  
 
   const abrirHelper = (risk: string, mitigation: string) => {
     setHelperContent({
       title: 'Risco e Mitigação',
-      description: `Risco: ${risk}\nMitigação: ${mitigation}`,
+      description: (
+        <View>
+          <Text style={styles.sectionTitle}>Risco</Text>
+          <Text style={styles.sectionText}>{risk}</Text>
+    
+          <View style={{ height: 12 }} />
+    
+          <Text style={styles.sectionTitle}>Mitigação</Text>
+          <Text style={styles.sectionText}>{mitigation}</Text>
+        </View>
+      ),
     });
+    
     setHelperVisible(true);
   };
 
@@ -103,5 +118,17 @@ const styles = StyleSheet.create({
     height: 15,
     borderRadius: 10,
   },
+  sectionTitle: {
+    fontWeight: '600',
+    fontSize: 16,
+    color: '#173A64',
+    marginBottom: 4,
+  },
+  sectionText: {
+    fontSize: 14,
+    color: '#444',
+    lineHeight: 20,
+  },
+  
 });
 

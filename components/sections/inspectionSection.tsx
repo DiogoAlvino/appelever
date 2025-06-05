@@ -43,7 +43,7 @@ export default function InspectionSection({ respostas, onResponder }: Inspection
             helperEnabled
             helperTitle={`${numero}. ${titulo}`}
             helperDescription={`Descrição do item ${titulo}`}
-            respondido={respondido} // <- aqui
+            respondido={respondido} 
           >
             <QuestionsList
               questoes={listaComIds}

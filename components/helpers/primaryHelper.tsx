@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, Dimensions, Pressable } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors, fontSize, border, width, heigth, margin, padding, gap, shadow } from '~/theme';
 
 interface PrimaryHelperProps {
   imageSource?: any;
-  description: string;
+  description: ReactNode;
   onClose: () => void;
   title: string;
   visible: boolean;
@@ -25,7 +25,7 @@ export default function PrimaryHelper({
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
             <TouchableOpacity onPress={onClose}>
-              <Feather name="x" size={20} color="#173A64" />
+              <Feather name="x" size={22} color="#173A64" />
             </TouchableOpacity>
           </View>
 
