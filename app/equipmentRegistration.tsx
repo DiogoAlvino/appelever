@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, View, Alert } from 'react-native';
-import { saveEquipment } from '~/services/equipmentService';
+import { saveEquipment, updateEquipment, fetchEquipmentById } from '~/services/equipmentService';
 
 import MainButton from '~/components/buttons/mainButton';
 import PrimaryInput from '~/components/inputs/primaryInput';
@@ -7,9 +7,9 @@ import PrimarySelect from '~/components/inputs/primarySelect';
 import PrimarySection from '~/components/sections/primarySection';
 
 import { useEquipmentForm } from '~/hooks/useEquipmentForm';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FeedbackModal from '~/components/modal/feedbackModal';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 export default function EquipmentRegistration() {
   const {
@@ -32,6 +32,31 @@ export default function EquipmentRegistration() {
   const [feedbackType, setFeedbackType] = useState<'loading' | 'success' | 'error'>('loading');
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
+  const { mode, equipmentId } = useLocalSearchParams();
+
+  useEffect(() => {
+    if (mode === 'edit' && equipmentId) {
+      const loadEquipment = async () => {
+        try {
+          const equipmentData = await fetchEquipmentById(equipmentId as string);
+          if (equipmentData) {
+            setLocal(equipmentData.local);
+            setResponsavel(equipmentData.responsavel);
+            setDetalhesEquipamento({
+              ...equipmentData.detalhes_equipamento,
+              dataInstalacao: new Date(equipmentData.detalhes_equipamento.dataInstalacao),
+            });
+            setEmpresaConservadora(equipmentData.empresa_conservadora);
+          }
+        } catch (error) {
+          console.error('Erro ao carregar equipamento para edição', error);
+        }
+      };
+
+      loadEquipment();
+    }
+  }, [mode, equipmentId]);
+
   const handleSave = async () => {
     const { valid } = validateForm();
 
@@ -43,26 +68,28 @@ export default function EquipmentRegistration() {
     }
 
     setFeedbackType('loading');
-    setFeedbackMessage('Salvando equipamento...');
+    setFeedbackMessage(mode === 'edit' ? 'Atualizando equipamento...' : 'Salvando equipamento...');
     setFeedbackVisible(true);
 
     try {
-      const docRef = await saveEquipment(getFormData());
+      if (mode === 'edit' && equipmentId) {
+        await updateEquipment(equipmentId as string, getFormData());
+        setFeedbackType('success');
+        setFeedbackMessage('Equipamento atualizado com sucesso!');
+        setTimeout(() => router.push('/equipments'), 1000);
+      } else {
+        const docRef = await saveEquipment(getFormData());
+        setFeedbackType('success');
+        setFeedbackMessage('Equipamento cadastrado com sucesso!');
+        setTimeout(() => router.push(`/equipmentForm/${docRef.id}`), 1000);
+      }
 
-      setFeedbackType('success');
-      setFeedbackMessage('Equipamento cadastrado com sucesso!');
-
-      setTimeout(() => {
-        setFeedbackVisible(false);
-        resetForm();
-        router.push(`/equipmentForm/${docRef.id}`);
-      }, 1000);
-
+      setTimeout(() => setFeedbackVisible(false), 1000);
       resetForm();
     } catch (error) {
       console.error(error);
       setFeedbackType('error');
-      setFeedbackMessage('Não foi possível cadastrar o equipamento.');
+      setFeedbackMessage('Erro ao salvar o equipamento.');
     }
   };
 
@@ -82,12 +109,28 @@ export default function EquipmentRegistration() {
       <PrimarySection title="Responsável Técnico">
         <PrimaryInput label="Responsável" value={responsavel.nome} onChangeText={(text) => { setResponsavel({ ...responsavel, nome: text }); clearFieldError('responsavel'); }} placeholder="Informe" error={!!errors.responsavel} errorMessage={errors.responsavel} />
         <PrimaryInput label="Função" value={responsavel.funcao} onChangeText={(text) => setResponsavel({ ...responsavel, funcao: text })} placeholder="Informe" />
-        <PrimaryInput label="Telefone" value={responsavel.telefone} onChangeText={(text) => { setResponsavel({ ...responsavel, telefone: text }); clearFieldError('telefone'); }} placeholder="Informe" error={!!errors.telefone} errorMessage={errors.telefone} mask="(99) 99999-9999"/>
+        <PrimaryInput label="Telefone" value={responsavel.telefone} onChangeText={(text) => { setResponsavel({ ...responsavel, telefone: text }); clearFieldError('telefone'); }} placeholder="Informe" error={!!errors.telefone} errorMessage={errors.telefone} mask="(99) 99999-9999" />
         <PrimaryInput label="E-mail" value={responsavel.email} onChangeText={(text) => { setResponsavel({ ...responsavel, email: text }); clearFieldError('email'); }} placeholder="Informe" error={!!errors.email} errorMessage={errors.email} />
       </PrimarySection>
 
       <PrimarySection title="Dados do Equipamento">
-        <PrimaryInput label="Data da Instalação" value={detalhesEquipamento.dataInstalacao.toISOString().split('T')[0]} onChangeText={(text) => { setDetalhesEquipamento({ ...detalhesEquipamento, dataInstalacao: new Date(text) }); clearFieldError('dataInstalacao'); }} placeholder="Informe" error={!!errors.dataInstalacao} errorMessage={errors.dataInstalacao} />
+        <PrimaryInput
+          label="Data da Instalação"
+          value={
+            detalhesEquipamento.dataInstalacao instanceof Date && !isNaN(detalhesEquipamento.dataInstalacao.getTime())
+              ? detalhesEquipamento.dataInstalacao.toISOString().split('T')[0]
+              : ''
+          }
+          onChangeText={(text) =>
+            setDetalhesEquipamento({
+              ...detalhesEquipamento,
+              dataInstalacao: new Date(text),
+            })
+          }
+          placeholder="Informe"
+          error={!!errors.dataInstalacao}
+          errorMessage={errors.dataInstalacao}
+        />
         <PrimaryInput label="Identificação" value={detalhesEquipamento.identificacaoEquipamento} onChangeText={(text) => { setDetalhesEquipamento({ ...detalhesEquipamento, identificacaoEquipamento: text }); clearFieldError('identificacao'); }} placeholder="Informe" error={!!errors.identificacao} errorMessage={errors.identificacao} />
         <PrimaryInput label="Fabricante" value={detalhesEquipamento.fabricante} onChangeText={(text) => { setDetalhesEquipamento({ ...detalhesEquipamento, fabricante: text }); clearFieldError('fabricante'); }} placeholder="Informe" error={!!errors.fabricante} errorMessage={errors.fabricante} />
         <PrimaryInput label="CNPJ" value={detalhesEquipamento.cnpj} onChangeText={(text) => { setDetalhesEquipamento({ ...detalhesEquipamento, cnpj: text }); clearFieldError('cnpjEquipamento'); }} placeholder="Informe" error={!!errors.cnpjEquipamento} errorMessage={errors.cnpjEquipamento} mask="99.999.999/9999-99" />
@@ -104,8 +147,15 @@ export default function EquipmentRegistration() {
       </PrimarySection>
 
       <View style={styles.buttons}>
-        <MainButton title="Cadastrar" type="primary" onPress={handleSave} />
-        <MainButton title="Cancelar" type="secondary" onPress={resetForm} />
+        <MainButton title={mode === 'edit' ? 'Salvar Alterações' : 'Cadastrar'} type="primary" onPress={handleSave} />
+        <MainButton title="Cancelar" type="secondary" onPress={() => {
+          resetForm();
+          if (equipmentId) {
+            router.push(`/equipmentForm/${equipmentId}`);
+          } else {
+            router.back();
+          }
+        }} />
       </View>
 
       <FeedbackModal
@@ -114,7 +164,6 @@ export default function EquipmentRegistration() {
         message={feedbackMessage}
         onClose={() => setFeedbackVisible(false)}
       />
-
     </ScrollView>
   );
 }

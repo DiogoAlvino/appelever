@@ -144,10 +144,19 @@ export default function EquipmentForm() {
 
       </ScrollView>
       <View style={styles.bottomMenu}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => console.log('Editar')}>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() =>
+            router.push({
+              pathname: '/equipmentRegistration',
+              params: { mode: 'edit', equipmentId: String(equipment.id) },
+            })
+          }
+        >
           <Feather name="edit" size={20} color="#173A64" />
           <Text style={styles.menuText}>Editar</Text>
         </TouchableOpacity>
+
 
         <TouchableOpacity style={styles.menuButton} onPress={handleDelete}>
           <Feather name="trash-2" size={20} color="red" />

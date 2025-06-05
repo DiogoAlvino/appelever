@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { db, auth } from '~/utils/firebase';
 import { EquipmentModel } from '~/models/equipmentModel';
 
@@ -37,3 +37,7 @@ export async function fetchEquipmentById(id: string) {
     throw new Error('Equipamento não encontrado');
   }
 }
+
+export const updateEquipment = async (id: string, data: any) => {
+  await updateDoc(doc(db, 'equipamentos', id), data);
+};
