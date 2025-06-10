@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { db, auth } from '~/utils/firebase';
 import { EquipmentModel } from '~/models/equipmentModel';
 
@@ -11,7 +11,15 @@ export async function saveEquipment(data: EquipmentModel) {
 }
 
 export async function fetchEquipments() {
-  const snapshot = await getDocs(collection(db, 'equipamentos'));
+  const userEmail = auth.currentUser?.email;
+  if (!userEmail) return [];
+
+  const q = query(
+    collection(db, 'equipamentos'),
+    where('usuario', '==', userEmail)
+  );
+
+  const snapshot = await getDocs(q);
   const equipments: EquipmentModel[] = [];
 
   snapshot.forEach((doc) => {
