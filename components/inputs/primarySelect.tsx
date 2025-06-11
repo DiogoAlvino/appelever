@@ -75,13 +75,15 @@ const styles = StyleSheet.create({
     marginBottom: margin.bottom,
   },
   selectContainer: {
-    backgroundColor: colors.bgInput,
+    backgroundColor: colors.primaryLight,
     borderRadius: border.radius,
     paddingHorizontal: padding.horizontal,
-    paddingVertical: 14,
+    paddingVertical: 13,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   selectText: {
     fontSize: fontSize.placeholder,

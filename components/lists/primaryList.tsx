@@ -86,13 +86,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: fontSize.label,
         color: colors.mainColor,
-        fontWeight: '500',
+        fontWeight: '600',
     },
     content: {
         marginTop: 12,
     },
     respondido: {
         borderLeftWidth: 6,
-        borderLeftColor: '#4CAF50', // Verde
+        borderLeftColor: colors.mainColor, // Verde
       },
 });

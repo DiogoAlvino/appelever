@@ -74,14 +74,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
-    height: heigth.input,
-    backgroundColor: colors.bgInput,
+    backgroundColor: colors.primaryLight,
     paddingHorizontal: padding.horizontal,
+    paddingVertical: 15.5,
     borderRadius: border.radius,
     fontSize: fontSize.placeholder,
     color: colors.primaryDark,
     borderWidth: 1,
     borderColor: '#ccc',
+    
   },
   iconButton: {
     position: 'absolute',

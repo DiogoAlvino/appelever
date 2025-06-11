@@ -68,8 +68,8 @@ export default function QuestionsList({ questoes, respostas, onResponder }: Ques
             title={
               <View style={styles.titleContainer}>
                 <View style={styles.titleLeft}>
-                  <Text style={styles.titleText}>{`Item ${q.id}`}</Text>
                   <View style={[styles.priorityDot, { backgroundColor: color }]} />
+                  <Text style={styles.titleText}>{`Item ${q.id}`}</Text>
                 </View>
             
                 <TouchableOpacity onPress={() => abrirHelper(q.risk, q.mitigation)}>
@@ -114,8 +114,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   priorityDot: {
-    width: 15,
-    height: 15,
+    width: 8,
+    height: 8,
     borderRadius: 10,
   },
   sectionTitle: {

@@ -15,6 +15,8 @@ export default function EquipmentPage() {
 
   const { equipment: selectedEquipment, loading } = useEquipmentById(String(equipmentId));
 
+ 
+
   const handleReport = () => {
     router.push({
       pathname: '/equipments',
@@ -75,8 +77,12 @@ export default function EquipmentPage() {
       />
 
       {Object.values(respostas).some(res => res !== null && res !== undefined) && (
-        <MainButton title="Finalizar" onPress={handleReport} />
+        <View style={{ width: '100%', gap: 10 }}>
+          <MainButton title="Finalizar" onPress={handleReport} />
+          <MainButton title="Cancelar" onPress={handleReport} type="secondary" />
+        </View>
       )}
+
     </ScrollView>
   );
 }

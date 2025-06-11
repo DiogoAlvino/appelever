@@ -22,6 +22,10 @@ export default function HomePage() {
         router.push("/inspections")
     }
 
+    function goToForensicAnalysis(){
+        router.push("/forensic")
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
             <ImageBackground source={require('~/assets/bg-login.png')} style={styles.card}>
@@ -51,7 +55,7 @@ export default function HomePage() {
                     <BlockButton
                         icon={<MaterialCommunityIcons name="text-box-search-outline" size={36} color="#fff" />}
                         label="Analise Forense"
-                        onPress={() => console.log('Botão clicado')}
+                        onPress={goToForensicAnalysis}
                     />
                 </View>
             </View>
