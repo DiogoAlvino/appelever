@@ -8,6 +8,8 @@ import { router, useLocalSearchParams } from "expo-router";
 import MainButton from "~/components/buttons/mainButton";
 import { useEquipmentById } from '~/hooks/useEquipmentById';
 import InspectionSection from "~/components/sections/inspectionSection";
+import { saveInspection } from '~/services/inspectionService';
+import FeedbackModal from '~/components/modal/feedbackModal'; // IMPORTANTE
 
 export default function EquipmentPage() {
   const { equipmentId } = useLocalSearchParams<{ equipmentId: string }>();
@@ -15,13 +17,40 @@ export default function EquipmentPage() {
 
   const { equipment: selectedEquipment, loading } = useEquipmentById(String(equipmentId));
 
- 
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<'loading' | 'success' | 'error'>('loading');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
-  const handleReport = () => {
-    router.push({
-      pathname: '/equipments',
-      params: { equipmentId },
-    });
+  const handleReport = async () => {
+    try {
+      if (!selectedEquipment) {
+        throw new Error('Equipamento não encontrado. A inspeção não pode ser salva.');
+      }
+
+      setFeedbackType('loading');
+      setFeedbackMessage('Salvando inspeção...');
+      setFeedbackVisible(true);
+
+      await saveInspection(
+        String(equipmentId),
+        respostas,
+        selectedEquipment.usuario || 'Desconhecido'
+      );
+
+      setFeedbackType('success');
+      setFeedbackMessage('Inspeção salva com sucesso!');
+      setTimeout(() => {
+        setFeedbackVisible(false);
+        router.push({
+          pathname: '/equipments',
+          params: { equipmentId },
+        });
+      }, 1000);
+    } catch (error) {
+      console.error('Erro ao salvar inspeção:', error);
+      setFeedbackType('error');
+      setFeedbackMessage((error as Error).message || 'Erro ao salvar inspeção.');
+    }
   };
 
   const handleResponder = (id: string, value: 'sim' | 'nao' | 'na' | null) => {
@@ -29,7 +58,7 @@ export default function EquipmentPage() {
   };
 
   const handleViewEquipment = (equipmentId: any) => {
-    router.push({
+    router.replace({
       pathname: '/equipmentForm/[equipmentId]',
       params: { equipmentId },
     });
@@ -79,10 +108,16 @@ export default function EquipmentPage() {
       {Object.values(respostas).some(res => res !== null && res !== undefined) && (
         <View style={{ width: '100%', gap: 10 }}>
           <MainButton title="Finalizar" onPress={handleReport} />
-          <MainButton title="Cancelar" onPress={handleReport} type="secondary" />
+          <MainButton title="Cancelar" onPress={() => router.back()} type="secondary" />
         </View>
       )}
 
+      <FeedbackModal
+        visible={feedbackVisible}
+        type={feedbackType}
+        message={feedbackMessage}
+        onClose={() => setFeedbackVisible(false)}
+      />
     </ScrollView>
   );
 }
