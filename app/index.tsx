@@ -10,19 +10,19 @@ import { auth } from "~/utils/firebase";
 
 export default function HomePage() {
 
-    function goToEquipmentRegistration(){
+    function goToEquipmentRegistration() {
         router.push("/equipmentRegistration")
     }
 
-    function goToNormativeInpection(){
+    function goToNormativeInpection() {
         router.push("/equipments")
     }
 
-    function goToInspectionList(){
+    function goToInspectionList() {
         router.push("/inspections")
     }
 
-    function goToForensicAnalysis(){
+    function goToForensicAnalysis() {
         router.push("/forensic")
     }
 
@@ -36,33 +36,41 @@ export default function HomePage() {
             </ImageBackground>
             <View style={styles.services}>
                 <Text style={styles.servicesTitle}>Serviços</Text>
-                <View style={styles.servicesButtons}>
-                    <BlockButton
-                        icon={<MaterialCommunityIcons name="square-edit-outline" size={36} color="#fff" />}
-                        label="Cadastrar Equipamento"
-                        onPress={goToEquipmentRegistration}
-                    />
-                    <BlockButton
-                        icon={<MaterialCommunityIcons name="checkbox-marked-outline" size={36} color="#fff" />}
-                        label="Inspeção Normativa"
-                        onPress={goToNormativeInpection}
-                    />
-                    <BlockButton
-                        icon={<MaterialCommunityIcons name="format-list-bulleted" size={36} color="#fff" />}
-                        label="Lista de inspeções"
-                        onPress={goToInspectionList}
-                    />
-                    <BlockButton
-                        icon={<MaterialCommunityIcons name="text-box-search-outline" size={36} color="#fff" />}
-                        label="Analise Forense"
-                        onPress={goToForensicAnalysis}
-                    />
-                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingVertical: 5 }}>
+                    <View style={styles.servicesButtons}>
+                        <BlockButton
+                            icon={<MaterialCommunityIcons name="square-edit-outline" size={36} color="#fff" />}
+                            label="Cadastrar Equipamento"
+                            onPress={goToEquipmentRegistration}
+                        />
+                        <BlockButton
+                            icon={<MaterialCommunityIcons name="checkbox-marked-outline" size={36} color="#fff" />}
+                            label="Inspeção Normativa"
+                            onPress={goToNormativeInpection}
+                        />
+                        <BlockButton
+                            icon={<MaterialCommunityIcons name="format-list-bulleted" size={36} color="#fff" />}
+                            label="Lista de Inspeções"
+                            onPress={goToInspectionList}
+                        />
+                        <BlockButton
+                            icon={<MaterialCommunityIcons name="text-box-search-outline" size={36} color="#fff" />}
+                            label="Analise Forense"
+                            onPress={goToForensicAnalysis}
+                        />
+                        <BlockButton
+                            icon={<MaterialCommunityIcons name="clipboard-list-outline" size={36} color="#fff" />}
+                            label="Lista de Analises"
+                            onPress={goToForensicAnalysis}
+                        />
+                    </View>
+                </ScrollView>
+
             </View>
             <View style={styles.dashboard}>
                 <Text style={styles.dashboardTitle}>Dashboard</Text>
                 <View>
-                    <PrimaryChart/>
+                    <PrimaryChart />
                 </View>
             </View>
         </ScrollView>
@@ -102,13 +110,14 @@ const styles = StyleSheet.create({
     },
     servicesButtons: {
         flexDirection: "row",
-        justifyContent: "space-between"
+        gap: 8,
     },
-    servicesTitle:{
+
+    servicesTitle: {
         fontSize: fontSize.label,
         fontWeight: "500",
         color: colors.primaryDark,
-        paddingBottom:  8
+        paddingBottom: 8
     },
     dashboard: {
         width: "100%",
@@ -118,6 +127,6 @@ const styles = StyleSheet.create({
         fontSize: fontSize.label,
         fontWeight: "500",
         color: colors.primaryDark,
-        paddingBottom:  8
+        paddingBottom: 8
     }
 });
