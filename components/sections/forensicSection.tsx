@@ -5,6 +5,7 @@ import { StyleSheet, View, Text } from 'react-native';
 import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
 import RemoveButton from '../buttons/removeButton';
 import AddButton from '../buttons/addButton';
+import LocationButton from '../buttons/locationButton';
 
 
 export default function ForensicSection() {
@@ -106,12 +107,7 @@ export default function ForensicSection() {
                     <View style={styles.campoInternoSecundario}>
                         <Text style={styles.titulos}>Atendimento</Text>
 
-                        <PrimaryInput
-                            label="Geolocalização"
-                            placeholder="Informe"
-                            value={dadosIniciais.edificacao}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, edificacao: text })}
-                        />
+                        <LocationButton />
                         <PrimaryInput
                             label="Viatura (placa)"
                             placeholder="Informe"
@@ -206,7 +202,7 @@ export default function ForensicSection() {
             </PrimaryList>
 
             <PrimaryList
-                title="5. Documentação"
+                title="6. Documentação"
                 helperEnabled
                 helperTitle="Ajuda"
                 helperDescription="Insira as informações referentes ao local onde o equipamento está instalado."
