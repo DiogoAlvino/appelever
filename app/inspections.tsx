@@ -1,10 +1,16 @@
+import { useState } from 'react';
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+
 import SearchInput from '~/components/inputs/searchInput';
 import InspectionList from '~/components/lists/inspectionList';
 import { useInspections } from '~/hooks/useInspections';
+import FeedbackModal from '~/components/modal/feedbackModal';
 
 export default function Inspections() {
   const { inspections, loading, reload } = useInspections();
+
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
   if (loading) {
     return (
@@ -23,8 +29,22 @@ export default function Inspections() {
           <Text>Total: {inspections.length}</Text>
         </View>
 
-        <InspectionList inspections={inspections} />
+        <InspectionList
+          inspections={inspections}
+          onError={(msg) => {
+            setFeedbackMessage(msg);
+            setFeedbackVisible(true);
+          } } selectedId={null} onSelect={function (id: string): void {
+            throw new Error('Function not implemented.');
+          } }        />
       </ScrollView>
+
+      <FeedbackModal
+        visible={feedbackVisible}
+        type="error"
+        message={feedbackMessage}
+        onClose={() => setFeedbackVisible(false)}
+      />
     </View>
   );
 }

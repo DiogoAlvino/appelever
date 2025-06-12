@@ -1,47 +1,61 @@
-import React, { useState } from 'react';
-import { Text } from 'react-native';
+// InspectionList.tsx
+import React from 'react';
+import { Text, View, StyleSheet } from 'react-native';
 import SecondarySection from '../sections/secondarySection';
 import { colors } from '~/theme/colors';
-
-interface InspectionItem {
-  id: string;
-  date: string;
-  name: string;
-}
+import { router } from 'expo-router';
+import { InspectionModel } from '~/models/inspectionModel';
 
 interface InspectionListProps {
-  inspections: InspectionItem[];
+  inspections: InspectionModel[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  onError?: (msg: string) => void;
 }
 
-export default function InspectionList({ inspections }: InspectionListProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const handleCheck = (id: string) => {
-    setSelectedId((prevId) => (prevId === id ? null : id));
+export default function InspectionList({ inspections, selectedId, onSelect, onError }: InspectionListProps) {
+  const handleViewInspection = (inspectionId: string | undefined) => {
+    if (!inspectionId) {
+      onError?.('Erro: inspeção sem ID. Não foi possível abrir os detalhes.');
+      return;
+    }
+    router.push({
+      pathname: '/inspectionForm/[inspectionId]',
+      params: { inspectionId },
+    });
   };
 
   return (
-    <>
-      {inspections.map((equip) => {
-        const isSelected = selectedId === equip.id;
-        const isDisabled = selectedId !== null && !isSelected;
+    <View style={styles.wrapper}>
+      {inspections.map((inspection) => {
 
         return (
           <SecondarySection
-            key={equip.id}
+            key={inspection.id}
             icon={null}
-            title={equip.id}
-            backgroundColor={isDisabled ? '#f1f1f1' : colors.primaryLight}
-          >
-            <Text style={{ color: isDisabled ? '#888' : colors.primaryDark }}>
-              {new Date(equip.date).toLocaleDateString('pt-BR')}
+            title={`Inspeção #${inspection.id?.slice(-6)}`}
+            onPress={() => handleViewInspection(inspection.id)}
+            backgroundColor={colors.primaryLight}>
+            <Text style={{ color: colors.primaryDark }}>
+              Responsável: {inspection.usuario}
             </Text>
-            <Text style={{ color: isDisabled ? '#888' : colors.primaryDark }}>
-              {equip.name}
+            <Text style={{ color: colors.primaryDark }}>
+              Data: {new Date(inspection.dataCriacao).toLocaleDateString('pt-BR')}
+            </Text>
+            <Text style={{ color: colors.primaryDark }}>
+              Itens respondidos: {Object.keys(inspection.answers || {}).length}
             </Text>
           </SecondarySection>
         );
       })}
-    </>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  wrapper: {
+    width: '100%',
+    alignItems: 'center',
+    gap: 10,
+  },
+});
