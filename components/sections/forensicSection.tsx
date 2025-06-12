@@ -103,7 +103,7 @@ export default function ForensicSection() {
 
                     </View>
 
-                    <View style={styles.campoInterno}>
+                    <View style={styles.campoInternoSecundario}>
                         <Text style={styles.titulos}>Atendimento</Text>
 
                         <PrimaryInput
@@ -143,7 +143,10 @@ export default function ForensicSection() {
                 title="2. Materiais, equipamentos, EPI e EPC"
             >
                 <View style={styles.campos}>
-                    <Text style={styles.titulos}>Lista</Text>
+                    <View style={styles.campoInternoSecundario}>
+                        <Text style={styles.titulos}>Lista</Text>
+
+                    </View>
                     
                 </View>
             </PrimaryList>
@@ -248,5 +251,9 @@ const styles = StyleSheet.create({
         borderStyle: "dashed",
         paddingBottom: 20
 
+    },
+    campoInternoSecundario: {
+        gap: 15,
+        paddingBottom: 20
     }
 });
