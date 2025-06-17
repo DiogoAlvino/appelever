@@ -2,40 +2,44 @@ import Feather from "@expo/vector-icons/build/Feather";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import AlertMessage from "~/components/messages/alertMessage";
-import SecondarySection from "~/components/sections/secondarySection";
 import { colors, fontSize } from '~/theme';
 import { router, useLocalSearchParams } from "expo-router";
 import MainButton from "~/components/buttons/mainButton";
-import { useEquipmentById } from '~/hooks/useEquipmentById';
-import InspectionSection from "~/components/sections/inspectionSection";
 import ForensicSection from "~/components/sections/forensicSection";
 
 export default function ForensicPage() {
- 
+
   const handleReport = () => {
     router.push({
       pathname: '/equipments',
     });
   };
 
-  
+  function goToDashboard() {
+    router.push("/")
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
-      
+
       <AlertMessage
         type="info"
-        message="Os modulos abaixo possui os campos necessarios para usa analise forense"
+        message="Os módulos abaixo estão relacionados à Análise Forense."
+      />
+
+      <AlertMessage
+        type="info"
+        message="Os módulos não possuem uma ordem obrigatória de preenchimento. Preencha conforme a sua necessidade."
       />
 
       <ForensicSection />
 
-    
-        <View style={{ width: '100%', gap: 10 }}>
-          <MainButton title="Finalizar" onPress={handleReport} />
-          <MainButton title="Cancelar" onPress={handleReport} type="secondary" />
-        </View>
-    
+
+      <View style={{ width: '100%', gap: 10 }}>
+        <MainButton title="Finalizar" onPress={handleReport} />
+        <MainButton title="Cancelar" onPress={goToDashboard} type="secondary" />
+      </View>
+
 
     </ScrollView>
   );

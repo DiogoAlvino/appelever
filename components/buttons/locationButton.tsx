@@ -1,4 +1,3 @@
-// components/buttons/locationButton.tsx
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList } from 'react-native';
 import * as Location from 'expo-location';
@@ -15,15 +14,33 @@ export default function LocationButton() {
   const handleGetCurrentLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') return alert('Permissão negada');
-
+  
     const location = await Location.getCurrentPositionAsync({});
-    const addressInfo = await Location.reverseGeocodeAsync(location.coords);
-
-    const address = `${addressInfo[0]?.street}, ${addressInfo[0]?.city}`;
-    setLocationInfo({ address, latitude: location.coords.latitude, longitude: location.coords.longitude });
-    setModalVisible(false);
+  
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=${GOOGLE_API_KEY}`
+      );
+      const data = await response.json();
+      console.log('GEOCODE RESPONSE:', JSON.stringify(data, null, 2));
+  
+      let address = 'Endereço não encontrado';
+      if (data.status === 'OK' && data.results.length > 0) {
+        const result = data.results[0];
+        address = result.formatted_address || result.address_components?.map((c: any) => c.long_name).join(', ') || address;
+      }
+  
+      setLocationInfo({
+        address,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Erro ao buscar endereço pelo Geocode:', error);
+    }
   };
-
+  
   const handleSearch = async (text: string) => {
     setSearch(text);
     if (text.length < 3) return;

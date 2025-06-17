@@ -149,75 +149,77 @@ export default function ForensicSection() {
 
             <PrimaryList
                 title="3. Análise preliminar do local"
-                helperEnabled
-                helperTitle="Ajuda"
-                helperDescription="Insira as informações referentes ao local onde o equipamento está instalado."
             >
                 <View style={styles.campos}>
-                    <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
+                    <View style={styles.campoInternoSecundario}>
+                        <Text style={styles.titulos}>Lista</Text>
+
+                    </View>
                     
-                    <PrimaryInput
-                        label="Condições ambientais"
-                        placeholder="Informe"
-                        value={dadosIniciais.logradouro}
-                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
-                    />
                 </View>
             </PrimaryList>
 
             <PrimaryList
-                title="4. Análise Preliminar de Risco (APR)"
-                helperEnabled
-                helperTitle="Ajuda"
-                helperDescription="Insira as informações referentes ao local onde o equipamento está instalado."
+                title="4. Análise preliminar de risco (APR)"
             >
                 <View style={styles.campos}>
-                    <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
+                    <View style={styles.campoInternoSecundario}>
+                        <Text style={styles.titulos}>Lista</Text>
+
+                    </View>
                     
-                    <PrimaryInput
-                        label="Condições ambientais"
-                        placeholder="Informe"
-                        value={dadosIniciais.logradouro}
-                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
-                    />
                 </View>
             </PrimaryList>
 
             <PrimaryList
                 title="5. Exames"
-                helperEnabled
-                helperTitle="Ajuda"
-                helperDescription="Insira as informações referentes ao local onde o equipamento está instalado."
             >
                 <View style={styles.campos}>
-                    <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
+                    <View style={styles.campoInternoSecundario}>
+                        <Text style={styles.titulos}>Lista</Text>
+
+                    </View>
                     
-                    <PrimaryInput
-                        label="Condições ambientais"
-                        placeholder="Informe"
-                        value={dadosIniciais.logradouro}
-                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
-                    />
                 </View>
             </PrimaryList>
 
             <PrimaryList
                 title="6. Documentação"
-                helperEnabled
-                helperTitle="Ajuda"
-                helperDescription="Insira as informações referentes ao local onde o equipamento está instalado."
             >
                 <View style={styles.campos}>
-                    <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
+                    <View style={styles.campoInternoSecundario}>
+                        <Text style={styles.titulos}>Lista</Text>
+
+                    </View>
                     
-                    <PrimaryInput
-                        label="Condições ambientais"
-                        placeholder="Informe"
-                        value={dadosIniciais.logradouro}
-                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
-                    />
                 </View>
             </PrimaryList>
+
+            <PrimaryList
+                title="7. Equipamento"
+            >
+                <View style={styles.campos}>
+                    <View style={styles.campoInternoSecundario}>
+                        <Text style={styles.titulos}>Lista</Text>
+
+                    </View>
+                    
+                </View>
+            </PrimaryList>
+
+            <PrimaryList
+                title="8. Entrevistas"
+            >
+                <View style={styles.campos}>
+                    <View style={styles.campoInternoSecundario}>
+                        <Text style={styles.titulos}>Lista</Text>
+
+                    </View>
+                    
+                </View>
+            </PrimaryList>
+            
+            
 
             
 

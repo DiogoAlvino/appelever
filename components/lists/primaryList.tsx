@@ -64,7 +64,8 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: colors.primaryLight,
         borderRadius: border.radius,
-        padding: 15,
+        paddingHorizontal: 15,
+        paddingVertical: 25,
         elevation: 1,
         width: "100%",
         shadowColor: colors.primaryDark,
@@ -93,6 +94,6 @@ const styles = StyleSheet.create({
     },
     respondido: {
         borderLeftWidth: 6,
-        borderLeftColor: colors.mainColor, // Verde
+        borderLeftColor: colors.mainColor, 
       },
 });

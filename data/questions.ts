@@ -517,7 +517,7 @@ export const questions = [
         verification: "Resistência mecânica das portas de pavimento",
         priority: "Alto",
         risk: "O risco de resistência inadequada das portas de pavimento é que elas podem não suportar impactos ou esforços mecânicos, levando a deformações ou falhas.",
-        mitigation: "Instalaras portas de pavimento de acordo com a ABNT NBR 16858-1:2021, 5.3.5.3"
+        mitigation: "Instalar as portas de pavimento de acordo com a ABNT NBR 16858-1:2021, 5.3.5.3"
       },
       {
         id: "14",
