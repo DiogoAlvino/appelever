@@ -4,4 +4,6 @@ export interface InspectionAnswerModel {
     risk: string;
     mitigation: string;
     verification: string;
+    normaID: string;
+    limit: string;
 }

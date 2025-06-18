@@ -23,6 +23,8 @@ export async function saveInspection(
           risk: q.risk,
           mitigation: q.mitigation,
           verification: q.verification,
+          normaID: q.normaID,
+          limit: q.limit,
         };
       }
     });
