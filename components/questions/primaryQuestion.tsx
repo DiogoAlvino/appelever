@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
+    paddingBottom: 10
   },
   option: {
     flexDirection: 'row',

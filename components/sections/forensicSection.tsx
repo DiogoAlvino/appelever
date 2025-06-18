@@ -6,6 +6,8 @@ import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~
 import RemoveButton from '../buttons/removeButton';
 import AddButton from '../buttons/addButton';
 import LocationButton from '../buttons/locationButton';
+import FileUpload from '../inputs/fileUpload';
+import VoiceInput from '../inputs/voiceInput';
 
 
 export default function ForensicSection() {
@@ -19,6 +21,8 @@ export default function ForensicSection() {
         cidade: '',
         estado: '',
     });
+
+    const [message, setMessage] = useState('');
 
     return (
         <View style={styles.section}>
@@ -143,7 +147,7 @@ export default function ForensicSection() {
                         <Text style={styles.titulos}>Lista</Text>
 
                     </View>
-                    
+
                 </View>
             </PrimaryList>
 
@@ -151,11 +155,18 @@ export default function ForensicSection() {
                 title="3. Análise preliminar do local"
             >
                 <View style={styles.campos}>
-                    <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Lista</Text>
-
+                    <View style={styles.campoInterno}>
+                        <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
+                        <FileUpload />
+                        <VoiceInput value={message} onChangeText={setMessage} />
                     </View>
-                    
+
+                    <View style={styles.campoInternoSecundario}>
+                        <Text style={styles.titulos}>Condições ambientais</Text>
+                        <Text>Descreva as condições como: barulho, fumaça, iluminação e etc </Text>
+                        <VoiceInput value={message} onChangeText={setMessage} />
+                    </View>
+
                 </View>
             </PrimaryList>
 
@@ -167,7 +178,7 @@ export default function ForensicSection() {
                         <Text style={styles.titulos}>Lista</Text>
 
                     </View>
-                    
+
                 </View>
             </PrimaryList>
 
@@ -179,7 +190,7 @@ export default function ForensicSection() {
                         <Text style={styles.titulos}>Lista</Text>
 
                     </View>
-                    
+
                 </View>
             </PrimaryList>
 
@@ -191,7 +202,7 @@ export default function ForensicSection() {
                         <Text style={styles.titulos}>Lista</Text>
 
                     </View>
-                    
+
                 </View>
             </PrimaryList>
 
@@ -203,7 +214,7 @@ export default function ForensicSection() {
                         <Text style={styles.titulos}>Lista</Text>
 
                     </View>
-                    
+
                 </View>
             </PrimaryList>
 
@@ -215,15 +226,15 @@ export default function ForensicSection() {
                         <Text style={styles.titulos}>Lista</Text>
 
                     </View>
-                    
+
                 </View>
             </PrimaryList>
-            
-            
 
-            
 
-            
+
+
+
+
         </View>
     );
 }
@@ -238,7 +249,7 @@ const styles = StyleSheet.create({
         gap: 20
     },
     titulos: {
-        color: colors.mainColor,
+        color: "#000",
         fontWeight: '600',
         fontSize: fontSize.label
     },
