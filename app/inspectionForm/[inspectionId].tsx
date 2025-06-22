@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, router } from "expo-router";
-import { ScrollView, StyleSheet, View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
+import { ScrollView, StyleSheet, View, Text, ActivityIndicator, TouchableOpacity, Image } from "react-native";
 import { useState } from "react";
 
 import SecondarySection from "~/components/sections/secondarySection";
@@ -65,6 +65,7 @@ export default function InspectionForm() {
   return (
     <>
       <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+        
         <SecondarySection
           icon={<Feather name="user" size={20} color="#173A64" />}
           title="Responsável pela inspeção"
@@ -87,18 +88,66 @@ export default function InspectionForm() {
             {Object.entries(inspection.answers).map(([id, question]) => (
               <View key={id} style={styles.answerItem}>
                 <View style={styles.titleRow}>
-                  <Text style={styles.itemTitle}>🔹</Text>
-                  <Text style={styles.itemTitle}>Item {id}</Text>
+                  <Text style={styles.itemTitle}>🔹 Item {id}</Text>
                 </View>
-                <Text style={styles.itemText}>Resposta: {question.answer}</Text>
-                <Text style={styles.itemText}>Prioridade: {capitalize(question.priority)}</Text>
-                <Text style={styles.itemText}>Risco: {question.risk}</Text>
-                <Text style={styles.itemText}>Mitigação: {question.mitigation}</Text>
-                <Text style={styles.itemText}>Verificação: {question.verification}</Text>
+                <Text style={styles.itemText}>✔ Resposta: {question.answer.toUpperCase()}</Text>
+                <Text style={styles.itemText}>⚠ Prioridade: {capitalize(question.priority)}</Text>
+                <Text style={styles.itemText}>💥 Risco: {question.risk}</Text>
+                <Text style={styles.itemText}>📌 Verificação: {question.verification}</Text>
+
+                {(question.uploads?.length || 0) > 0 && (
+                  <View style={styles.uploadedList}>
+                    <Text style={styles.uploadedTitle}>📷 Imagens:</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                      {(question.uploads || []).map((file, idx) => (
+                        <TouchableOpacity
+                          key={`${file.nome}-${idx}`}
+                          onPress={() =>
+                            router.push({
+                              pathname: '/previewImage',
+                              params: { uri: file.arquivo },
+                            })
+                          }
+                          style={styles.thumbnailWrapper}
+                        >
+                          <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
+                          <View style={styles.imageContainer}>
+                            <Image source={{ uri: file.arquivo }} style={styles.thumbnail} />
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
               </View>
             ))}
           </View>
         </SecondarySection>
+
+        <SecondarySection
+          icon={<Feather name="tool" size={20} color="#173A64" />}
+          title="Implementações"
+          showChevron={false}
+        >
+          <View style={styles.sectionContent}>
+            {Object.entries(inspection.answers)
+              .filter(([, question]) => question.answer === 'nao')
+              .map(([id, question]) => (
+                <View key={id} style={styles.answerItem}>
+                  <View style={styles.titleRow}>
+                    <Text style={styles.itemTitle}>🔧 Item {id}</Text>
+                  </View>
+                  <Text style={styles.itemText}>🛡 Mitigação: {question.mitigation}</Text>
+                  <Text style={styles.itemText}>📖 Norma ID: {question.normaID}</Text>
+                  <Text style={styles.itemText}>⚡ Limite: {question.limit}</Text>
+                </View>
+              ))}
+            {Object.values(inspection.answers).filter(q => q.answer === 'nao').length === 0 && (
+              <Text style={styles.text}>Nenhuma implementação necessária.</Text>
+            )}
+          </View>
+        </SecondarySection>
+
       </ScrollView>
 
       <View style={styles.bottomMenu}>
@@ -145,6 +194,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 10,
+    paddingVertical: 10,
   },
   menuButton: {
     alignItems: 'center',
@@ -153,18 +203,22 @@ const styles = StyleSheet.create({
   },
   menuText: {
     marginTop: 4,
-    color: '#173A64',
     fontSize: fontSize.placeholder,
   },
   answerItem: {
-    marginBottom: 12,
+    marginBottom: 18,
     width: '100%',
+    backgroundColor: '#f8f9fb',
+    borderRadius: 8,
+    padding: 10,
+    borderLeftWidth: 3,
+    borderColor: colors.mainColor,
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   itemTitle: {
     fontSize: fontSize.label,
@@ -175,8 +229,38 @@ const styles = StyleSheet.create({
     fontSize: fontSize.placeholder,
     color: colors.primaryDark,
     lineHeight: 20,
-    marginBottom: 2,
-    flexWrap: 'wrap',
+    marginBottom: 4,
+  },
+  uploadedList: {
+    marginTop: 8,
     width: '100%',
+  },
+  uploadedTitle: {
+    fontWeight: '600',
+    fontSize: 13,
+    color: colors.primaryDark,
+    marginBottom: 4,
+  },
+  imageContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  thumbnailWrapper: {
+    marginRight: 10,
+    alignItems: 'center',
+  },
+  thumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 4,
+  },
+  imageLabel: {
+    fontSize: 11,
+    color: '#444',
+    marginBottom: 4,
+    maxWidth: 80,
+    textAlign: 'center',
   },
 });

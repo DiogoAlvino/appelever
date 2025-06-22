@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { ScrollView, StyleSheet, View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
+import { ScrollView, StyleSheet, View, Text, ActivityIndicator, TouchableOpacity, Image } from "react-native";
 
 import SecondarySection from "~/components/sections/secondarySection";
 import { colors, fontSize } from '~/theme';
@@ -56,7 +56,6 @@ export default function EquipmentForm() {
       params: { equipmentId: String(equipment.id) },
     });
   };
-
 
   if (loading) {
     return (
@@ -142,7 +141,31 @@ export default function EquipmentForm() {
           )}
         </SecondarySection>
 
+        <SecondarySection
+          icon={<Feather name="image" size={20} color="#173A64" />}
+          title="Imagens do equipamento"
+          showChevron={false}
+        >
+          {(equipment.uploads.length > 0 && equipment.uploads.some(file => file.arquivo)) ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {equipment.uploads.map((file, index) => (
+                file.arquivo && (
+                  <View key={index} style={styles.imageWrapper}>
+                    <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
+                    <View style={styles.imageContainer}>
+                      <Image source={{ uri: file.arquivo }} style={styles.thumbnail} />
+                    </View>
+                  </View>
+                )
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={styles.text}>Nenhuma imagem disponível</Text>
+          )}
+        </SecondarySection>
+
       </ScrollView>
+
       <View style={styles.bottomMenu}>
         <TouchableOpacity
           style={styles.menuButton}
@@ -157,20 +180,17 @@ export default function EquipmentForm() {
           <Text style={styles.menuText}>Editar</Text>
         </TouchableOpacity>
 
-
         <TouchableOpacity style={styles.menuButton} onPress={handleDelete}>
           <Feather name="trash-2" size={20} color="red" />
           <Text style={[styles.menuText, { color: 'red' }]}>Excluir</Text>
         </TouchableOpacity>
 
-
         <TouchableOpacity style={styles.menuButton} onPress={handleInspection}>
           <Feather name="navigation" size={20} color="#173A64" />
           <Text style={styles.menuText}>Inspeção</Text>
         </TouchableOpacity>
-
       </View>
-      
+
       <FeedbackModal
         visible={feedbackVisible}
         type={feedbackType}
@@ -178,7 +198,6 @@ export default function EquipmentForm() {
         onClose={() => setFeedbackVisible(false)}
         onConfirm={confirmDelete}
       />
-
     </>
   );
 }
@@ -207,17 +226,37 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 10,
   },
-
   menuButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10
+    padding: 10,
   },
-
   menuText: {
     marginTop: 4,
     color: '#173A64',
     fontSize: fontSize.placeholder,
   },
-
+  imageWrapper: {
+    marginRight: 10,
+    alignItems: 'center',
+    maxWidth: 100,
+  },
+  imageLabel: {
+    fontSize: 11,
+    color: '#444',
+    marginBottom: 4,
+    maxWidth: 80,
+    textAlign: 'center',
+  },
+  imageContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  thumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 4,
+  },
 });
