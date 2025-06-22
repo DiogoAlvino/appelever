@@ -1,13 +1,15 @@
 import { db } from '~/utils/firebase';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import { InspectionModel } from '~/models/inspectionModel';
 import { questions } from '~/data/questions';
 import { InspectionAnswerModel } from '~/models/inspectionAnswerModel';
+import { UploadModel } from '~/models/uploadModel';
 
 export async function saveInspection(
   equipmentId: string,
   respostasUsuario: { [id: string]: 'sim' | 'nao' | 'na' | null },
-  usuario: string
+  usuario: string,
+  imagens: { [questionId: string]: UploadModel[] }
 ) {
   const answers: { [id: string]: InspectionAnswerModel } = {};
 
@@ -25,6 +27,7 @@ export async function saveInspection(
           verification: q.verification,
           normaID: q.normaID,
           limit: q.limit,
+          uploads: imagens[id] || [],
         };
       }
     });

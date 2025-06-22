@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import PrimaryQuestion from '../questions/primaryQuestion';
 import PrimaryHelper from '../helpers/primaryHelper';
 import { Feather } from '@expo/vector-icons';
+import { UploadModel } from '~/models/uploadModel';
 
 interface QuestionsListProps {
   questoes: {
@@ -14,6 +15,8 @@ interface QuestionsListProps {
   }[];
   respostas: { [id: string]: 'sim' | 'nao' | 'na' | null };
   onResponder: (id: string, value: 'sim' | 'nao' | 'na' | null) => void;
+  onUploadImage: (questionId: string, uploads: UploadModel[]) => void;
+  imagens: { [questionId: string]: UploadModel[] };
 }
 
 const getPriorityColor = (priority: string) => {
@@ -30,13 +33,21 @@ const getPriorityColor = (priority: string) => {
   }
 };
 
-export default function QuestionsList({ questoes, respostas, onResponder }: QuestionsListProps) {
+export default function QuestionsList({
+  questoes,
+  respostas,
+  onResponder,
+  onUploadImage,
+  imagens,
+}: QuestionsListProps) {
   const [helperVisible, setHelperVisible] = useState(false);
-  const [helperContent, setHelperContent] = useState<{ title: string; description: React.ReactNode }>({
+  const [helperContent, setHelperContent] = useState<{
+    title: string;
+    description: React.ReactNode;
+  }>({
     title: '',
     description: '',
   });
-  
 
   const abrirHelper = (risk: string, mitigation: string) => {
     setHelperContent({
@@ -45,15 +56,15 @@ export default function QuestionsList({ questoes, respostas, onResponder }: Ques
         <View>
           <Text style={styles.sectionTitle}>Risco</Text>
           <Text style={styles.sectionText}>{risk}</Text>
-    
+
           <View style={{ height: 12 }} />
-    
+
           <Text style={styles.sectionTitle}>Mitigação</Text>
           <Text style={styles.sectionText}>{mitigation}</Text>
         </View>
       ),
     });
-    
+
     setHelperVisible(true);
   };
 
@@ -65,23 +76,23 @@ export default function QuestionsList({ questoes, respostas, onResponder }: Ques
         return (
           <PrimaryQuestion
             key={q.id}
-            title={
+            questionId={q.id}
+            title={(
               <View style={styles.titleContainer}>
                 <View style={styles.titleLeft}>
                   <View style={[styles.priorityDot, { backgroundColor: color }]} />
                   <Text style={styles.titleText}>{`Item ${q.id}`}</Text>
                 </View>
-            
                 <TouchableOpacity onPress={() => abrirHelper(q.risk, q.mitigation)}>
                   <Feather name="help-circle" size={20} color="#173A64" />
                 </TouchableOpacity>
               </View>
-            }            
+            )}
             description={q.verification}
             selectedOption={respostas[q.id] || null}
-            onSelect={(value) =>
-              onResponder(q.id, respostas[q.id] === value ? null : value)
-            }
+            onSelect={(value) => onResponder(q.id, respostas[q.id] === value ? null : value)}
+            onUploadSuccess={(uploads) => onUploadImage(q.id, uploads)}
+            uploads={imagens[q.id] || []}
           />
         );
       })}
@@ -102,7 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
-    width: "100%",
+    width: '100%',
   },
   titleLeft: {
     flexDirection: 'row',
@@ -129,6 +140,4 @@ const styles = StyleSheet.create({
     color: '#444',
     lineHeight: 20,
   },
-  
 });
-

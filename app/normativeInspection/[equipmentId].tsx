@@ -9,11 +9,13 @@ import MainButton from "~/components/buttons/mainButton";
 import { useEquipmentById } from '~/hooks/useEquipmentById';
 import InspectionSection from "~/components/sections/inspectionSection";
 import { saveInspection } from '~/services/inspectionService';
-import FeedbackModal from '~/components/modal/feedbackModal'; // IMPORTANTE
+import FeedbackModal from '~/components/modal/feedbackModal';
+import { UploadModel } from "~/models/uploadModel";
 
 export default function EquipmentPage() {
   const { equipmentId } = useLocalSearchParams<{ equipmentId: string }>();
   const [respostas, setRespostas] = useState<{ [id: string]: 'sim' | 'nao' | 'na' | null }>({});
+  const [imagens, setImagens] = useState<{ [id: string]: UploadModel[] }>({});
 
   const { equipment: selectedEquipment, loading } = useEquipmentById(String(equipmentId));
 
@@ -34,7 +36,8 @@ export default function EquipmentPage() {
       await saveInspection(
         String(equipmentId),
         respostas,
-        selectedEquipment.usuario || 'Desconhecido'
+        selectedEquipment.usuario || 'Desconhecido',
+        imagens
       );
 
       setFeedbackType('success');
@@ -55,6 +58,10 @@ export default function EquipmentPage() {
 
   const handleResponder = (id: string, value: 'sim' | 'nao' | 'na' | null) => {
     setRespostas((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleUploadImage = (questionId: string, uploads: UploadModel[]) => {
+    setImagens((prev) => ({ ...prev, [questionId]: [...(prev[questionId] || []), ...uploads] }));
   };
 
   const handleViewEquipment = (equipmentId: any) => {
@@ -103,6 +110,8 @@ export default function EquipmentPage() {
       <InspectionSection
         respostas={respostas}
         onResponder={handleResponder}
+        onUploadImage={handleUploadImage}
+        imagens={imagens}
       />
 
       {Object.values(respostas).some(res => res !== null && res !== undefined) && (

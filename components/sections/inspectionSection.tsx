@@ -2,13 +2,16 @@ import React from 'react';
 import PrimaryList from '~/components/lists/primaryList';
 import QuestionsList from '~/components/lists/questionsList';
 import { questions } from '~/data/questions';
+import { UploadModel } from '~/models/uploadModel';
 
 interface InspectionSectionProps {
   respostas: { [id: string]: 'sim' | 'nao' | 'na' | null };
   onResponder: (id: string, value: 'sim' | 'nao' | 'na' | null) => void;
+  onUploadImage: (questionId: string, uploads: UploadModel[]) => void;
+  imagens: { [questionId: string]: UploadModel[] };
 }
 
-export default function InspectionSection({ respostas, onResponder }: InspectionSectionProps) {
+export default function InspectionSection({ respostas, onResponder, onUploadImage, imagens }: InspectionSectionProps) {
   return (
     <>
       {questions.map((section, index) => {
@@ -35,6 +38,8 @@ export default function InspectionSection({ respostas, onResponder }: Inspection
               questoes={listaComIds}
               respostas={respostas}
               onResponder={onResponder}
+              onUploadImage={onUploadImage}
+              imagens={imagens}
             />
           </PrimaryList>
         );

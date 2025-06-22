@@ -1,72 +1,110 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
-import * as MediaLibrary from 'expo-media-library';
 import { useCameraPermissions } from 'expo-camera';
 import { Feather } from '@expo/vector-icons';
-import { colors, border } from '~/theme';
+import { UploadModel } from '~/models/uploadModel';
+import { colors } from '~/theme';
 
 interface FileItem {
   name: string;
   size: number;
   uri: string;
-  type: 'image' | 'file' | 'photo';
+  type: 'image' | 'photo';
 }
 
-export default function FileUpload() {
-  const [files, setFiles] = useState<FileItem[]>([]);
+interface Props {
+  onUploadSuccess: (files: UploadModel[]) => void;
+}
 
+export default function FileUpload({ onUploadSuccess }: Props) {
+  const [files, setFiles] = useState<FileItem[]>([]);
   const [permission, requestPermission] = useCameraPermissions();
 
-  const handlePickFiles = async () => {
-    const result = await DocumentPicker.getDocumentAsync({ type: '*/*', multiple: true });
-    if (result.assets) {
-      const newFiles: FileItem[] = result.assets.map((file) => ({
-        name: file.name,
-        size: file.size ?? 0,
+  const compressAndConvert = async (
+    source: 'camera' | 'gallery'
+  ): Promise<{ base64: string; fileName: string; uri: string; fileSize: number } | null> => {
+    const pickerMethod =
+      source === 'camera'
+        ? ImagePicker.launchCameraAsync
+        : ImagePicker.launchImageLibraryAsync;
+
+    const result = await pickerMethod({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.3,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const file = result.assets[0];
+      if (!file.base64) {
+        Alert.alert('Erro', 'Não foi possível converter a imagem.');
+        return null;
+      }
+
+      return {
+        base64: file.base64,
+        fileName: file.fileName || (source === 'camera' ? 'foto.jpg' : 'imagem.jpg'),
         uri: file.uri,
-        type: 'file', 
-      }));
-      setFiles(prev => [...prev, ...newFiles]);
+        fileSize: file.fileSize ?? 0,
+      };
     }
+
+    return null;
   };
 
   const handlePickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images });
-    if (!result.canceled && result.assets.length > 0) {
-      const file = result.assets[0];
-      setFiles(prev => [...prev, {
-        name: file.fileName || 'imagem.jpg',
-        size: file.fileSize ?? 0,
-        uri: file.uri,
-        type: 'image'
-      }]);
-    }
+    const result = await compressAndConvert('gallery');
+    if (!result) return;
+
+    const upload: UploadModel = {
+      nome: result.fileName,
+      arquivo: `data:image/jpeg;base64,${result.base64}`,
+    };
+
+    onUploadSuccess([upload]);
+    setFiles((prev) => [
+      ...prev,
+      {
+        name: result.fileName,
+        size: result.fileSize,
+        uri: result.uri,
+        type: 'image',
+      },
+    ]);
   };
 
   const handleTakePhoto = async () => {
     const { granted } = await requestPermission();
-    if (granted) {
-      const result = await ImagePicker.launchCameraAsync({ quality: 0.7 });
-      if (!result.canceled && result.assets.length > 0) {
-        const file = result.assets[0];
-        setFiles((prev) => [...prev, {
-          name: file.fileName || 'foto.jpg',
-          size: file.fileSize ?? 0,
-          uri: file.uri,
-          type: 'photo', // fix literal type
-        }]);
-      }
-    } else {
+    if (!granted) {
       Alert.alert('Permissão negada', 'Você precisa permitir o uso da câmera.');
+      return;
     }
+
+    const result = await compressAndConvert('camera');
+    if (!result) return;
+
+    const upload: UploadModel = {
+      nome: result.fileName,
+      arquivo: `data:image/jpeg;base64,${result.base64}`,
+    };
+
+    onUploadSuccess([upload]);
+    setFiles((prev) => [
+      ...prev,
+      {
+        name: result.fileName,
+        size: result.fileSize,
+        uri: result.uri,
+        type: 'photo',
+      },
+    ]);
   };
 
   const formatSize = (bytes: number) => `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 
   const handleRemove = (uri: string) => {
-    setFiles((prev) => prev.filter(file => file.uri !== uri));
+    setFiles((prev) => prev.filter((file) => file.uri !== uri));
   };
 
   return (
@@ -78,20 +116,13 @@ export default function FileUpload() {
         <TouchableOpacity style={styles.button} onPress={handlePickImage}>
           <Feather name="image" size={20} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handlePickFiles}>
-          <Feather name="paperclip" size={20} color="#fff" />
-        </TouchableOpacity>
       </View>
 
       {files.length > 0 && (
         <View style={styles.fileList}>
           {files.map((file) => (
             <View key={file.uri} style={styles.fileItem}>
-              {file.type === 'image' || file.type === 'photo' ? (
-                <Image source={{ uri: file.uri }} style={styles.thumbnail} />
-              ) : (
-                <Feather name="file" size={20} color="#777" />
-              )}
+              <Image source={{ uri: file.uri }} style={styles.thumbnail} />
               <View style={styles.fileDetails}>
                 <Text numberOfLines={1}>{file.name}</Text>
                 <Text style={styles.fileSize}>{formatSize(file.size)}</Text>
@@ -112,12 +143,11 @@ export default function FileUpload() {
 
 const styles = StyleSheet.create({
   container: { width: '100%', gap: 12, paddingTop: 5 },
-  buttonsContainer: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: 12,
- },
-    
+  },
   button: {
     backgroundColor: colors.mainColor,
     borderRadius: 8,

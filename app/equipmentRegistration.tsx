@@ -11,6 +11,7 @@ import { useEquipmentForm } from '~/hooks/useEquipmentForm';
 import { useState, useEffect } from 'react';
 import FeedbackModal from '~/components/modal/feedbackModal';
 import { router, useLocalSearchParams } from 'expo-router';
+import { UploadModel } from '~/models/uploadModel';
 
 export default function EquipmentRegistration() {
   const {
@@ -32,6 +33,7 @@ export default function EquipmentRegistration() {
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackType, setFeedbackType] = useState<'loading' | 'success' | 'error'>('loading');
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [uploads, setUploads] = useState<UploadModel[]>([]);
 
   const { mode, equipmentId } = useLocalSearchParams();
 
@@ -48,6 +50,7 @@ export default function EquipmentRegistration() {
               dataInstalacao: new Date(equipmentData.detalhes_equipamento.dataInstalacao),
             });
             setEmpresaConservadora(equipmentData.empresa_conservadora);
+            setUploads(equipmentData.uploads || []);
           }
         } catch (error) {
           console.error('Erro ao carregar equipamento para edição', error);
@@ -72,14 +75,19 @@ export default function EquipmentRegistration() {
     setFeedbackMessage(mode === 'edit' ? 'Atualizando equipamento...' : 'Salvando equipamento...');
     setFeedbackVisible(true);
 
+    const formData = {
+      ...getFormData(),
+      uploads,
+    };
+
     try {
       if (mode === 'edit' && equipmentId) {
-        await updateEquipment(equipmentId as string, getFormData());
+        await updateEquipment(equipmentId as string, formData);
         setFeedbackType('success');
         setFeedbackMessage('Equipamento atualizado com sucesso!');
         setTimeout(() => router.push('/equipments'), 1000);
       } else {
-        const docRef = await saveEquipment(getFormData());
+        const docRef = await saveEquipment(formData);
         setFeedbackType('success');
         setFeedbackMessage('Equipamento cadastrado com sucesso!');
         setTimeout(() => router.push(`/equipmentForm/${docRef.id}`), 1000);
@@ -87,6 +95,7 @@ export default function EquipmentRegistration() {
 
       setTimeout(() => setFeedbackVisible(false), 1000);
       resetForm();
+      setUploads([]);
     } catch (error) {
       console.error(error);
       setFeedbackType('error');
@@ -148,11 +157,10 @@ export default function EquipmentRegistration() {
       </PrimarySection>
 
       <PrimarySection title="Arquivos Relacionados">
-        <FileUpload/>
-      
+        <FileUpload
+          onUploadSuccess={(files) => setUploads((prev) => [...prev, ...files])}
+        />
       </PrimarySection>
-
-      
 
       <View style={styles.buttons}>
         <MainButton title={mode === 'edit' ? 'Salvar Alterações' : 'Cadastrar'} type="primary" onPress={handleSave} />

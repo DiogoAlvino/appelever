@@ -1,9 +1,13 @@
+// models/inspectionAnswerModel.ts
+import { UploadModel } from './uploadModel';
+
 export interface InspectionAnswerModel {
-    answer: 'sim' | 'nao' | 'na';
-    priority: 'alto' | 'medio' | 'médio' | 'baixo';
-    risk: string;
-    mitigation: string;
-    verification: string;
-    normaID: string;
-    limit: string;
+  answer: 'sim' | 'nao' | 'na';
+  priority: 'alto' | 'medio' | 'médio' | 'baixo';
+  risk: string;
+  mitigation: string;
+  verification: string;
+  normaID?: string;
+  limit?: string;
+  uploads?: UploadModel[];
 }
