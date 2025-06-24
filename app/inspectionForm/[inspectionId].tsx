@@ -6,14 +6,18 @@ import { useState } from "react";
 import SecondarySection from "~/components/sections/secondarySection";
 import FeedbackModal from "~/components/modal/feedbackModal";
 import { useInspectionById } from "~/hooks/useInspectionById";
+import { useEquipmentById } from "~/hooks/useEquipmentById";
 import { db } from '~/utils/firebase';
 import { deleteDoc, doc } from 'firebase/firestore';
-import { colors, fontSize, padding } from '~/theme';
+import { colors, fontSize } from '~/theme';
 import { capitalize } from "lodash";
 
 export default function InspectionForm() {
   const { inspectionId } = useLocalSearchParams();
-  const { inspection, loading } = useInspectionById(String(inspectionId));
+  const { inspection, loading: loadingInspection } = useInspectionById(String(inspectionId));
+
+  const equipmentId = inspection?.equipmentId;
+  const { equipment: selectedEquipment, loading: loadingEquipment } = useEquipmentById(equipmentId ?? '');
 
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackType, setFeedbackType] = useState<'confirm' | 'loading' | 'success' | 'error'>('confirm');
@@ -46,7 +50,14 @@ export default function InspectionForm() {
     }
   };
 
-  if (loading) {
+  const handleViewEquipment = (equipmentId: string) => {
+    router.push({
+      pathname: '/equipmentForm/[equipmentId]',
+      params: { equipmentId },
+    });
+  };
+
+  if (loadingInspection || (equipmentId && loadingEquipment)) {
     return (
       <View style={[styles.container, { justifyContent: 'center', flex: 1 }]}>
         <ActivityIndicator size="large" color="#000" />
@@ -65,6 +76,26 @@ export default function InspectionForm() {
   return (
     <>
       <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+
+        <SecondarySection
+          icon={<Feather name="tag" size={20} color="#173A64" />}
+          title={selectedEquipment?.detalhes_equipamento?.identificacaoEquipamento || 'Equipamento não identificado'}
+          onPress={() => {
+            if (selectedEquipment?.id) {
+              handleViewEquipment(selectedEquipment.id);
+            }
+          }}
+        >
+          {selectedEquipment ? (
+            <>
+              <Text style={styles.text}>{selectedEquipment.id}</Text>
+              <Text style={styles.text}>{selectedEquipment.local?.edificacao}</Text>
+            </>
+          ) : (
+            <Text style={styles.text}>Não foi possível localizar o equipamento vinculado a esta inspeção.</Text>
+          )}
+        </SecondarySection>
+
 
         <SecondarySection
           icon={<Feather name="user" size={20} color="#173A64" />}
@@ -99,7 +130,7 @@ export default function InspectionForm() {
                     <Text style={styles.itemTitle}>Prioridade:</Text>
                     <Text style={[styles.itemText, { marginLeft: 4 }]}>{capitalize(question.priority)}</Text>
                   </View>
-                  <View >
+                  <View>
                     <Text style={styles.itemTitle}>Verificação:</Text>
                     <Text style={styles.itemText}>{question.verification}</Text>
                   </View>
@@ -124,7 +155,6 @@ export default function InspectionForm() {
                     </TouchableOpacity>
                   )
                 ))}
-
               </View>
             ))}
           </View>
@@ -152,7 +182,6 @@ export default function InspectionForm() {
                       <Text style={styles.itemText}>{question.limit}</Text>
                     </View>
                   </View>
-
                 </View>
               ))}
             {Object.values(inspection.answers).filter(q => q.answer === 'nao').length === 0 && (
