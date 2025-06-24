@@ -65,7 +65,7 @@ export default function InspectionForm() {
   return (
     <>
       <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
-        
+
         <SecondarySection
           icon={<Feather name="user" size={20} color="#173A64" />}
           title="Responsável pela inspeção"
@@ -105,30 +105,26 @@ export default function InspectionForm() {
                   </View>
                 </View>
 
-                {(question.uploads?.length || 0) > 0 && (
-                  <View style={styles.uploadedList}>
-                    <Text style={styles.uploadedTitle}>📷 Imagens:</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                      {(question.uploads || []).map((file, idx) => (
-                        <TouchableOpacity
-                          key={`${file.nome}-${idx}`}
-                          onPress={() =>
-                            router.push({
-                              pathname: '/previewImage',
-                              params: { uri: file.arquivo },
-                            })
-                          }
-                          style={styles.thumbnailWrapper}
-                        >
-                          <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
-                          <View style={styles.imageContainer}>
-                            <Image source={{ uri: file.arquivo }} style={styles.thumbnail} />
-                          </View>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  </View>
-                )}
+                {(question.uploads || []).map((file, idx) => (
+                  !!file.arquivo && typeof file.arquivo === 'string' && (
+                    <TouchableOpacity
+                      key={`${file.nome}-${idx}`}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/previewImage',
+                          params: { uri: file.arquivo },
+                        })
+                      }
+                      style={styles.thumbnailWrapper}
+                    >
+                      <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
+                      <View style={styles.imageContainer}>
+                        <Image source={{ uri: file.arquivo }} style={styles.thumbnail} />
+                      </View>
+                    </TouchableOpacity>
+                  )
+                ))}
+
               </View>
             ))}
           </View>

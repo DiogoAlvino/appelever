@@ -146,16 +146,25 @@ export default function EquipmentForm() {
           title="Imagens do equipamento"
           showChevron={false}
         >
-          {(equipment.uploads.length > 0 && equipment.uploads.some(file => file.arquivo)) ? (
+          {(equipment.uploads.length > 0 && equipment.uploads.some(file => typeof file.arquivo === 'string' && !!file.arquivo)) ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {equipment.uploads.map((file, index) => (
-                file.arquivo && (
-                  <View key={index} style={styles.imageWrapper}>
+                typeof file.arquivo === 'string' && !!file.arquivo && (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.imageWrapper}
+                    onPress={() =>
+                      router.push({
+                        pathname: '/previewImage',
+                        params: { uri: file.arquivo },
+                      })
+                    }
+                  >
                     <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
                     <View style={styles.imageContainer}>
                       <Image source={{ uri: file.arquivo }} style={styles.thumbnail} />
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 )
               ))}
             </ScrollView>
@@ -163,6 +172,7 @@ export default function EquipmentForm() {
             <Text style={styles.text}>Nenhuma imagem disponível</Text>
           )}
         </SecondarySection>
+
 
       </ScrollView>
 
