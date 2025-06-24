@@ -136,29 +136,39 @@ export default function InspectionForm() {
                   </View>
                 </View>
 
-                {(question.uploads || []).map((file, idx) => (
-                  !!file.arquivo && typeof file.arquivo === 'string' && (
-                    <TouchableOpacity
-                      key={`${file.nome}-${idx}`}
-                      onPress={() =>
-                        router.push({
-                          pathname: '/previewImage',
-                          params: { uri: file.arquivo },
-                        })
-                      }
-                      style={styles.thumbnailWrapper}
-                    >
-                      <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
-                      <View style={styles.imageContainer}>
-                        <Image source={{ uri: file.arquivo }} style={styles.thumbnail} />
-                      </View>
-                    </TouchableOpacity>
-                  )
-                ))}
+                {(question.uploads?.length ?? 0) > 0 && (
+                  <View style={styles.uploadedList}>
+                    <Text style={styles.uploadedTitle}>📷 Imagens:</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                      {(question.uploads ?? []).map((file, idx) => (
+                        !!file.arquivo && typeof file.arquivo === 'string' && (
+                          <TouchableOpacity
+                            key={`${file.nome}-${idx}`}
+                            onPress={() =>
+                              router.push({
+                                pathname: '/previewImage',
+                                params: { uri: file.arquivo },
+                              })
+                            }
+                            style={styles.thumbnailWrapper}
+                          >
+                            <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
+                            <View style={styles.imageContainer}>
+                              <Image source={{ uri: file.arquivo }} style={styles.thumbnail} />
+                            </View>
+                          </TouchableOpacity>
+                        )
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
+
+
               </View>
             ))}
           </View>
         </SecondarySection>
+
 
         <SecondarySection
           icon={<Feather name="tool" size={20} color="#173A64" />}
