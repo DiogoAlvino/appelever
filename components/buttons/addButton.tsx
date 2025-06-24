@@ -20,7 +20,7 @@ interface AddButtonProps {
 export default function AddButton({ label, onPress, style }: AddButtonProps) {
   return (
     <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
-      <Feather name="plus-circle" size={19} color="#007bff" />
+      <Feather name="plus-circle" size={19} color="#1666db" />
       <Text style={styles.label}>{label}</Text>
     </TouchableOpacity>
   );

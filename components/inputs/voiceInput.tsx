@@ -3,6 +3,7 @@ import { View, TextInput, StyleSheet, TouchableOpacity, Keyboard } from 'react-n
 import Voice from '@react-native-voice/voice';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '~/theme';
+import { Platform } from 'react-native';
 
 interface VoiceInputProps {
   value: string;
@@ -11,6 +12,10 @@ interface VoiceInputProps {
 
 export default function VoiceInput({ value, onChangeText }: VoiceInputProps) {
   const [isRecording, setIsRecording] = useState(false);
+
+  if (Platform.OS === 'web') {
+    return null; // Ou exiba apenas o TextInput sem botão de gravação
+  }
 
   useEffect(() => {
     Voice.onSpeechResults = (event) => {
@@ -21,9 +26,14 @@ export default function VoiceInput({ value, onChangeText }: VoiceInputProps) {
     Voice.onSpeechEnd = () => setIsRecording(false);
 
     return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
+      if (Voice?.destroy && Voice?.removeAllListeners) {
+        Voice.destroy().then(() => {
+          Voice.removeAllListeners();
+        }).catch((e) => console.warn('Erro ao destruir voz:', e));
+      }
     };
   }, [value]);
+
 
   const startRecording = async () => {
     try {

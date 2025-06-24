@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View, Alert } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, Text } from 'react-native';
 import { saveEquipment, updateEquipment, fetchEquipmentById } from '~/services/equipmentService';
 import FileUpload from '~/components/inputs/fileUpload';
 
@@ -50,7 +50,9 @@ export default function EquipmentRegistration() {
               dataInstalacao: new Date(equipmentData.detalhes_equipamento.dataInstalacao),
             });
             setEmpresaConservadora(equipmentData.empresa_conservadora);
-            setUploads(equipmentData.uploads || []);
+            if (equipmentData.uploads) {
+              setUploads(equipmentData.uploads);
+            }
           }
         } catch (error) {
           console.error('Erro ao carregar equipamento para edição', error);
@@ -75,12 +77,12 @@ export default function EquipmentRegistration() {
     setFeedbackMessage(mode === 'edit' ? 'Atualizando equipamento...' : 'Salvando equipamento...');
     setFeedbackVisible(true);
 
-    const formData = {
-      ...getFormData(),
-      uploads,
-    };
-
     try {
+      const formData = {
+        ...getFormData(),
+        uploads,
+      };
+
       if (mode === 'edit' && equipmentId) {
         await updateEquipment(equipmentId as string, formData);
         setFeedbackType('success');
@@ -95,7 +97,6 @@ export default function EquipmentRegistration() {
 
       setTimeout(() => setFeedbackVisible(false), 1000);
       resetForm();
-      setUploads([]);
     } catch (error) {
       console.error(error);
       setFeedbackType('error');
@@ -158,8 +159,12 @@ export default function EquipmentRegistration() {
 
       <PrimarySection title="Arquivos Relacionados">
         <FileUpload
-          onUploadSuccess={(files) => setUploads((prev) => [...prev, ...files])}
+          equipmentId={equipmentId as string || 'temp'}
+          onUploadSuccess={(uploaded: UploadModel) => setUploads(prev => [...prev, uploaded])}
         />
+        {uploads.map((file) => (
+          <Text key={file.path}>{file.nome}</Text>
+        ))}
       </PrimarySection>
 
       <View style={styles.buttons}>

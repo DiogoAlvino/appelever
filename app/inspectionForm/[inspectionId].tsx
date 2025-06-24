@@ -8,7 +8,7 @@ import FeedbackModal from "~/components/modal/feedbackModal";
 import { useInspectionById } from "~/hooks/useInspectionById";
 import { db } from '~/utils/firebase';
 import { deleteDoc, doc } from 'firebase/firestore';
-import { colors, fontSize } from '~/theme';
+import { colors, fontSize, padding } from '~/theme';
 import { capitalize } from "lodash";
 
 export default function InspectionForm() {
@@ -88,12 +88,22 @@ export default function InspectionForm() {
             {Object.entries(inspection.answers).map(([id, question]) => (
               <View key={id} style={styles.answerItem}>
                 <View style={styles.titleRow}>
-                  <Text style={styles.itemTitle}>🔹 Item {id}</Text>
+                  <Text style={styles.itemTitle}>Item {id}</Text>
                 </View>
-                <Text style={styles.itemText}>✔ Resposta: {question.answer.toUpperCase()}</Text>
-                <Text style={styles.itemText}>⚠ Prioridade: {capitalize(question.priority)}</Text>
-                <Text style={styles.itemText}>💥 Risco: {question.risk}</Text>
-                <Text style={styles.itemText}>📌 Verificação: {question.verification}</Text>
+                <View style={styles.inspection}>
+                  <View style={styles.viewItem}>
+                    <Text style={styles.itemTitle}>Resposta:</Text>
+                    <Text style={[styles.itemText, { marginLeft: 4 }]}>{question.answer.toUpperCase()}</Text>
+                  </View>
+                  <View style={styles.viewItem}>
+                    <Text style={styles.itemTitle}>Prioridade:</Text>
+                    <Text style={[styles.itemText, { marginLeft: 4 }]}>{capitalize(question.priority)}</Text>
+                  </View>
+                  <View >
+                    <Text style={styles.itemTitle}>Verificação:</Text>
+                    <Text style={styles.itemText}>{question.verification}</Text>
+                  </View>
+                </View>
 
                 {(question.uploads?.length || 0) > 0 && (
                   <View style={styles.uploadedList}>
@@ -134,12 +144,19 @@ export default function InspectionForm() {
               .filter(([, question]) => question.answer === 'nao')
               .map(([id, question]) => (
                 <View key={id} style={styles.answerItem}>
-                  <View style={styles.titleRow}>
-                    <Text style={styles.itemTitle}>🔧 Item {id}</Text>
+                  <View style={styles.inspection}>
+                    <Text style={styles.itemTitle}>Item {id}</Text>
+                    <Text style={styles.itemTitle}>Norma: {question.normaID}</Text>
+                    <View>
+                      <Text style={styles.itemTitle}>Descrição:</Text>
+                      <Text style={styles.itemText}>{question.mitigation}</Text>
+                    </View>
+                    <View>
+                      <Text style={styles.itemTitle}>Necessidade de implementação:</Text>
+                      <Text style={styles.itemText}>{question.limit}</Text>
+                    </View>
                   </View>
-                  <Text style={styles.itemText}>🛡 Mitigação: {question.mitigation}</Text>
-                  <Text style={styles.itemText}>📖 Norma ID: {question.normaID}</Text>
-                  <Text style={styles.itemText}>⚡ Limite: {question.limit}</Text>
+
                 </View>
               ))}
             {Object.values(inspection.answers).filter(q => q.answer === 'nao').length === 0 && (
@@ -206,13 +223,12 @@ const styles = StyleSheet.create({
     fontSize: fontSize.placeholder,
   },
   answerItem: {
-    marginBottom: 18,
     width: '100%',
-    backgroundColor: '#f8f9fb',
-    borderRadius: 8,
-    padding: 10,
-    borderLeftWidth: 3,
-    borderColor: colors.mainColor,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc9",
+    borderStyle: "dashed",
+    paddingBottom: 20,
+    paddingTop: 5,
   },
   titleRow: {
     flexDirection: 'row',
@@ -222,7 +238,7 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontSize: fontSize.label,
-    fontWeight: 'bold',
+    fontWeight: '500',
     color: colors.primaryDark,
   },
   itemText: {
@@ -262,5 +278,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     maxWidth: 80,
     textAlign: 'center',
+  },
+  inspection: {
+    gap: 4,
+  },
+  viewItem: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    width: "100%",
   },
 });

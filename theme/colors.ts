@@ -8,7 +8,7 @@ export const colors = {
     bgInput: '#F0F6FF',
     bgScreen: '#F5FAFF',
     bgMenu: '#6D8ABD',
-    bgLink: '#007bff',
+    bgLink: '#1666db',
     bgGray: '#F9F9F9',
 };
   

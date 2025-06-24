@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   label: {
-    color: colors.mainColor,
+    color: colors.bgLink,
     fontSize: 14,
     fontWeight: '500',
   },
