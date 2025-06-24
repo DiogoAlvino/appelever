@@ -1,16 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 
 import SearchInput from '~/components/inputs/searchInput';
 import InspectionList from '~/components/lists/inspectionList';
 import { useInspections } from '~/hooks/useInspections';
 import FeedbackModal from '~/components/modal/feedbackModal';
+import { useAuth } from '~/hooks/useAuth';
 
 export default function Inspections() {
-  const { inspections, loading, reload } = useInspections();
+  const { user } = useAuth();
+  const { inspections, loading, fetchInspections } = useInspections();
 
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
+
+  useEffect(() => {
+    if (user?.email) {
+      fetchInspections(user.email);
+    }
+  }, [user?.email]);
 
   if (loading) {
     return (
@@ -23,7 +31,7 @@ export default function Inspections() {
   return (
     <View style={styles.page}>
       <ScrollView contentContainerStyle={styles.container}>
-        <SearchInput onSearch={reload} />
+        <SearchInput onSearch={() => fetchInspections(user?.email || '')} />
         <View style={styles.bar}>
           <Text>Filtro</Text>
           <Text>Total: {inspections.length}</Text>
@@ -34,9 +42,10 @@ export default function Inspections() {
           onError={(msg) => {
             setFeedbackMessage(msg);
             setFeedbackVisible(true);
-          } } selectedId={null} onSelect={function (id: string): void {
-            throw new Error('Function not implemented.');
-          } }        />
+          }}
+          selectedId={null}
+          onSelect={() => {}}
+        />
       </ScrollView>
 
       <FeedbackModal
