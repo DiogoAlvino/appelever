@@ -9,6 +9,7 @@ import LocationButton from '../buttons/locationButton';
 import FileUpload from '../inputs/fileUpload';
 import VoiceInput from '../inputs/voiceInput';
 import PrimarySelect from '../inputs/primarySelect';
+import MaterialList from '../lists/materialList';
 
 
 export default function ForensicSection() {
@@ -174,15 +175,12 @@ export default function ForensicSection() {
                 </View>
             </PrimaryList>
 
-            <PrimaryList
-                title="2. Materiais, equipamentos, EPI e EPC"
-            >
+            <PrimaryList title="2. Materiais, equipamentos, EPI e EPC">
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Lista</Text>
-
+                        <Text style={styles.titulos}>Lista de Materiais e EPIs</Text>
+                        <MaterialList />
                     </View>
-
                 </View>
             </PrimaryList>
 
