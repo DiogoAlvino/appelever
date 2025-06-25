@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { use, useState } from 'react';
 import PrimaryList from '~/components/lists/primaryList';
 import PrimaryInput from '../inputs/primaryInput';
 import { StyleSheet, View, Text } from 'react-native';
@@ -29,11 +29,19 @@ export default function ForensicSection() {
     const [peritoAuxiliar, setPeritoAuxiliar] = useState(['']);
     const [tecnico, setTecnico] = useState(['']);
     const [outros, setOutros] = useState(['']);
+    const [dadosPreliminares, setDadosPreliminares] = useState(['']);
+    const [acondicionamento, setAcondicionamento] = useState(['']);
     const [riscoAPR, setRiscoAPR] = useState({
         riscoAcidente: '',
         riscoFisico: '',
         gravidade: '',
         probabilidade: '',
+    });
+    const [vestigio, setVestigio] = useState({
+        naturezaVestigio: '',
+        naturezaOutros: '',
+        acondicionamento: '',
+        acondicionamentoOutros: '',
     });
 
     const adicionarCampo = (setter: React.Dispatch<React.SetStateAction<string[]>>) => {
@@ -178,7 +186,6 @@ export default function ForensicSection() {
             <PrimaryList title="2. Materiais, equipamentos, EPI e EPC">
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Lista de Materiais e EPIs</Text>
                         <MaterialList />
                     </View>
                 </View>
@@ -257,7 +264,7 @@ export default function ForensicSection() {
                                     label={`Perito auxiliar ${index + 1}`}
                                     placeholder="Informe"
                                     value={info}
-                                    onChangeText={(text) => atualizarCampo(setPeritoAuxiliar ,index, text)}
+                                    onChangeText={(text) => atualizarCampo(setPeritoAuxiliar, index, text)}
                                 />
 
                                 <PrimaryInput
@@ -270,7 +277,7 @@ export default function ForensicSection() {
                                 {index > 0 && (
                                     <RemoveButton
                                         label="Remover perito auxiliar"
-                                        onPress={() => removerCampo(setPeritoAuxiliar ,index)}
+                                        onPress={() => removerCampo(setPeritoAuxiliar, index)}
                                     />
                                 )}
                             </View>
@@ -286,7 +293,7 @@ export default function ForensicSection() {
                                     label={`Técnico ${index + 1}`}
                                     placeholder="Informe"
                                     value={info}
-                                    onChangeText={(text) => atualizarCampo(setTecnico ,index, text)}
+                                    onChangeText={(text) => atualizarCampo(setTecnico, index, text)}
                                 />
 
                                 <PrimaryInput
@@ -299,7 +306,7 @@ export default function ForensicSection() {
                                 {index > 0 && (
                                     <RemoveButton
                                         label="Remover técnico"
-                                        onPress={() => removerCampo(setTecnico ,index)}
+                                        onPress={() => removerCampo(setTecnico, index)}
                                     />
                                 )}
                             </View>
@@ -316,7 +323,7 @@ export default function ForensicSection() {
                                     label={`Outros ${index + 1}`}
                                     placeholder="Informe"
                                     value={info}
-                                    onChangeText={(text) => atualizarCampo(setOutros ,index, text)}
+                                    onChangeText={(text) => atualizarCampo(setOutros, index, text)}
                                 />
 
                                 <PrimaryInput
@@ -329,7 +336,7 @@ export default function ForensicSection() {
                                 {index > 0 && (
                                     <RemoveButton
                                         label="Remover técnico"
-                                        onPress={() => removerCampo(setOutros ,index)}
+                                        onPress={() => removerCampo(setOutros, index)}
                                     />
                                 )}
                             </View>
@@ -358,7 +365,7 @@ export default function ForensicSection() {
                                 }}
                                 placeholder="Selecione"
                                 options={['Temperatura', 'Vibração', 'Irradiação', 'Ruído', 'Pressão', 'Umidade']} />
-                            
+
 
                         </View >
 
@@ -379,18 +386,18 @@ export default function ForensicSection() {
                                 }}
                                 placeholder="Selecione"
                                 options={['Baixa', 'Moderada', 'Alta']} />
-                            
+
 
                         </View >
 
                         <View style={styles.campoInternoSecundario}>
                             <Text style={styles.titulos}>Medidas Mitigatórias</Text>
                             <PrimaryInput
-                                    label="(Isolamento do Local, uso de EPI, EPC;)"
-                                    placeholder="Informe"
-                                    value={dadosIniciais.logradouro}
-                                    onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
-                                />
+                                label="(Isolamento do Local, uso de EPI, EPC;)"
+                                placeholder="Informe"
+                                value={dadosIniciais.logradouro}
+                                onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            />
 
                         </View >
                     </View>
@@ -405,10 +412,124 @@ export default function ForensicSection() {
             >
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Lista</Text>
+                        <Text style={styles.titulos}>Vestígio - Coleta</Text>
+                        <View style={styles.campoInterno}>
+                            {dadosPreliminares.map((info, index) => (
+                                <View key={index} style={{ marginBottom: 12, gap: 12 }}>
+                                    <Text style={styles.titulos}>Dados preliminares {index + 1}</Text>
+        
+                                    <PrimaryInput
+                                        label="Nº do vestígio"
+                                        placeholder="Informe"
+                                        value={dadosIniciais.logradouro}
+                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                    />
+        
+                                    <PrimaryInput
+                                        label="Unidade de Origem"
+                                        placeholder="Informe"
+                                        value={dadosIniciais.logradouro}
+                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                    />
+        
+                                    <PrimaryInput
+                                        label="Nº do Procedimento (IP/TCO/Outros)"
+                                        placeholder="Informe"
+                                        value={dadosIniciais.logradouro}
+                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                    />
+                                        <PrimarySelect
+                                            label="Natureza do Vestígio"
+                                            selected={vestigio.naturezaVestigio}
+                                            onSelect={(value) => {
+                                                setVestigio({ ...vestigio, naturezaVestigio: value, naturezaOutros: '' });
+                                            }}
+                                            placeholder="Selecione"
+                                            options={['Biológico', 'Documental', 'Equipamento', 'Material', 'Mídia de armazenamento', 'Cadáver', 'Outros']}
+                                        />
+        
+                                        {vestigio.naturezaVestigio === 'Outros' && (
+                                            <PrimaryInput
+                                                label="Descreva a natureza"
+                                                placeholder="Informe"
+                                                value={vestigio.naturezaOutros || ''}
+                                                onChangeText={(text) => setVestigio({ ...vestigio, naturezaOutros: text })}
+                                            />
+                                        )}
+                                    <Text style={styles.textos}>Descrição Detalhada do(s) Vestígio(s)</Text>
+                                    <Text>Quantidades, características, numerações, estado de conservação, possíveis danos, etc</Text>
+                                    <VoiceInput value={message} onChangeText={setMessage} />
+                                    <FileUpload />
 
+                                    {index > 0 && (
+                                        <RemoveButton
+                                            label="Remover dados do vestigio"
+                                            onPress={() => removerCampo(setDadosPreliminares, index)}
+                                        />
+                                    )}
+                                </View>
+                            ))}
+                            <AddButton label="Adicionar outros dados" onPress={() => adicionarCampo(setDadosPreliminares)} />
+                        </View>
+                        <View style={styles.campoInternoSecundario}>
+                            {acondicionamento.map((info, index) => (
+                                <View key={index} style={{ marginBottom: 12, gap: 12 }}>
+                                    <Text style={styles.titulos}>Coleta/Acondicionamento {index + 1}</Text>
+                                    <PrimaryInput
+                                        label="Responsavel pela coleta"
+                                        placeholder="Informe"
+                                        value={dadosIniciais.logradouro}
+                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                    />
+                                    <PrimaryInput
+                                        label="Matricula"
+                                        placeholder="Informe"
+                                        value={dadosIniciais.logradouro}
+                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                    />
+                                    {/* DATA E HORA AUTOMATICO */}
+                                    <LocationButton />
+                                    <PrimarySelect
+                                        label="Tipo de acondicionamento"
+                                        selected={vestigio.acondicionamento}
+                                        onSelect={(value) => {
+                                            setVestigio({
+                                                ...vestigio,
+                                                acondicionamento: value,
+                                                acondicionamentoOutros: '',
+                                            });
+                                        }}
+                                        placeholder="Selecione"
+                                        options={['Saco plástico', 'Frasco', 'Caixa térmica', 'Outros']}
+                                    />
+        
+                                    {vestigio.acondicionamento === 'Outros' && (
+                                        <PrimaryInput
+                                            label="Descreva o tipo de acondicionamento"
+                                            placeholder="Informe"
+                                            value={vestigio.acondicionamentoOutros}
+                                            onChangeText={(text) => setVestigio({ ...vestigio, acondicionamentoOutros: text })}
+                                        />
+                                    )}
+                                    <PrimaryInput
+                                        label="N do lacre/ Invólucro de segurança"
+                                        placeholder="Informe"
+                                        value={dadosIniciais.logradouro}
+                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                    />
+                                    <FileUpload/>
+
+                                    {index > 0 && (
+                                        <RemoveButton
+                                            label="Remover acondicionamento"
+                                            onPress={() => removerCampo(setAcondicionamento, index)}
+                                        />
+                                    )}
+                                </View>
+                            ))}
+                            <AddButton label="Adicionar outros dados" onPress={() => adicionarCampo(setAcondicionamento)} />
+                        </View>
                     </View>
-
                 </View>
             </PrimaryList>
 
@@ -417,10 +538,52 @@ export default function ForensicSection() {
             >
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Lista</Text>
+                        <Text style={styles.titulos}>Registros</Text>
+                        <PrimaryInput
+                            label="Licenças e Alvará;"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <PrimaryInput
+                            label="ART"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <PrimaryInput
+                            label="Plano de Manutenção"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <PrimaryInput
+                            label="Contrato de Manutenção"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <PrimaryInput
+                            label="Registro de manutenção"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <PrimaryInput
+                            label="Relatório de Inspeção Anual – RIA"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <PrimaryInput
+                            label="Outro (especificar)"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <VoiceInput value={message} onChangeText={setMessage} />
 
                     </View>
-
                 </View>
             </PrimaryList>
 
@@ -429,7 +592,12 @@ export default function ForensicSection() {
             >
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Lista</Text>
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.titulos}>1. Casa de maquinas</Text>
+                            <Text style={styles.titulos}>1.2 Máquina de tração</Text>
+                            <Text></Text>
+
+                        </View>
 
                     </View>
 
@@ -441,7 +609,28 @@ export default function ForensicSection() {
             >
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Lista</Text>
+                        <Text style={styles.titulos}>Registro e análise de depoimentos</Text>
+                        <Text>Vítimas sobreviventes, Testemunhas, Síndico/Administrador; Zelador; Técnicos de manutenção</Text>
+                        <PrimaryInput
+                            label="Nome"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <PrimaryInput
+                            label="Identificação (CPF, RG)"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <PrimaryInput
+                            label="Endereço"
+                            placeholder="Informe"
+                            value={dadosIniciais.logradouro}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                        />
+                        <VoiceInput value={message} onChangeText={setMessage} />
+                        
 
                     </View>
 
@@ -470,6 +659,12 @@ const styles = StyleSheet.create({
         color: "#000",
         fontWeight: '600',
         fontSize: fontSize.label
+    },
+    textos: {
+        color: "#000",
+        fontSize: fontSize.label,
+        paddingTop: 5,
+
     },
     campoInterno: {
         gap: 15,

@@ -75,10 +75,10 @@ export default function MaterialList() {
 
 const styles = StyleSheet.create({
     container: { gap: 20 },
-    grupo: { marginBottom: 20, gap: 10 },
+    grupo: { gap: 10 },
     titulo: { fontSize: 16, fontWeight: '600', color: '#000', marginBottom: 8 },
     listaCompacta: {
-        maxHeight: 250,
+    
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 6,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     acoes: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 8,
+        
     },
     acaoTexto: {
         color: '#173A64',
