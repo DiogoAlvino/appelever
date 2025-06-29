@@ -39,6 +39,12 @@
       "permissions": [
         "RECORD_AUDIO"
       ]
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "cc9be0d2-3767-47db-b171-254851f32d68"
+      }
     }
   }
 }
