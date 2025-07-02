@@ -11,6 +11,7 @@ import { db } from '~/utils/firebase';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { colors, fontSize } from '~/theme';
 import { capitalize } from "lodash";
+import { generatePDFWithHTML } from '~/services/pdfService';
 
 export default function InspectionForm() {
   const { inspectionId } = useLocalSearchParams();
@@ -207,7 +208,21 @@ export default function InspectionForm() {
           <Feather name="trash-2" size={20} color="red" />
           <Text style={[styles.menuText, { color: 'red' }]}>Excluir</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => {
+            if (inspection && selectedEquipment) {
+              generatePDFWithHTML(inspection, selectedEquipment);
+            }
+          }}
+        >
+          <Feather name="download" size={20} color="#173A64" />
+          <Text style={styles.menuText}>PDF</Text>
+        </TouchableOpacity>
+
       </View>
+
 
       <FeedbackModal
         visible={feedbackVisible}
