@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList } from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 
-const GOOGLE_API_KEY = 'AIzaSyAfODKuAjbLnq3OJ3tPTESua-N1dDaY_wI';
+const OPENCAGE_API_KEY = '25cec5c47001443785b8c9c55021bb44'; // Coloque aqui a chave do OpenCage
 
 export default function LocationButton() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -14,22 +14,21 @@ export default function LocationButton() {
   const handleGetCurrentLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') return alert('Permissão negada');
-  
+
     const location = await Location.getCurrentPositionAsync({});
-  
+
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=${GOOGLE_API_KEY}`
+        `https://api.opencagedata.com/geocode/v1/json?q=${location.coords.latitude}+${location.coords.longitude}&key=${OPENCAGE_API_KEY}&language=pt-BR`
       );
       const data = await response.json();
-      console.log('GEOCODE RESPONSE:', JSON.stringify(data, null, 2));
-  
+      console.log('OPENCAGE RESPONSE:', JSON.stringify(data, null, 2));
+
       let address = 'Endereço não encontrado';
-      if (data.status === 'OK' && data.results.length > 0) {
-        const result = data.results[0];
-        address = result.formatted_address || result.address_components?.map((c: any) => c.long_name).join(', ') || address;
+      if (data.results.length > 0) {
+        address = data.results[0].formatted;
       }
-  
+
       setLocationInfo({
         address,
         latitude: location.coords.latitude,
@@ -37,44 +36,33 @@ export default function LocationButton() {
       });
       setModalVisible(false);
     } catch (error) {
-      console.error('Erro ao buscar endereço pelo Geocode:', error);
+      console.error('Erro ao buscar endereço no OpenCage:', error);
+      Alert.alert('Erro', 'Não foi possível obter o endereço.');
     }
   };
-  
+
   const handleSearch = async (text: string) => {
     setSearch(text);
     if (text.length < 3) return;
 
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
-          text
-        )}&key=${GOOGLE_API_KEY}&language=pt-BR`
+        `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(text)}&key=${OPENCAGE_API_KEY}&language=pt-BR`
       );
       const data = await response.json();
-      setResults(data.predictions);
+      setResults(data.results);
     } catch (error) {
       console.error('Erro ao buscar endereço:', error);
     }
   };
 
-  const handleSelectPlace = async (placeId: string, description: string) => {
-    try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`
-      );
-      const data = await response.json();
-      const location = data.result.geometry.location;
-
-      setLocationInfo({
-        address: description,
-        latitude: location.lat,
-        longitude: location.lng,
-      });
-      setModalVisible(false);
-    } catch (error) {
-      console.error('Erro ao obter detalhes do local:', error);
-    }
+  const handleSelectPlace = (item: any) => {
+    setLocationInfo({
+      address: item.formatted,
+      latitude: item.geometry.lat,
+      longitude: item.geometry.lng,
+    });
+    setModalVisible(false);
   };
 
   return (
@@ -101,10 +89,10 @@ export default function LocationButton() {
 
           <FlatList
             data={results}
-            keyExtractor={(item) => item.place_id}
+            keyExtractor={(item, index) => String(index)}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => handleSelectPlace(item.place_id, item.description)}>
-                <Text style={styles.result}>{item.description}</Text>
+              <TouchableOpacity onPress={() => handleSelectPlace(item)}>
+                <Text style={styles.result}>{item.formatted}</Text>
               </TouchableOpacity>
             )}
           />

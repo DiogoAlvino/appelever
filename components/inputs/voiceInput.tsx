@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Keyboard } from 'react-native';
-import Voice from '@react-native-voice/voice';
+import { useState } from 'react';
+import { View, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { Audio, AVPlaybackStatus, } from 'expo-av';
 import { Feather } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system';
+import axios from 'axios';
 import { colors } from '~/theme';
-import { Platform } from 'react-native';
+import { Buffer } from 'buffer';
+
+if (typeof Buffer === 'undefined') global.Buffer = require('buffer').Buffer;
+
+const ASSEMBLYAI_API_KEY = '476ceef22d284a3e94722b323d8d2236';
 
 interface VoiceInputProps {
   value: string;
@@ -12,44 +18,83 @@ interface VoiceInputProps {
 
 export default function VoiceInput({ value, onChangeText }: VoiceInputProps) {
   const [isRecording, setIsRecording] = useState(false);
-
-  if (Platform.OS === 'web') {
-    return null; // Ou exiba apenas o TextInput sem botão de gravação
-  }
-
-  useEffect(() => {
-    Voice.onSpeechResults = (event) => {
-      const spokenText = event.value?.[0] || '';
-      onChangeText(value + (value ? ' ' : '') + spokenText);
-    };
-
-    Voice.onSpeechEnd = () => setIsRecording(false);
-
-    return () => {
-      if (Voice?.destroy && Voice?.removeAllListeners) {
-        Voice.destroy().then(() => {
-          Voice.removeAllListeners();
-        }).catch((e) => console.warn('Erro ao destruir voz:', e));
-      }
-    };
-  }, [value]);
-
+  const [loading, setLoading] = useState(false);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
 
   const startRecording = async () => {
     try {
+      await Audio.requestPermissionsAsync();
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      setRecording(recording);
       setIsRecording(true);
-      await Voice.start('pt-BR');
-    } catch (e) {
-      console.error('Erro ao iniciar reconhecimento:', e);
+    } catch (err) {
+      console.error('Erro ao iniciar gravação:', err);
     }
   };
 
   const stopRecording = async () => {
     try {
-      await Voice.stop();
       setIsRecording(false);
-    } catch (e) {
-      console.error('Erro ao parar reconhecimento:', e);
+      if (!recording) return;
+      await recording.stopAndUnloadAsync();
+      const uri = recording.getURI();
+      setRecording(null);
+
+      if (uri) await transcribeAudio(uri);
+    } catch (err) {
+      console.error('Erro ao parar gravação:', err);
+    }
+  };
+
+  const transcribeAudio = async (uri: string) => {
+    try {
+      setLoading(true);
+      const base64Audio = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      const audioBuffer = Buffer.from(base64Audio, 'base64');
+
+      const uploadRes = await axios.post('https://api.assemblyai.com/v2/upload', audioBuffer, {
+        headers: {
+          authorization: ASSEMBLYAI_API_KEY,
+          'Content-Type': 'application/octet-stream',
+        },
+      });
+
+      const audioUrl = uploadRes.data.upload_url;
+
+      const transcriptRes = await axios.post('https://api.assemblyai.com/v2/transcript', {
+        audio_url: audioUrl,
+        language_code: 'pt',
+      }, {
+        headers: { authorization: ASSEMBLYAI_API_KEY },
+      });
+
+      const transcriptId = transcriptRes.data.id;
+
+      let transcriptText = '';
+      while (true) {
+        const pollingRes = await axios.get(`https://api.assemblyai.com/v2/transcript/${transcriptId}`, {
+          headers: { authorization: ASSEMBLYAI_API_KEY },
+        });
+
+        if (pollingRes.data.status === 'completed') {
+          transcriptText = pollingRes.data.text;
+          break;
+        } else if (pollingRes.data.status === 'failed') {
+          Alert.alert('Erro', 'Falha na transcrição.');
+          setLoading(false);
+          return;
+        }
+
+        await new Promise(res => setTimeout(res, 2000));
+      }
+
+      onChangeText(value + (value ? ' ' : '') + transcriptText);
+    } catch (err) {
+      console.error('Erro na transcrição:', err);
+      Alert.alert('Erro', 'Não foi possível transcrever o áudio.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,15 +102,18 @@ export default function VoiceInput({ value, onChangeText }: VoiceInputProps) {
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        placeholder="Digitar texto"
+        placeholder="Digite ou grave um áudio"
         placeholderTextColor="#aaa"
         multiline
         value={value}
         onChangeText={onChangeText}
-        onBlur={Keyboard.dismiss}
       />
-      <TouchableOpacity onPress={isRecording ? stopRecording : startRecording}>
-        <Feather name="mic" size={24} color={isRecording ? colors.primaryDark : "#ccc"} />
+      <TouchableOpacity onPress={isRecording ? stopRecording : startRecording} disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color={colors.primaryDark} />
+        ) : (
+          <Feather name="mic" size={24} color={isRecording ? colors.primaryDark : "#ccc"} />
+        )}
       </TouchableOpacity>
     </View>
   );

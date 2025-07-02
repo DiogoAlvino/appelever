@@ -12,47 +12,28 @@ import PrimarySelect from '../inputs/primarySelect';
 import MaterialList from '../lists/materialList';
 import CheckBox from '../inputs/CheckBox';
 import { useForensic } from '~/hooks/useForensic';
+import { doc, setDoc } from 'firebase/firestore';
 
 
 export default function ForensicSection() {
     const {
-        dadosIniciais,
-        setDadosIniciais,
-        auxiliar,
-        setAuxiliar,
-        adicionarCampo,
-        removerCampo,
-        atualizarCampo,
-        clearFieldError,
-        errors,
+        dadosIniciais, setDadosIniciais,
+        message, setMessage,
+        informacoes, setInformacoes,
+        peritoAuxiliar, setPeritoAuxiliar,
+        equipePericial, setEquipePericial,
+        tecnico, setTecnico,
+        outros, setOutros,
+        dadosPreliminares, setDadosPreliminares,
+        acondicionamento, setAcondicionamento,
+        documentacao, setDocumentacao,
+        depoimentos, setDepoimentos,
+        riscoAPR, setRiscoAPR,
+        adicionarCampo, atualizarCampo, removerCampo,
+        clearFieldError, errors,
     } = useForensic();
 
-    const [message, setMessage] = useState('');
-    const [informacoes, setInformacoes] = useState(['']);
-    const [peritoAuxiliar, setPeritoAuxiliar] = useState(['']);
-    const [tecnico, setTecnico] = useState(['']);
-    const [outros, setOutros] = useState(['']);
-    const [dadosPreliminares, setDadosPreliminares] = useState(['']);
-    const [acondicionamento, setAcondicionamento] = useState(['']);
-    const [depoimentos, setDepoimentos] = useState(['']);
-    const [riscoAPR, setRiscoAPR] = useState({
-        riscoAcidente: '',
-        riscoFisico: '',
-        gravidade: '',
-        probabilidade: '',
-        riscoQuimico: false,
-        riscoBiologico: false,
-    });
-    const [vestigio, setVestigio] = useState({
-        naturezaVestigio: '',
-        naturezaOutros: '',
-        acondicionamento: '',
-        acondicionamentoOutros: '',
-    });
-    const [entrevista, setEntrevista] = useState({
-        tipoEntrevistado: '',
-        genero: '',
-    })
+
 
     return (
         <View style={styles.section}>
@@ -68,59 +49,79 @@ export default function ForensicSection() {
                         <PrimaryInput
                             label="Nome completo"
                             placeholder="Informe"
-                            value={dadosIniciais.edificacao}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, edificacao: text })}
+                            value={dadosIniciais.peritoResponsavel}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, peritoResponsavel: text })}
                         />
                         <PrimaryInput
                             label="Cargo"
                             placeholder="Informe"
                             value={dadosIniciais.cep}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, cep: text })}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, cargoPerito: text })}
                             mask="99999-999"
                         />
                         <PrimaryInput
                             label="Matricula"
                             placeholder="Informe"
                             value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, matriculaPerito: text })}
                         />
                     </View>
 
                     <View style={styles.campoInterno}>
-                        {auxiliar.map((info, index) => (
+                        {equipePericial.map((membro, index) => (
                             <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                 <Text style={styles.titulos}>Equipe Pericial - Auxiliar {index + 1}</Text>
 
                                 <PrimaryInput
                                     label="Nome completo"
                                     placeholder="Informe"
-                                    value={dadosIniciais.edificacao}
-                                    onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, edificacao: text })}
+                                    value={membro.nome}
+                                    onChangeText={(text) => {
+                                        const copia = [...equipePericial];
+                                        copia[index].nome = text;
+                                        setEquipePericial(copia);
+                                    }}
                                 />
+
                                 <PrimaryInput
                                     label="Cargo"
                                     placeholder="Informe"
-                                    value={dadosIniciais.cep}
-                                    onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, cep: text })}
-                                    mask="99999-999"
+                                    value={membro.cargo}
+                                    onChangeText={(text) => {
+                                        const copia = [...equipePericial];
+                                        copia[index].cargo = text;
+                                        setEquipePericial(copia);
+                                    }}
                                 />
+
                                 <PrimaryInput
                                     label="Matricula"
                                     placeholder="Informe"
-                                    value={dadosIniciais.logradouro}
-                                    onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                    value={membro.matricula}
+                                    onChangeText={(text) => {
+                                        const copia = [...equipePericial];
+                                        copia[index].matricula = text;
+                                        setEquipePericial(copia);
+                                    }}
                                 />
 
                                 {index > 0 && (
                                     <RemoveButton
                                         label="Remover auxiliar"
-                                        onPress={() => removerCampo(setAuxiliar, index)}
+                                        onPress={() =>
+                                            setEquipePericial((prev) => prev.filter((_, i) => i !== index))
+                                        }
                                     />
                                 )}
                             </View>
                         ))}
 
-                        <AddButton label="Adicionar mais um membro da equipe" onPress={() => adicionarCampo(setAuxiliar)} />
+                        <AddButton
+                            label="Adicionar mais um membro da equipe"
+                            onPress={() =>
+                                setEquipePericial((prev) => [...prev, { nome: '', cargo: '', matricula: '' }])
+                            }
+                        />
 
                     </View>
 
@@ -156,29 +157,29 @@ export default function ForensicSection() {
                         <PrimaryInput
                             label="Viatura (placa)"
                             placeholder="Informe"
-                            value={dadosIniciais.cep}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, cep: text })}
+                            value={dadosIniciais.viatura}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, viatura: text })}
                             mask="99999-999"
                         />
                         <PrimaryInput
                             label="Numero de vitimas (Obitos, feridos)"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={dadosIniciais.numeroVitimas}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, numeroVitimas: text })}
                         />
                         <PrimaryInput
                             label="Condição das vitimas (Obitos, feridos)"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={dadosIniciais.condicaoVitimas}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, condicaoVitimas: text })}
                         />
                         <PrimarySelect
-                                label="Autoridade policial no local"
-                                selected={dadosIniciais.autoridadePolicial}
-                                onSelect={(value) => setDadosIniciais({ ...dadosIniciais, autoridadePolicial: value })}
-                                placeholder="Selecione"
-                                options={['Sim', 'Não']}
-                            />
+                            label="Autoridade policial no local"
+                            selected={dadosIniciais.autoridadePolicial}
+                            onSelect={(value) => setDadosIniciais({ ...dadosIniciais, autoridadePolicial: value })}
+                            placeholder="Selecione"
+                            options={['Sim', 'Não']}
+                        />
                     </View>
                 </View>
             </PrimaryList>
@@ -197,6 +198,8 @@ export default function ForensicSection() {
                         <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
                         <FileUpload />
                         <VoiceInput value={message} onChangeText={setMessage} />
+                        <Text >Texto Capturado:</Text>
+                        <Text >{message || 'Nada capturado ainda'}</Text>
                     </View>
 
                     <View style={styles.campoInterno}>
@@ -215,15 +218,19 @@ export default function ForensicSection() {
                         <Text style={styles.titulos}>Informações do fato</Text>
                         <Text>Você pode informar testemunhas, técnico, policial e etc</Text>
 
-                        {informacoes.map((info, index) => (
+                        {informacoes.map((item, index) => (
                             <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                 <PrimaryInput
                                     label={`Informação ${index + 1}`}
                                     placeholder="Informe"
-                                    value={info}
-                                    onChangeText={(text) => atualizarCampo(setInformacoes, index, text)}
+                                    value={item.descricao}
+                                    onChangeText={(text) => atualizarCampo(setInformacoes, index, 'descricao', text)}
                                 />
-                                <VoiceInput value={message} onChangeText={setMessage} />
+
+                                <VoiceInput
+                                    value={item.observacao}
+                                    onChangeText={(text) => atualizarCampo(setInformacoes, index, 'observacao', text)}
+                                />
 
                                 {index > 0 && (
                                     <RemoveButton
@@ -234,7 +241,13 @@ export default function ForensicSection() {
                             </View>
                         ))}
 
-                        <AddButton label="Adicionar outra informação" onPress={() => adicionarCampo(setInformacoes)} />
+                        <AddButton
+                            label="Adicionar outra informação"
+                            onPress={() =>
+                                adicionarCampo(setInformacoes, { descricao: '', observacao: '' })
+                            }
+                        />
+
 
                     </View>
                 </View>
@@ -249,14 +262,14 @@ export default function ForensicSection() {
                         <PrimaryInput
                             label="Perito responsavel"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={riscoAPR.peritoResponsavel}
+                            onChangeText={(text) => setRiscoAPR({ ...riscoAPR, peritoResponsavel: text })}
                         />
                         <PrimaryInput
                             label="Matricula"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={riscoAPR.peritoMatricula}
+                            onChangeText={(text) => setRiscoAPR({ ...riscoAPR, peritoMatricula: text })}
                         />
 
 
@@ -264,91 +277,142 @@ export default function ForensicSection() {
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Peritos auxiliares</Text>
 
-                        {peritoAuxiliar.map((info, index) => (
-                            <View key={index} style={{ marginBottom: 12, gap: 12 }}>
-                                <PrimaryInput
-                                    label={`Perito auxiliar ${index + 1}`}
-                                    placeholder="Informe"
-                                    value={info}
-                                    onChangeText={(text) => atualizarCampo(setPeritoAuxiliar, index, text)}
-                                />
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.titulos}>Peritos auxiliares</Text>
 
-                                <PrimaryInput
-                                    label="Matricula"
-                                    placeholder="Informe"
-                                    value={dadosIniciais.logradouro}
-                                    onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
-                                />
-
-                                {index > 0 && (
-                                    <RemoveButton
-                                        label="Remover perito auxiliar"
-                                        onPress={() => removerCampo(setPeritoAuxiliar, index)}
+                            {peritoAuxiliar.map((auxiliar, index) => (
+                                <View key={index} style={{ marginBottom: 12, gap: 12 }}>
+                                    <PrimaryInput
+                                        label={`Perito auxiliar ${index + 1}`}
+                                        placeholder="Informe o nome"
+                                        value={auxiliar.nome}
+                                        onChangeText={(text) => {
+                                            const copia = [...peritoAuxiliar];
+                                            copia[index].nome = text;
+                                            setPeritoAuxiliar(copia);
+                                        }}
                                     />
-                                )}
-                            </View>
-                        ))}
-                        <AddButton label="Adicionar outro perito auxiliar" onPress={() => adicionarCampo(setPeritoAuxiliar)} />
+
+                                    <PrimaryInput
+                                        label="Matrícula"
+                                        placeholder="Informe a matrícula"
+                                        value={auxiliar.matricula}
+                                        onChangeText={(text) => {
+                                            const copia = [...peritoAuxiliar];
+                                            copia[index].matricula = text;
+                                            setPeritoAuxiliar(copia);
+                                        }}
+                                    />
+
+                                    {index > 0 && (
+                                        <RemoveButton
+                                            label="Remover perito auxiliar"
+                                            onPress={() =>
+                                                setPeritoAuxiliar((prev) => prev.filter((_, i) => i !== index))
+                                            }
+                                        />
+                                    )}
+                                </View>
+                            ))}
+
+                            <AddButton
+                                label="Adicionar outro perito auxiliar"
+                                onPress={() =>
+                                    setPeritoAuxiliar((prev) => [...prev, { nome: '', matricula: '' }])
+                                }
+                            />
+                        </View>
                     </View>
+
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Técnicos</Text>
 
-                        {tecnico.map((info, index) => (
+                        {tecnico.map((item, index) => (
                             <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                 <PrimaryInput
                                     label={`Técnico ${index + 1}`}
-                                    placeholder="Informe"
-                                    value={info}
-                                    onChangeText={(text) => atualizarCampo(setTecnico, index, text)}
+                                    placeholder="Informe o nome"
+                                    value={item.nome}
+                                    onChangeText={(text) => {
+                                        const copia = [...tecnico];
+                                        copia[index].nome = text;
+                                        setTecnico(copia);
+                                    }}
                                 />
 
                                 <PrimaryInput
-                                    label="Matricula"
-                                    placeholder="Informe"
-                                    value={dadosIniciais.logradouro}
-                                    onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                    label="Matrícula"
+                                    placeholder="Informe a matrícula"
+                                    value={item.matricula}
+                                    onChangeText={(text) => {
+                                        const copia = [...tecnico];
+                                        copia[index].matricula = text;
+                                        setTecnico(copia);
+                                    }}
                                 />
 
                                 {index > 0 && (
                                     <RemoveButton
                                         label="Remover técnico"
-                                        onPress={() => removerCampo(setTecnico, index)}
+                                        onPress={() =>
+                                            setTecnico((prev) => prev.filter((_, i) => i !== index))
+                                        }
                                     />
                                 )}
                             </View>
                         ))}
-                        <AddButton label="Adicionar outro técnico" onPress={() => adicionarCampo(setTecnico)} />
+
+                        <AddButton
+                            label="Adicionar outro técnico"
+                            onPress={() => setTecnico((prev) => [...prev, { nome: '', matricula: '' }])}
+                        />
                     </View>
+
 
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Outros</Text>
 
-                        {outros.map((info, index) => (
+                        {outros.map((item, index) => (
                             <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                 <PrimaryInput
                                     label={`Outros ${index + 1}`}
-                                    placeholder="Informe"
-                                    value={info}
-                                    onChangeText={(text) => atualizarCampo(setOutros, index, text)}
+                                    placeholder="Informe o nome"
+                                    value={item.nome}
+                                    onChangeText={(text) => {
+                                        const copia = [...outros];
+                                        copia[index].nome = text;
+                                        setOutros(copia);
+                                    }}
                                 />
 
                                 <PrimaryInput
-                                    label="Matricula"
-                                    placeholder="Informe"
-                                    value={dadosIniciais.logradouro}
-                                    onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                    label="Matrícula"
+                                    placeholder="Informe a matrícula"
+                                    value={item.matricula}
+                                    onChangeText={(text) => {
+                                        const copia = [...outros];
+                                        copia[index].matricula = text;
+                                        setOutros(copia);
+                                    }}
                                 />
 
                                 {index > 0 && (
                                     <RemoveButton
-                                        label="Remover técnico"
-                                        onPress={() => removerCampo(setOutros, index)}
+                                        label="Remover"
+                                        onPress={() =>
+                                            setOutros((prev) => prev.filter((_, i) => i !== index))
+                                        }
                                     />
                                 )}
                             </View>
                         ))}
-                        <AddButton label="Adicionar outros" onPress={() => adicionarCampo(setOutros)} />
+
+                        <AddButton
+                            label="Adicionar outros"
+                            onPress={() => setOutros((prev) => [...prev, { nome: '', matricula: '' }])}
+                        />
                     </View>
+
 
                     <View style={styles.campoInternoSecundario}>
                         <Text style={styles.titulos}>Detalhamento das Etapas do Trabalho</Text>
@@ -417,8 +481,8 @@ export default function ForensicSection() {
                             <PrimaryInput
                                 label="(Isolamento do Local, uso de EPI, EPC;)"
                                 placeholder="Informe"
-                                value={dadosIniciais.logradouro}
-                                onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                value={riscoAPR.medidasMitigatoria}
+                                onChangeText={(text) => setRiscoAPR({ ...riscoAPR, medidasMitigatoria: text })}
                             />
                         </View >
                     </View>
@@ -435,120 +499,204 @@ export default function ForensicSection() {
                     <View style={styles.campoInternoSecundario}>
                         <Text style={styles.titulos}>Vestígio - Coleta</Text>
                         <View style={styles.campoInterno}>
-                            {dadosPreliminares.map((info, index) => (
+                            {dadosPreliminares.map((item, index) => (
                                 <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                     <Text style={styles.titulos}>Dados preliminares {index + 1}</Text>
 
                                     <PrimaryInput
                                         label="Nº do vestígio"
                                         placeholder="Informe"
-                                        value={dadosIniciais.logradouro}
-                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                        value={item.numeroVestigio}
+                                        onChangeText={(text) => {
+                                            const copia = [...dadosPreliminares];
+                                            copia[index].numeroVestigio = text;
+                                            setDadosPreliminares(copia);
+                                        }}
                                     />
 
                                     <PrimaryInput
                                         label="Unidade de Origem"
                                         placeholder="Informe"
-                                        value={dadosIniciais.logradouro}
-                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                        value={item.unidadeOrigem}
+                                        onChangeText={(text) => {
+                                            const copia = [...dadosPreliminares];
+                                            copia[index].unidadeOrigem = text;
+                                            setDadosPreliminares(copia);
+                                        }}
                                     />
 
                                     <PrimaryInput
                                         label="Nº do Procedimento (IP/TCO/Outros)"
                                         placeholder="Informe"
-                                        value={dadosIniciais.logradouro}
-                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                        value={item.procedimento}
+                                        onChangeText={(text) => {
+                                            const copia = [...dadosPreliminares];
+                                            copia[index].procedimento = text;
+                                            setDadosPreliminares(copia);
+                                        }}
                                     />
+
                                     <PrimarySelect
                                         label="Natureza do Vestígio"
-                                        selected={vestigio.naturezaVestigio}
+                                        selected={item.naturezaVestigio}
                                         onSelect={(value) => {
-                                            setVestigio({ ...vestigio, naturezaVestigio: value, naturezaOutros: '' });
+                                            const copia = [...dadosPreliminares];
+                                            copia[index].naturezaVestigio = value;
+                                            if (value !== 'Outros') copia[index].naturezaOutros = '';
+                                            setDadosPreliminares(copia);
                                         }}
                                         placeholder="Selecione"
                                         options={['Biológico', 'Documental', 'Equipamento', 'Material', 'Mídia de armazenamento', 'Cadáver', 'Outros']}
                                     />
 
-                                    {vestigio.naturezaVestigio === 'Outros' && (
+                                    {item.naturezaVestigio === 'Outros' && (
                                         <PrimaryInput
                                             label="Descreva a natureza"
                                             placeholder="Informe"
-                                            value={vestigio.naturezaOutros || ''}
-                                            onChangeText={(text) => setVestigio({ ...vestigio, naturezaOutros: text })}
+                                            value={item.naturezaOutros}
+                                            onChangeText={(text) => {
+                                                const copia = [...dadosPreliminares];
+                                                copia[index].naturezaOutros = text;
+                                                setDadosPreliminares(copia);
+                                            }}
                                         />
                                     )}
+
                                     <Text style={styles.textos}>Descrição Detalhada do(s) Vestígio(s)</Text>
                                     <Text>Quantidades, características, numerações, estado de conservação, possíveis danos, etc</Text>
-                                    <VoiceInput value={message} onChangeText={setMessage} />
+
+                                    <VoiceInput value={item.descricaoDetalhada} onChangeText={(text) => {
+                                        const copia = [...dadosPreliminares];
+                                        copia[index].descricaoDetalhada = text;
+                                        setDadosPreliminares(copia);
+                                    }} />
+
                                     <FileUpload />
 
                                     {index > 0 && (
                                         <RemoveButton
-                                            label="Remover dados do vestigio"
-                                            onPress={() => removerCampo(setDadosPreliminares, index)}
+                                            label="Remover dados do vestígio"
+                                            onPress={() =>
+                                                setDadosPreliminares((prev) => prev.filter((_, i) => i !== index))
+                                            }
                                         />
                                     )}
                                 </View>
                             ))}
-                            <AddButton label="Adicionar outros dados" onPress={() => adicionarCampo(setDadosPreliminares)} />
+
+                            <AddButton
+                                label="Adicionar outros dados"
+                                onPress={() =>
+                                    setDadosPreliminares((prev) => [
+                                        ...prev,
+                                        {
+                                            numeroVestigio: '',
+                                            unidadeOrigem: '',
+                                            procedimento: '',
+                                            naturezaVestigio: '',
+                                            naturezaOutros: '',
+                                            descricaoDetalhada: '',
+                                        },
+                                    ])
+                                }
+                            />
+
                         </View>
+
                         <View style={styles.campoInternoSecundario}>
-                            {acondicionamento.map((info, index) => (
+                            {acondicionamento.map((item, index) => (
                                 <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                     <Text style={styles.titulos}>Coleta/Acondicionamento {index + 1}</Text>
+
                                     <PrimaryInput
-                                        label="Responsavel pela coleta"
+                                        label="Responsável pela coleta"
                                         placeholder="Informe"
-                                        value={dadosIniciais.logradouro}
-                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                        value={item.responsavelColeta}
+                                        onChangeText={(text) => {
+                                            const copia = [...acondicionamento];
+                                            copia[index].responsavelColeta = text;
+                                            setAcondicionamento(copia);
+                                        }}
                                     />
+
                                     <PrimaryInput
-                                        label="Matricula"
+                                        label="Matrícula"
                                         placeholder="Informe"
-                                        value={dadosIniciais.logradouro}
-                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                        value={item.matricula}
+                                        onChangeText={(text) => {
+                                            const copia = [...acondicionamento];
+                                            copia[index].matricula = text;
+                                            setAcondicionamento(copia);
+                                        }}
                                     />
-                                    {/* DATA E HORA AUTOMATICO */}
+
                                     <LocationButton />
+
                                     <PrimarySelect
                                         label="Tipo de acondicionamento"
-                                        selected={vestigio.acondicionamento}
+                                        selected={item.tipoAcondicionamento}
                                         onSelect={(value) => {
-                                            setVestigio({
-                                                ...vestigio,
-                                                acondicionamento: value,
-                                                acondicionamentoOutros: '',
-                                            });
+                                            const copia = [...acondicionamento];
+                                            copia[index].tipoAcondicionamento = value;
+                                            if (value !== 'Outros') copia[index].tipoAcondicionamentoOutros = '';
+                                            setAcondicionamento(copia);
                                         }}
                                         placeholder="Selecione"
                                         options={['Saco plástico', 'Frasco', 'Caixa térmica', 'Outros']}
                                     />
 
-                                    {vestigio.acondicionamento === 'Outros' && (
+                                    {item.tipoAcondicionamento === 'Outros' && (
                                         <PrimaryInput
                                             label="Descreva o tipo de acondicionamento"
                                             placeholder="Informe"
-                                            value={vestigio.acondicionamentoOutros}
-                                            onChangeText={(text) => setVestigio({ ...vestigio, acondicionamentoOutros: text })}
+                                            value={item.tipoAcondicionamentoOutros}
+                                            onChangeText={(text) => {
+                                                const copia = [...acondicionamento];
+                                                copia[index].tipoAcondicionamentoOutros = text;
+                                                setAcondicionamento(copia);
+                                            }}
                                         />
                                     )}
+
                                     <PrimaryInput
-                                        label="N do lacre/ Invólucro de segurança"
+                                        label="Nº do lacre/ Invólucro de segurança"
                                         placeholder="Informe"
-                                        value={dadosIniciais.logradouro}
-                                        onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                        value={item.numeroLacre}
+                                        onChangeText={(text) => {
+                                            const copia = [...acondicionamento];
+                                            copia[index].numeroLacre = text;
+                                            setAcondicionamento(copia);
+                                        }}
                                     />
+
                                     <FileUpload />
 
                                     {index > 0 && (
                                         <RemoveButton
                                             label="Remover acondicionamento"
-                                            onPress={() => removerCampo(setAcondicionamento, index)}
+                                            onPress={() =>
+                                                setAcondicionamento((prev) => prev.filter((_, i) => i !== index))
+                                            }
                                         />
                                     )}
                                 </View>
                             ))}
-                            <AddButton label="Adicionar outros dados" onPress={() => adicionarCampo(setAcondicionamento)} />
+
+                            <AddButton
+                                label="Adicionar outro dado"
+                                onPress={() =>
+                                    setAcondicionamento((prev) => [
+                                        ...prev,
+                                        {
+                                            responsavelColeta: '',
+                                            matricula: '',
+                                            tipoAcondicionamento: '',
+                                            tipoAcondicionamentoOutros: '',
+                                            numeroLacre: '',
+                                        },
+                                    ])
+                                }
+                            />
                         </View>
                     </View>
                 </View>
@@ -563,44 +711,44 @@ export default function ForensicSection() {
                         <PrimaryInput
                             label="Licenças e Alvará;"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={documentacao.licencaAlvara}
+                            onChangeText={(text) => setDocumentacao({ ...documentacao, licencaAlvara: text })}
                         />
                         <PrimaryInput
                             label="ART"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={documentacao.art}
+                            onChangeText={(text) => setDocumentacao({ ...documentacao, art: text })}
                         />
                         <PrimaryInput
                             label="Plano de Manutenção"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={documentacao.planoManutencao}
+                            onChangeText={(text) => setDocumentacao({ ...documentacao, planoManutencao: text })}
                         />
                         <PrimaryInput
                             label="Contrato de Manutenção"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={documentacao.contratoManutencao}
+                            onChangeText={(text) => setDocumentacao({ ...documentacao, contratoManutencao: text })}
                         />
                         <PrimaryInput
                             label="Registro de manutenção"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={documentacao.registroManutencao}
+                            onChangeText={(text) => setDocumentacao({ ...documentacao, registroManutencao: text })}
                         />
                         <PrimaryInput
                             label="Relatório de Inspeção Anual – RIA"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={documentacao.relatorioRia}
+                            onChangeText={(text) => setDocumentacao({ ...documentacao, relatorioRia: text })}
                         />
                         <PrimaryInput
                             label="Outro (especificar)"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={documentacao.outro}
+                            onChangeText={(text) => setDocumentacao({ ...documentacao, outro: text })}
                         />
                         <VoiceInput value={message} onChangeText={setMessage} />
 
@@ -630,14 +778,23 @@ export default function ForensicSection() {
             >
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
-                        {depoimentos.map((info, index) => (
+                        {depoimentos.map((item, index) => (
                             <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                 <Text style={styles.titulos}>Registro e análise de depoimentos {index + 1}</Text>
 
                                 <PrimarySelect
                                     label="Tipo do entrevistado"
-                                    selected={entrevista.tipoEntrevistado}
-                                    onSelect={(value) => setEntrevista({ ...entrevista, tipoEntrevistado: value })}
+                                    selected={item.tipoEntrevistado}
+                                    onSelect={(value) => {
+                                        const copia = [...depoimentos];
+                                        copia[index].tipoEntrevistado = value;
+                                        if (value !== 'Vítimas sobreviventes') {
+                                            copia[index].genero = '';
+                                            copia[index].idade = '';
+                                            copia[index].descricaoLesoes = '';
+                                        }
+                                        setDepoimentos(copia);
+                                    }}
                                     placeholder="Selecione"
                                     options={[
                                         'Vítimas sobreviventes',
@@ -648,35 +805,51 @@ export default function ForensicSection() {
                                     ]}
                                 />
 
-                                {entrevista.tipoEntrevistado && (
+                                {item.tipoEntrevistado && (
                                     <>
                                         <PrimaryInput
                                             label="Nome"
                                             placeholder="Informe"
-                                            value={dadosIniciais.logradouro}
-                                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                            value={item.nomeEntrevistado}
+                                            onChangeText={(text) => {
+                                                const copia = [...depoimentos];
+                                                copia[index].nomeEntrevistado = text;
+                                                setDepoimentos(copia);
+                                            }}
                                         />
 
                                         <PrimaryInput
                                             label="Identificação (CPF, RG)"
                                             placeholder="Informe"
-                                            value={dadosIniciais.logradouro}
-                                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                            value={item.identificacao}
+                                            onChangeText={(text) => {
+                                                const copia = [...depoimentos];
+                                                copia[index].identificacao = text;
+                                                setDepoimentos(copia);
+                                            }}
                                         />
 
                                         <PrimaryInput
                                             label="Endereço"
                                             placeholder="Informe"
-                                            value={dadosIniciais.logradouro}
-                                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                            value={item.endereco}
+                                            onChangeText={(text) => {
+                                                const copia = [...depoimentos];
+                                                copia[index].endereco = text;
+                                                setDepoimentos(copia);
+                                            }}
                                         />
 
-                                        {entrevista.tipoEntrevistado === 'Vítimas sobreviventes' && (
+                                        {item.tipoEntrevistado === 'Vítimas sobreviventes' && (
                                             <>
                                                 <PrimarySelect
                                                     label="Gênero"
-                                                    selected={entrevista.genero}
-                                                    onSelect={(value) => setEntrevista({ ...entrevista, genero: value })}
+                                                    selected={item.genero}
+                                                    onSelect={(value) => {
+                                                        const copia = [...depoimentos];
+                                                        copia[index].genero = value;
+                                                        setDepoimentos(copia);
+                                                    }}
                                                     placeholder="Selecione"
                                                     options={['Masculino', 'Feminino']}
                                                 />
@@ -684,31 +857,68 @@ export default function ForensicSection() {
                                                 <PrimaryInput
                                                     label="Idade"
                                                     placeholder="Informe"
-                                                    value={dadosIniciais.logradouro}
-                                                    onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                                                    value={item.idade}
+                                                    onChangeText={(text) => {
+                                                        const copia = [...depoimentos];
+                                                        copia[index].idade = text;
+                                                        setDepoimentos(copia);
+                                                    }}
                                                 />
 
                                                 <Text style={styles.textos}>Descrição das lesões</Text>
+                                                <VoiceInput
+                                                    value={item.descricaoLesoes}
+                                                    onChangeText={(text) => {
+                                                        const copia = [...depoimentos];
+                                                        copia[index].descricaoLesoes = text;
+                                                        setDepoimentos(copia);
+                                                    }}
+                                                />
                                                 <FileUpload />
-                                                <VoiceInput value={message} onChangeText={setMessage} />
                                             </>
                                         )}
 
                                         <Text style={styles.textos}>Depoimento/Relato</Text>
-                                        <VoiceInput value={message} onChangeText={setMessage} />
+                                        <VoiceInput
+                                            value={item.depoimentoRelato}
+                                            onChangeText={(text) => {
+                                                const copia = [...depoimentos];
+                                                copia[index].depoimentoRelato = text;
+                                                setDepoimentos(copia);
+                                            }}
+                                        />
                                     </>
                                 )}
 
                                 {index > 0 && (
                                     <RemoveButton
                                         label="Remover entrevista"
-                                        onPress={() => removerCampo(setDepoimentos, index)}
+                                        onPress={() =>
+                                            setDepoimentos((prev) => prev.filter((_, i) => i !== index))
+                                        }
                                     />
                                 )}
                             </View>
                         ))}
 
-                        <AddButton label="Adicionar outra entrevista" onPress={() => adicionarCampo(setDepoimentos)} />
+                        <AddButton
+                            label="Adicionar outra entrevista"
+                            onPress={() =>
+                                setDepoimentos((prev) => [
+                                    ...prev,
+                                    {
+                                        tipoEntrevistado: '',
+                                        genero: '',
+                                        nomeEntrevistado: '',
+                                        identificacao: '',
+                                        endereco: '',
+                                        idade: '',
+                                        descricaoLesoes: '',
+                                        depoimentoRelato: '',
+                                    },
+                                ])
+                            }
+                        />
                     </View>
 
 
