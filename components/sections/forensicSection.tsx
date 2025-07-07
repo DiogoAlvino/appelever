@@ -1,4 +1,3 @@
-import { use, useState } from 'react';
 import PrimaryList from '~/components/lists/primaryList';
 import PrimaryInput from '../inputs/primaryInput';
 import { StyleSheet, View, Text } from 'react-native';
@@ -12,8 +11,6 @@ import PrimarySelect from '../inputs/primarySelect';
 import MaterialList from '../lists/materialList';
 import CheckBox from '../inputs/CheckBox';
 import { useForensic } from '~/hooks/useForensic';
-import { doc, setDoc } from 'firebase/firestore';
-
 
 export default function ForensicSection() {
     const {
@@ -32,8 +29,6 @@ export default function ForensicSection() {
         adicionarCampo, atualizarCampo, removerCampo,
         clearFieldError, errors,
     } = useForensic();
-
-
 
     return (
         <View style={styles.section}>
@@ -122,7 +117,6 @@ export default function ForensicSection() {
                                 setEquipePericial((prev) => [...prev, { nome: '', cargo: '', matricula: '' }])
                             }
                         />
-
                     </View>
 
                     <View style={styles.campoInterno}>
@@ -248,7 +242,6 @@ export default function ForensicSection() {
                             }
                         />
 
-
                     </View>
                 </View>
             </PrimaryList>
@@ -271,13 +264,11 @@ export default function ForensicSection() {
                             value={riscoAPR.peritoMatricula}
                             onChangeText={(text) => setRiscoAPR({ ...riscoAPR, peritoMatricula: text })}
                         />
-
-
                     </View>
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Peritos auxiliares</Text>
 
-                        <View style={styles.campoInterno}>
+                        <View style={styles.campoInternoSecundario}>
                             <Text style={styles.titulos}>Peritos auxiliares</Text>
 
                             {peritoAuxiliar.map((auxiliar, index) => (
@@ -368,7 +359,6 @@ export default function ForensicSection() {
                         />
                     </View>
 
-
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Outros</Text>
 
@@ -413,7 +403,6 @@ export default function ForensicSection() {
                         />
                     </View>
 
-
                     <View style={styles.campoInternoSecundario}>
                         <Text style={styles.titulos}>Detalhamento das Etapas do Trabalho</Text>
                         <Text>Descrição da atividade</Text>
@@ -456,7 +445,6 @@ export default function ForensicSection() {
                             </View>
                         </View>
 
-
                         <View style={styles.campoInterno}>
                             <Text style={styles.titulos}>Avalição do risco</Text>
                             <PrimarySelect label="Gravidade"
@@ -486,10 +474,7 @@ export default function ForensicSection() {
                             />
                         </View >
                     </View>
-
-
                 </View>
-
             </PrimaryList>
 
             <PrimaryList
@@ -920,9 +905,6 @@ export default function ForensicSection() {
                             }
                         />
                     </View>
-
-
-
                 </View>
             </PrimaryList>
         </View>
@@ -941,25 +923,23 @@ const styles = StyleSheet.create({
     titulos: {
         color: "#000",
         fontWeight: '600',
-        fontSize: fontSize.label
+        fontSize: fontSize.label,
     },
     textos: {
         color: colors.primaryDark,
         fontSize: fontSize.label,
         paddingTop: 5,
-
     },
     campoInterno: {
         gap: 15,
         borderBottomWidth: 1,
         borderBottomColor: "#D0CECE",
         borderStyle: "dashed",
-        paddingBottom: 20
-
+        paddingBottom: 20,
     },
     campoInternoSecundario: {
         gap: 15,
-        paddingBottom: 20
+        paddingBottom: 20,
     },
     checkboxRow: {
         flexDirection: 'row',

@@ -97,7 +97,6 @@ export default function InspectionForm() {
           )}
         </SecondarySection>
 
-
         <SecondarySection
           icon={<Feather name="user" size={20} color="#173A64" />}
           title="Responsável pela inspeção"
@@ -164,12 +163,10 @@ export default function InspectionForm() {
                   </View>
                 )}
 
-
               </View>
             ))}
           </View>
         </SecondarySection>
-
 
         <SecondarySection
           icon={<Feather name="tool" size={20} color="#173A64" />}
@@ -184,6 +181,12 @@ export default function InspectionForm() {
                   <View style={styles.inspection}>
                     <Text style={styles.itemTitle}>Item {id}</Text>
                     <Text style={styles.itemTitle}>Norma: {question.normaID}</Text>
+
+                    <View style={styles.viewItem}>
+                      <Text style={styles.itemTitle}>Criticidade:</Text>
+                      <Text style={[styles.itemText, { marginLeft: 4 }]}>{capitalize(question.priority)}</Text>
+                    </View>
+
                     <View>
                       <Text style={styles.itemTitle}>Descrição:</Text>
                       <Text style={styles.itemText}>{question.mitigation}</Text>
@@ -222,8 +225,7 @@ export default function InspectionForm() {
         </TouchableOpacity>
 
       </View>
-
-
+      
       <FeedbackModal
         visible={feedbackVisible}
         type={feedbackType}

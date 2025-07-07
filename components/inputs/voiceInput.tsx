@@ -112,7 +112,8 @@ export default function VoiceInput({ value, onChangeText }: VoiceInputProps) {
         {loading ? (
           <ActivityIndicator color={colors.primaryDark} />
         ) : (
-          <Feather name="mic" size={24} color={isRecording ? colors.primaryDark : "#ccc"} />
+          <Feather name="mic" size={24} color={isRecording ? 'red' : '#ccc'} />
+
         )}
       </TouchableOpacity>
     </View>

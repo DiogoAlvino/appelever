@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, fontSize } from '~/theme';
 
 const OPENCAGE_API_KEY = '25cec5c47001443785b8c9c55021bb44'; // Coloque aqui a chave do OpenCage
 
@@ -77,7 +78,7 @@ export default function LocationButton() {
           <Text style={styles.title}>Selecionar Localização</Text>
 
           <TouchableOpacity onPress={handleGetCurrentLocation}>
-            <Text style={styles.link}>📍 Usar minha localização atual</Text>
+            <Text style={styles.link}>Usar minha localização atual</Text>
           </TouchableOpacity>
 
           <TextInput
@@ -105,8 +106,8 @@ export default function LocationButton() {
 
       {locationInfo && (
         <View style={styles.info}>
-          <Text>{locationInfo.address}</Text>
-          <Text>Lat: {locationInfo.latitude}, Lng: {locationInfo.longitude}</Text>
+          <Text style={styles.textoInfo}>{locationInfo.address}</Text>
+          <Text style={styles.textoInfo}>Lat: {locationInfo.latitude}, Lng: {locationInfo.longitude}</Text>
         </View>
       )}
     </>
@@ -154,14 +155,18 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
   },
   closeButton: {
-    marginTop: 20,
+    marginTop: 2,
   },
   closeText: {
     color: 'red',
     fontWeight: '600',
   },
   info: {
-    marginTop: 20,
-    paddingHorizontal: 10,
+    marginTop: 2,
+    paddingHorizontal: 1,
   },
+  textoInfo: {
+    fontSize: fontSize.placeholder,
+    color: colors.primaryDark
+  }
 });
