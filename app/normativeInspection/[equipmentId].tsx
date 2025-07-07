@@ -45,7 +45,7 @@ export default function EquipmentPage() {
       setTimeout(() => {
         setFeedbackVisible(false);
         router.push({
-          pathname: '/equipments',
+          pathname: '/inspections',
           params: { equipmentId },
         });
       }, 1000);
