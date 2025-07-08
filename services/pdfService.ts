@@ -3,8 +3,13 @@ import * as Sharing from 'expo-sharing';
 import { EquipmentModel } from '~/models/equipmentModel';
 import { InspectionModel } from '~/models/inspectionModel';
 
-export async function generatePDFWithHTML(inspection: InspectionModel, equipment: EquipmentModel) {
+export async function generatePDFWithHTML(
+  inspection: InspectionModel,
+  equipment: EquipmentModel
+) {
   try {
+    const dataHoraAtual = new Date().toLocaleString('pt-BR');
+
     const htmlContent = `
     <html>
     <head>
@@ -38,6 +43,12 @@ export async function generatePDFWithHTML(inspection: InspectionModel, equipment
           object-fit: contain;
           margin: 20px 0;
           page-break-after: always;
+        }
+        .footer {
+          text-align: right;
+          font-size: 12px;
+          color: #555;
+          margin-top: 40px;
         }
       </style>
     </head>
@@ -111,6 +122,10 @@ export async function generatePDFWithHTML(inspection: InspectionModel, equipment
                 </div>
               `).join('')
           : `<p>Nenhuma implementação necessária.</p>`}
+      </div>
+
+      <div class="footer">
+        Documento gerado em: ${dataHoraAtual}
       </div>
     </body>
     </html>
