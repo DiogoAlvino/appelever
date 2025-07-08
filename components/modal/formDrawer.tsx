@@ -11,14 +11,38 @@ interface Campo {
 }
 
 interface Props {
-  title: string; // título no drawer
-  buttonLabel: string; // texto no botão da tela principal
+  title: string;
+  buttonLabel: string;
   campos: Campo[];
 }
 
 export default function FormDrawer({ title, buttonLabel, campos }: Props) {
   const [visible, setVisible] = useState(false);
   const [preenchido, setPreenchido] = useState(false);
+
+  const [valoresTexto, setValoresTexto] = useState<{ [id: number]: string }>({});
+  const [arquivosCampos, setArquivosCampos] = useState<{ [id: number]: any[] }>({});
+
+  const verificarSePreenchido = (textos: typeof valoresTexto, arquivos: typeof arquivosCampos) => {
+    const algumPreenchido = campos.some(campo => {
+      const temTexto = textos[campo.id]?.trim();
+      const temArquivo = arquivos[campo.id]?.length > 0;
+      return !!temTexto || !!temArquivo;
+    });
+    setPreenchido(algumPreenchido);
+  };
+
+  const atualizarTexto = (id: number, valor: string) => {
+    const atualizados = { ...valoresTexto, [id]: valor };
+    setValoresTexto(atualizados);
+    verificarSePreenchido(atualizados, arquivosCampos);
+  };
+
+  const atualizarArquivos = (id: number, novosArquivos: any[]) => {
+    const atualizados = { ...arquivosCampos, [id]: novosArquivos };
+    setArquivosCampos(atualizados);
+    verificarSePreenchido(valoresTexto, atualizados);
+  };
 
   return (
     <>
@@ -31,22 +55,6 @@ export default function FormDrawer({ title, buttonLabel, campos }: Props) {
           gap: 10,
         }}
       >
-        <View
-          style={{
-            width: 20,
-            height: 20,
-            borderRadius: 4,
-            borderWidth: 2,
-            borderColor: preenchido ? '#28a745' : '#0066cc',
-            backgroundColor: preenchido ? '#28a745' : 'transparent',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          {preenchido && (
-            <View style={{ width: 10, height: 10, backgroundColor: '#fff' }} />
-          )}
-        </View>
         <Text style={{
           color: preenchido ? '#28a745' : '#0066cc',
           fontWeight: '600'
@@ -59,19 +67,13 @@ export default function FormDrawer({ title, buttonLabel, campos }: Props) {
         isVisible={visible}
         animationIn="slideInRight"
         animationOut="slideOutRight"
-        onBackdropPress={() => {
-          setVisible(false);
-          setPreenchido(true); // marca como preenchido ao fechar
-        }}
+        onBackdropPress={() => setVisible(false)}
         style={styles.modal}
       >
         <View style={styles.drawer}>
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity onPress={() => {
-              setVisible(false);
-              setPreenchido(true);
-            }}>
+            <TouchableOpacity onPress={() => setVisible(false)}>
               <Feather name="x" size={24} color="#333" />
             </TouchableOpacity>
           </View>
@@ -80,8 +82,14 @@ export default function FormDrawer({ title, buttonLabel, campos }: Props) {
             {campos.map((campo) => (
               <View key={campo.id} style={{ marginBottom: 20, gap: 10 }}>
                 <Text style={styles.label}>{campo.titulo}</Text>
-                <VoiceInput value={''} onChangeText={() => { }} />
-                <FileUpload />
+                <VoiceInput
+                  value={valoresTexto[campo.id] || ''}
+                  onChangeText={(texto) => atualizarTexto(campo.id, texto)}
+                />
+                <FileUpload
+                  value={arquivosCampos[campo.id] || []}
+                  onChange={(arquivos) => atualizarArquivos(campo.id, arquivos)}
+                />
               </View>
             ))}
           </ScrollView>

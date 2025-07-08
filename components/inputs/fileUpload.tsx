@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -8,21 +8,32 @@ import { uploadFileToStorage } from '~/services/uploadFileService';
 import { UploadModel } from '~/models/uploadModel';
 import { colors } from '~/theme';
 
-interface FileUploadProps {
-  equipmentId?: string;
-  onUploadSuccess?: (file: UploadModel) => void;
-}
-
-interface FileItem {
+export interface FileItem {
   name: string;
   size: number;
   uri: string;
   type: 'image' | 'file' | 'photo';
 }
 
-export default function FileUpload({ equipmentId, onUploadSuccess }: FileUploadProps) {
+interface FileUploadProps {
+  equipmentId?: string;
+  onUploadSuccess?: (file: UploadModel) => void;
+  onChange?: (files: FileItem[]) => void;
+  value?: FileItem[];
+}
+
+export default function FileUpload({ equipmentId, onUploadSuccess, onChange, value }: FileUploadProps) {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [permission, requestPermission] = useCameraPermissions();
+
+  useEffect(() => {
+    if (value) setFiles(value);
+  }, [value]);
+
+  const notifyChange = (newFiles: FileItem[]) => {
+    setFiles(newFiles);
+    onChange?.(newFiles);
+  };
 
   const uploadAndRegister = async (uri: string, name: string) => {
     try {
@@ -34,7 +45,6 @@ export default function FileUpload({ equipmentId, onUploadSuccess }: FileUploadP
       } else {
         console.warn('equipmentId não fornecido, upload ignorado');
       }
-
     } catch (err) {
       console.error('Erro ao enviar arquivo', err);
       Alert.alert('Erro', 'Falha ao enviar arquivo');
@@ -44,10 +54,17 @@ export default function FileUpload({ equipmentId, onUploadSuccess }: FileUploadP
   const handlePickFiles = async () => {
     const result = await DocumentPicker.getDocumentAsync({ type: '*/*', multiple: true });
     if (result.assets) {
+      const novos = [...files];
       for (const file of result.assets) {
         await uploadAndRegister(file.uri, file.name);
-        setFiles((prev) => [...prev, { name: file.name, size: file.size ?? 0, uri: file.uri, type: 'file' }]);
+        novos.push({
+          name: file.name,
+          size: file.size ?? 0,
+          uri: file.uri,
+          type: 'file' as const,
+        });
       }
+      notifyChange(novos);
     }
   };
 
@@ -56,12 +73,16 @@ export default function FileUpload({ equipmentId, onUploadSuccess }: FileUploadP
     if (!result.canceled && result.assets.length > 0) {
       const file = result.assets[0];
       await uploadAndRegister(file.uri, file.fileName || 'imagem.jpg');
-      setFiles(prev => [...prev, {
-        name: file.fileName || 'imagem.jpg',
-        size: file.fileSize ?? 0,
-        uri: file.uri,
-        type: 'image'
-      }]);
+      const novos = [
+        ...files,
+        {
+          name: file.fileName || 'imagem.jpg',
+          size: file.fileSize ?? 0,
+          uri: file.uri,
+          type: 'image' as const,
+        },
+      ];
+      notifyChange(novos);
     }
   };
 
@@ -72,12 +93,16 @@ export default function FileUpload({ equipmentId, onUploadSuccess }: FileUploadP
       if (!result.canceled && result.assets.length > 0) {
         const file = result.assets[0];
         await uploadAndRegister(file.uri, file.fileName || 'foto.jpg');
-        setFiles(prev => [...prev, {
-          name: file.fileName || 'foto.jpg',
-          size: file.fileSize ?? 0,
-          uri: file.uri,
-          type: 'photo'
-        }]);
+        const novos = [
+          ...files,
+          {
+            name: file.fileName || 'foto.jpg',
+            size: file.fileSize ?? 0,
+            uri: file.uri,
+            type: 'photo' as const,
+          },
+        ];
+        notifyChange(novos);
       }
     } else {
       Alert.alert('Permissão negada', 'Você precisa permitir o uso da câmera.');
@@ -85,7 +110,8 @@ export default function FileUpload({ equipmentId, onUploadSuccess }: FileUploadP
   };
 
   const handleRemove = (uri: string) => {
-    setFiles(prev => prev.filter(file => file.uri !== uri));
+    const atualizados = files.filter(file => file.uri !== uri);
+    notifyChange(atualizados);
   };
 
   const formatSize = (bytes: number) => `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
