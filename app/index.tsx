@@ -55,12 +55,12 @@ export default function HomePage() {
                         />
                         <BlockButton
                             icon={<MaterialCommunityIcons name="text-box-search-outline" size={36} color="#fff" />}
-                            label="Analise Forense"
+                            label="Análise Forense"
                             onPress={goToForensicAnalysis}
                         />
                         <BlockButton
                             icon={<MaterialCommunityIcons name="clipboard-list-outline" size={36} color="#fff" />}
-                            label="Lista de Analises"
+                            label="Lista de Análises"
                             onPress={goToForensicAnalysis}
                         />
                         <BlockButton

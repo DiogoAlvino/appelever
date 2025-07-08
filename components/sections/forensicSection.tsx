@@ -1,6 +1,6 @@
 import PrimaryList from '~/components/lists/primaryList';
 import PrimaryInput from '../inputs/primaryInput';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
 import RemoveButton from '../buttons/removeButton';
 import AddButton from '../buttons/addButton';
@@ -11,6 +11,10 @@ import PrimarySelect from '../inputs/primarySelect';
 import MaterialList from '../lists/materialList';
 import CheckBox from '../inputs/CheckBox';
 import { useForensic } from '~/hooks/useForensic';
+import { inspecaoCampos } from '~/data/inspecaoCampos';
+import { useState } from 'react';
+import MaquinaTracaoDrawer from '../modal/formDrawer';
+import FormDrawer from '../modal/formDrawer';
 
 export default function ForensicSection() {
     const {
@@ -29,6 +33,12 @@ export default function ForensicSection() {
         adicionarCampo, atualizarCampo, removerCampo,
         clearFieldError, errors,
     } = useForensic();
+
+    const camposMaquinaTracao = inspecaoCampos.maquinaTracao;
+
+    const [drawerMaquinaTracaoVisible, setDrawerMaquinaTracaoVisible] = useState(false);
+    const [preenchidoMaquinaTracao, setPreenchidoMaquinaTracao] = useState(false);
+
 
     return (
         <View style={styles.section}>
@@ -741,22 +751,135 @@ export default function ForensicSection() {
                 </View>
             </PrimaryList>
 
-            <PrimaryList
-                title="7. Equipamento"
-            >
+            <PrimaryList title="7. Equipamento">
                 <View style={styles.campos}>
-                    <View style={styles.campoInternoSecundario}>
-                        <View style={styles.campoInterno}>
-                            <Text style={styles.titulos}>1. Casa de maquinas</Text>
-                            <Text style={styles.titulos}>1.2 Máquina de tração</Text>
-                            <Text></Text>
+                    <View style={styles.nivel1}>
 
+                        <View style={styles.sectionSpacing}>
+                            <PrimaryList title="7.1 Casa de Máquinas">
+                                <View style={styles.campos}>
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Máquina de tração"
+                                            buttonLabel="Máquina de tração"
+                                            campos={inspecaoCampos.maquinaTracao}
+                                        />
+                                    </View>
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Limitador de Velocidade"
+                                            buttonLabel="Limitador de Velocidade"
+                                            campos={inspecaoCampos.limitadorVelocidade}
+                                        />
+                                    </View>
+                                </View>
+                            </PrimaryList>
+                        </View>
+                        
+                        <View style={styles.sectionSpacing}>
+                            <PrimaryList title="7.2 Cabos e Contrapeso">
+                                <View style={styles.campos}>
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Cabos"
+                                            buttonLabel="Cabos"
+                                            campos={inspecaoCampos.cabos}
+                                        />
+                                    </View>
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Contrapeso"
+                                            buttonLabel="Contrapeso"
+                                            campos={inspecaoCampos.contrapeso}
+                                        />
+                                    </View>
+                                </View>
+                            </PrimaryList>
+                        </View>
+
+                        <View style={styles.sectionSpacing}>
+                            <PrimaryList title="7.3 Cabine e Portas">
+                                <View style={styles.campos}>
+
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Cabine"
+                                            buttonLabel="Cabine"
+                                            campos={inspecaoCampos.cabine}
+                                        />
+                                    </View>
+
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Portas"
+                                            buttonLabel="Portas"
+                                            campos={inspecaoCampos.portas}
+                                        />
+                                    </View>
+
+                                </View>
+                            </PrimaryList>
+                        </View>
+
+                        <View style={styles.sectionSpacing}>
+                            <PrimaryList title="7.4 Freios de Emergência">
+                                <View style={styles.campos}>
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Freios de Emergência"
+                                            buttonLabel="Freios de Emergência"
+                                            campos={inspecaoCampos.freiosEmergencia}
+                                        />
+                                    </View>
+                                </View>
+                            </PrimaryList>
+                        </View>
+                        
+                        <View style={styles.sectionSpacing}>
+                            <PrimaryList title="7.5 Quadro de Comando">
+                                <View style={styles.campos}>
+
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Sistema de Controle"
+                                            buttonLabel="Sistema de Controle"
+                                            campos={inspecaoCampos.sistemaControle}
+                                        />
+                                    </View>
+
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Sistema Elétrico"
+                                            buttonLabel="Sistema Elétrico"
+                                            campos={inspecaoCampos.sistemaEletrico}
+                                        />
+                                    </View>
+
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Sensores"
+                                            buttonLabel="Sensores"
+                                            campos={inspecaoCampos.sensores}
+                                        />
+                                    </View>
+
+                                    <View style={styles.nivel2}>
+                                        <FormDrawer
+                                            title="Poço do Elevador"
+                                            buttonLabel="Poço do Elevador"
+                                            campos={inspecaoCampos.pocoElevador}
+                                        />
+                                    </View>
+
+                                </View>
+                            </PrimaryList>
                         </View>
 
                     </View>
-
                 </View>
             </PrimaryList>
+
+
 
             <PrimaryList
                 title="8. Entrevistas"
@@ -951,4 +1074,44 @@ const styles = StyleSheet.create({
         fontSize: fontSize.placeholder,
         color: colors.primaryDark,
     },
+    nivel1: {
+        padding: 10,
+        backgroundColor: '#f8f9fa',
+        borderRadius: 8,
+        marginBottom: 16,
+    },
+
+    nivel2: {
+        marginTop: 8,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 12,
+        borderColor: '#ddd',
+        borderWidth: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+
+    subsecao: {
+        gap: 16,
+    },
+
+    tituloGrupo: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.primaryDark,
+        marginTop: 12,
+    },
+
+    campoObservacao: {
+        marginBottom: 20,
+        gap: 12,
+    },
+    sectionSpacing: {
+        marginBottom: 16,
+    },
+
 });

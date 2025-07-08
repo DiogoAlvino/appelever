@@ -9,8 +9,8 @@ import { UploadModel } from '~/models/uploadModel';
 import { colors } from '~/theme';
 
 interface FileUploadProps {
-  equipmentId: string;
-  onUploadSuccess: (file: UploadModel) => void;
+  equipmentId?: string;
+  onUploadSuccess?: (file: UploadModel) => void;
 }
 
 interface FileItem {
@@ -28,8 +28,13 @@ export default function FileUpload({ equipmentId, onUploadSuccess }: FileUploadP
     try {
       const response = await fetch(uri);
       const blob = await response.blob();
-      const uploaded = await uploadFileToStorage(blob, name, equipmentId);
-      onUploadSuccess(uploaded);
+      if (equipmentId) {
+        const uploaded = await uploadFileToStorage(blob, name, equipmentId);
+        onUploadSuccess?.(uploaded);
+      } else {
+        console.warn('equipmentId não fornecido, upload ignorado');
+      }
+
     } catch (err) {
       console.error('Erro ao enviar arquivo', err);
       Alert.alert('Erro', 'Falha ao enviar arquivo');
