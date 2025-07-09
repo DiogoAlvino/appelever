@@ -723,7 +723,7 @@ export default function ForensicSection() {
                         <FileUpload />
 
                         <PrimaryInput
-                            label="Licenças e Alvará;"
+                            label="Licenças e Alvará"
                             placeholder="Informe"
                             value={documentacao.licencaAlvara}
                             onChangeText={(text) => setDocumentacao({ ...documentacao, licencaAlvara: text })}
