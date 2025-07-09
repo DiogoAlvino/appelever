@@ -17,12 +17,21 @@ export async function generatePDFWithHTML(
       <style>
         body {
           font-family: Arial, sans-serif;
-          margin: 20px;
           color: #333;
+          margin: 20px;
         }
+
         h1, h2 {
           text-align: center;
         }
+
+        .header-text {
+          text-align: center;
+          font-weight: bold;
+          font-size: 14px;
+          margin-bottom: 30px;
+        }
+
         .section {
           border: 1px solid #ccc;
           border-radius: 8px;
@@ -30,13 +39,16 @@ export async function generatePDFWithHTML(
           margin-bottom: 20px;
           page-break-inside: avoid;
         }
+
         .label {
           font-weight: bold;
         }
+
         .item {
           border-bottom: 1px dashed #ddd;
           padding: 10px 0;
         }
+
         .full-image {
           width: 100%;
           max-height: 700px;
@@ -44,6 +56,7 @@ export async function generatePDFWithHTML(
           margin: 20px 0;
           page-break-after: always;
         }
+
         .footer {
           text-align: right;
           font-size: 12px;
@@ -54,6 +67,11 @@ export async function generatePDFWithHTML(
     </head>
     <body>
       <h1>Ficha de Inspeção</h1>
+      
+      <div class="header-text">
+        Inspeção de conformidade em elevadores de passageiros a tração.<br />
+        Fundamentado NBR 16585-7
+      </div>
 
       <div class="section">
         <h2>Dados do Equipamento</h2>
