@@ -63,11 +63,6 @@ export default function HomePage() {
                             label="Lista de Análises"
                             onPress={goToForensicAnalysis}
                         />
-                        <BlockButton
-                            icon={<MaterialCommunityIcons name="draw" size={36} color="#fff" />}
-                            label="Testar Croqui"
-                            onPress={() => router.push('/testCroqui')}
-                        />
 
                     </View>
                 </ScrollView>

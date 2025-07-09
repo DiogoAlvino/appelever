@@ -15,6 +15,7 @@ import { inspecaoCampos } from '~/data/inspecaoCampos';
 import { useState } from 'react';
 import MaquinaTracaoDrawer from '../modal/formDrawer';
 import FormDrawer from '../modal/formDrawer';
+import CroquiModal from '../croqui';
 
 export default function ForensicSection() {
     const {
@@ -697,184 +698,90 @@ export default function ForensicSection() {
                 </View>
             </PrimaryList>
 
-            <PrimaryList
-                title="6. Documentação"
-            >
+            <PrimaryList title="6. Documentação">
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
+                        <Text style={styles.titulos}>Croqui do Local</Text>
+                        <CroquiModal />
+
                         <Text style={styles.titulos}>Registros</Text>
+
+                        <PrimaryInput
+                            label="Projetos"
+                            placeholder="Informe"
+                            value={documentacao.projetos}
+                            onChangeText={(text) => setDocumentacao({ ...documentacao, projetos: text })}
+                        />
+                        <FileUpload />
+
+                        <PrimaryInput
+                            label="Memorial de Cálculo"
+                            placeholder="Informe"
+                            value={documentacao.memorialCalculo}
+                            onChangeText={(text) => setDocumentacao({ ...documentacao, memorialCalculo: text })}
+                        />
+                        <FileUpload />
+
                         <PrimaryInput
                             label="Licenças e Alvará;"
                             placeholder="Informe"
                             value={documentacao.licencaAlvara}
                             onChangeText={(text) => setDocumentacao({ ...documentacao, licencaAlvara: text })}
                         />
+                        <FileUpload />
+
                         <PrimaryInput
                             label="ART"
                             placeholder="Informe"
                             value={documentacao.art}
                             onChangeText={(text) => setDocumentacao({ ...documentacao, art: text })}
                         />
+                        <FileUpload />
+
                         <PrimaryInput
                             label="Plano de Manutenção"
                             placeholder="Informe"
                             value={documentacao.planoManutencao}
                             onChangeText={(text) => setDocumentacao({ ...documentacao, planoManutencao: text })}
                         />
+                        <FileUpload />
+
                         <PrimaryInput
                             label="Contrato de Manutenção"
                             placeholder="Informe"
                             value={documentacao.contratoManutencao}
                             onChangeText={(text) => setDocumentacao({ ...documentacao, contratoManutencao: text })}
                         />
+                        <FileUpload />
+
                         <PrimaryInput
                             label="Registro de manutenção"
                             placeholder="Informe"
                             value={documentacao.registroManutencao}
                             onChangeText={(text) => setDocumentacao({ ...documentacao, registroManutencao: text })}
                         />
+                        <FileUpload />
+
                         <PrimaryInput
                             label="Relatório de Inspeção Anual – RIA"
                             placeholder="Informe"
                             value={documentacao.relatorioRia}
                             onChangeText={(text) => setDocumentacao({ ...documentacao, relatorioRia: text })}
                         />
+                        <FileUpload />
+
                         <PrimaryInput
                             label="Outro (especificar)"
                             placeholder="Informe"
                             value={documentacao.outro}
                             onChangeText={(text) => setDocumentacao({ ...documentacao, outro: text })}
                         />
+                        <FileUpload />
+
+                        <Text style={styles.titulos}>Observações</Text>
                         <VoiceInput value={message} onChangeText={setMessage} />
-
-                    </View>
-                </View>
-            </PrimaryList>
-
-            <PrimaryList title="7. Equipamento">
-                <View style={styles.campos}>
-                    <View style={styles.nivel1}>
-
-                        <View style={styles.sectionSpacing}>
-                            <PrimaryList title="7.1 Casa de Máquinas">
-                                <View style={styles.campos}>
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Máquina de tração"
-                                            buttonLabel="Máquina de tração"
-                                            campos={inspecaoCampos.maquinaTracao}
-                                        />
-                                    </View>
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Limitador de Velocidade"
-                                            buttonLabel="Limitador de Velocidade"
-                                            campos={inspecaoCampos.limitadorVelocidade}
-                                        />
-                                    </View>
-                                </View>
-                            </PrimaryList>
-                        </View>
-                        
-                        <View style={styles.sectionSpacing}>
-                            <PrimaryList title="7.2 Cabos e Contrapeso">
-                                <View style={styles.campos}>
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Cabos"
-                                            buttonLabel="Cabos"
-                                            campos={inspecaoCampos.cabos}
-                                        />
-                                    </View>
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Contrapeso"
-                                            buttonLabel="Contrapeso"
-                                            campos={inspecaoCampos.contrapeso}
-                                        />
-                                    </View>
-                                </View>
-                            </PrimaryList>
-                        </View>
-
-                        <View style={styles.sectionSpacing}>
-                            <PrimaryList title="7.3 Cabine e Portas">
-                                <View style={styles.campos}>
-
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Cabine"
-                                            buttonLabel="Cabine"
-                                            campos={inspecaoCampos.cabine}
-                                        />
-                                    </View>
-
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Portas"
-                                            buttonLabel="Portas"
-                                            campos={inspecaoCampos.portas}
-                                        />
-                                    </View>
-
-                                </View>
-                            </PrimaryList>
-                        </View>
-
-                        <View style={styles.sectionSpacing}>
-                            <PrimaryList title="7.4 Freios de Emergência">
-                                <View style={styles.campos}>
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Freios de Emergência"
-                                            buttonLabel="Freios de Emergência"
-                                            campos={inspecaoCampos.freiosEmergencia}
-                                        />
-                                    </View>
-                                </View>
-                            </PrimaryList>
-                        </View>
-                        
-                        <View style={styles.sectionSpacing}>
-                            <PrimaryList title="7.5 Quadro de Comando">
-                                <View style={styles.campos}>
-
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Sistema de Controle"
-                                            buttonLabel="Sistema de Controle"
-                                            campos={inspecaoCampos.sistemaControle}
-                                        />
-                                    </View>
-
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Sistema Elétrico"
-                                            buttonLabel="Sistema Elétrico"
-                                            campos={inspecaoCampos.sistemaEletrico}
-                                        />
-                                    </View>
-
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Sensores"
-                                            buttonLabel="Sensores"
-                                            campos={inspecaoCampos.sensores}
-                                        />
-                                    </View>
-
-                                    <View style={styles.nivel2}>
-                                        <FormDrawer
-                                            title="Poço do Elevador"
-                                            buttonLabel="Poço do Elevador"
-                                            campos={inspecaoCampos.pocoElevador}
-                                        />
-                                    </View>
-
-                                </View>
-                            </PrimaryList>
-                        </View>
-
+                        <Text style={{ marginTop: 4 }}>Texto Capturado:</Text>
+                        <Text>{message || 'Nada capturado ainda'}</Text>
                     </View>
                 </View>
             </PrimaryList>

@@ -89,6 +89,8 @@ export const useForensic = () => {
 
 
     const [documentacao, setDocumentacao] = useState({
+        projetos: '',
+        memorialCalculo: '',
         licencaAlvara: '',
         art: '',
         planoManutencao: '',
@@ -183,6 +185,8 @@ export const useForensic = () => {
             outroDocumento: '',
         });
         setDocumentacao({
+            projetos: '',
+            memorialCalculo: '',
             licencaAlvara: '',
             art: '',
             planoManutencao: '',

@@ -59,7 +59,6 @@ export default function RootLayout() {
           <Stack.Screen name="reportInspection/[equipmentId]" options={{ title: 'Relatório de Inspeção' }} />
           <Stack.Screen name="forensic" options={{ title: 'Análise Forense' }} />
           <Stack.Screen name="previewImage" options={{ title: 'Imagem' }} />
-          <Stack.Screen name="testCroqui" options={{ title: 'CROQUI' }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
       </KeyboardAvoidingView>
