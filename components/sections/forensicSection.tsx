@@ -15,12 +15,16 @@ import { inspecaoCampos } from '~/data/inspecaoCampos';
 import { useState } from 'react';
 import MaquinaTracaoDrawer from '../modal/formDrawer';
 import FormDrawer from '../modal/formDrawer';
+
 import CroquiModal from '../croqui';
+import { ScrollView } from 'react-native-gesture-handler';
+import ResumoVestigio from './vestigioSection';
+import Modal from 'react-native-modal';
+
 
 export default function ForensicSection() {
     const {
         dadosIniciais, setDadosIniciais,
-        message, setMessage,
         informacoes, setInformacoes,
         peritoAuxiliar, setPeritoAuxiliar,
         equipePericial, setEquipePericial,
@@ -33,12 +37,113 @@ export default function ForensicSection() {
         riscoAPR, setRiscoAPR,
         adicionarCampo, atualizarCampo, removerCampo,
         clearFieldError, errors,
+        reconhecimentoArea,
+        setReconhecimentoArea,
+        mensagemInformacoesGerais,
+        setMensagemInformacoesGerais,
+        mensagemDepoimentos,
+        setMensagemDepoimentos,
+        mensagemLesoesDepoimentos,
+        setMensagemLesoesDepoimentos,
+        mensagemRiscoAPR,
+        setMensagemRiscoAPR,
+        mensagemDescricaoVestigio,
+        setMensagemDescricaoVestigio,
+        mensagemDescricaoPreliminar,
+        setMensagemDescricaoPreliminar,
+        mensagemAcondicionamentoOutro,
+        setMensagemAcondicionamentoOutro,
+        mensagemDocumentacaoOutro,
+        setMensagemDocumentacaoOutro,
     } = useForensic();
+
+    const [modalVestigioVisible, setModalVestigioVisible] = useState(false);
+    const [origemVestigio, setOrigemVestigio] = useState<'equipamentos' | 'entrevistas' | 'documentacao' | null>(null);
+
+    const [vestigiosEquipamentos, setVestigiosEquipamentos] = useState<VestigioResumo[]>([]);
+    const [vestigiosEntrevistas, setVestigiosEntrevistas] = useState<VestigioResumo[]>([]);
+    const [vestigiosDocumentacao, setVestigiosDocumentacao] = useState<VestigioResumo[]>([]);
+
+    const [vestigioSelecionado, setVestigioSelecionado] = useState<VestigioResumo | null>(null);
+
+
+    const [vestigioTemp, setVestigioTemp] = useState({
+        numeroVestigio: '',
+        unidadeOrigem: '',
+        procedimento: '',
+        naturezaVestigio: '',
+        naturezaOutros: '',
+        descricaoDetalhada: '',
+        responsavelColeta: '',
+        matricula: '',
+        tipoAcondicionamento: '',
+        tipoAcondicionamentoOutros: '',
+        numeroLacre: '',
+    });
+
+    type VestigioResumo = {
+        numeroVestigio: string;
+        naturezaVestigio: string;
+        origem: 'equipamentos' | 'entrevistas' | 'documentacao';
+        dadosCompletos: {
+            dadosPreliminares: {
+                numeroVestigio: string;
+                unidadeOrigem: string;
+                procedimento: string;
+                naturezaVestigio: string;
+                naturezaOutros: string;
+                descricaoDetalhada: string;
+            }[];
+            acondicionamento: {
+                responsavelColeta: string;
+                matricula: string;
+                tipoAcondicionamento: string;
+                tipoAcondicionamentoOutros: string;
+                numeroLacre: string;
+            }[];
+        };
+    };
+
+    function handleVisualizarVestigio(vestigio: VestigioResumo) {
+        setVestigioSelecionado(vestigio);
+        setOrigemVestigio(vestigio.origem);
+        setModalVestigioVisible(true);
+    }
 
     const camposMaquinaTracao = inspecaoCampos.maquinaTracao;
 
     const [drawerMaquinaTracaoVisible, setDrawerMaquinaTracaoVisible] = useState(false);
     const [preenchidoMaquinaTracao, setPreenchidoMaquinaTracao] = useState(false);
+
+    function handleAvancarVestigio() {
+        const resumoVestigio: VestigioResumo = {
+            numeroVestigio: dadosPreliminares[0].numeroVestigio,
+            naturezaVestigio: dadosPreliminares[0].naturezaVestigio,
+            origem: origemVestigio as 'equipamentos' | 'entrevistas' | 'documentacao',
+            dadosCompletos: {
+                dadosPreliminares,
+                acondicionamento,
+            },
+        };
+
+        if (origemVestigio === 'equipamentos') {
+            setVestigiosEquipamentos(prev => [...prev, resumoVestigio]);
+        } if (origemVestigio === 'entrevistas') {
+            setVestigiosEntrevistas(prev => [...prev, resumoVestigio]);
+        } else {
+            setVestigiosDocumentacao(prev => [...prev, resumoVestigio]);
+        }
+
+        setModalVestigioVisible(false);
+    }
+
+
+    const origemLabels: Record<'equipamentos' | 'entrevistas' | 'documentacao', string> = {
+        equipamentos: 'Equipamentos',
+        entrevistas: 'Entrevistas',
+        documentacao: 'Documentação',
+    };
+
 
 
     return (
@@ -61,14 +166,14 @@ export default function ForensicSection() {
                         <PrimaryInput
                             label="Cargo"
                             placeholder="Informe"
-                            value={dadosIniciais.cep}
+                            value={dadosIniciais.cargoPerito}
                             onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, cargoPerito: text })}
                             mask="99999-999"
                         />
                         <PrimaryInput
                             label="Matricula"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
+                            value={dadosIniciais.matriculaPerito}
                             onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, matriculaPerito: text })}
                         />
                     </View>
@@ -136,21 +241,21 @@ export default function ForensicSection() {
                         <PrimaryInput
                             label="Data e hora"
                             placeholder="Informe"
-                            value={dadosIniciais.edificacao}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, edificacao: text })}
+                            value={dadosIniciais.dataHora.toLocaleString()}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, dataHora: new Date() })}
                         />
                         <PrimaryInput
                             label="Tipo de ocorrencia"
                             placeholder="Informe"
-                            value={dadosIniciais.cep}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, cep: text })}
+                            value={dadosIniciais.tipoOcorrencia}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, tipoOcorrencia: text })}
                             mask="99999-999"
                         />
                         <PrimaryInput
                             label="Autoridade policial solicitante"
                             placeholder="Informe"
-                            value={dadosIniciais.logradouro}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, logradouro: text })}
+                            value={dadosIniciais.autoridadePolicialNome}
+                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, autoridadePolicialNome: text })}
                         />
 
                     </View>
@@ -202,21 +307,20 @@ export default function ForensicSection() {
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
                         <FileUpload />
-                        <VoiceInput value={message} onChangeText={setMessage} />
-                        <Text >Texto Capturado:</Text>
-                        <Text >{message || 'Nada capturado ainda'}</Text>
+                        <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+
                     </View>
 
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Condições ambientais</Text>
                         <Text>Descreva as condições como: barulho, fumaça, iluminação e etc</Text>
-                        <VoiceInput value={message} onChangeText={setMessage} />
+                        <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
                     </View>
 
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Características do local</Text>
                         <Text>Condições especiais relevantes</Text>
-                        <VoiceInput value={message} onChangeText={setMessage} />
+                        <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
                     </View>
 
                     <View style={styles.campoInternoSecundario}>
@@ -491,452 +595,640 @@ export default function ForensicSection() {
             <PrimaryList
                 title="5. Exames"
             >
-                <View style={styles.campos}>
-                    <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Vestígio - Coleta</Text>
-                        <View style={styles.campoInterno}>
-                            {dadosPreliminares.map((item, index) => (
-                                <View key={index} style={{ marginBottom: 12, gap: 12 }}>
-                                    <Text style={styles.titulos}>Dados preliminares {index + 1}</Text>
-
-                                    <PrimaryInput
-                                        label="Nº do vestígio"
-                                        placeholder="Informe"
-                                        value={item.numeroVestigio}
-                                        onChangeText={(text) => {
-                                            const copia = [...dadosPreliminares];
-                                            copia[index].numeroVestigio = text;
-                                            setDadosPreliminares(copia);
-                                        }}
-                                    />
-
-                                    <PrimaryInput
-                                        label="Unidade de Origem"
-                                        placeholder="Informe"
-                                        value={item.unidadeOrigem}
-                                        onChangeText={(text) => {
-                                            const copia = [...dadosPreliminares];
-                                            copia[index].unidadeOrigem = text;
-                                            setDadosPreliminares(copia);
-                                        }}
-                                    />
-
-                                    <PrimaryInput
-                                        label="Nº do Procedimento (IP/TCO/Outros)"
-                                        placeholder="Informe"
-                                        value={item.procedimento}
-                                        onChangeText={(text) => {
-                                            const copia = [...dadosPreliminares];
-                                            copia[index].procedimento = text;
-                                            setDadosPreliminares(copia);
-                                        }}
-                                    />
-
-                                    <PrimarySelect
-                                        label="Natureza do Vestígio"
-                                        selected={item.naturezaVestigio}
-                                        onSelect={(value) => {
-                                            const copia = [...dadosPreliminares];
-                                            copia[index].naturezaVestigio = value;
-                                            if (value !== 'Outros') copia[index].naturezaOutros = '';
-                                            setDadosPreliminares(copia);
-                                        }}
-                                        placeholder="Selecione"
-                                        options={['Biológico', 'Documental', 'Equipamento', 'Material', 'Mídia de armazenamento', 'Cadáver', 'Outros']}
-                                    />
-
-                                    {item.naturezaVestigio === 'Outros' && (
-                                        <PrimaryInput
-                                            label="Descreva a natureza"
-                                            placeholder="Informe"
-                                            value={item.naturezaOutros}
-                                            onChangeText={(text) => {
-                                                const copia = [...dadosPreliminares];
-                                                copia[index].naturezaOutros = text;
-                                                setDadosPreliminares(copia);
-                                            }}
-                                        />
-                                    )}
-
-                                    <Text style={styles.textos}>Descrição Detalhada do(s) Vestígio(s)</Text>
-                                    <Text>Quantidades, características, numerações, estado de conservação, possíveis danos, etc</Text>
-
-                                    <VoiceInput value={item.descricaoDetalhada} onChangeText={(text) => {
-                                        const copia = [...dadosPreliminares];
-                                        copia[index].descricaoDetalhada = text;
-                                        setDadosPreliminares(copia);
-                                    }} />
-
-                                    <FileUpload />
-
-                                    {index > 0 && (
-                                        <RemoveButton
-                                            label="Remover dados do vestígio"
-                                            onPress={() =>
-                                                setDadosPreliminares((prev) => prev.filter((_, i) => i !== index))
-                                            }
-                                        />
-                                    )}
-                                </View>
-                            ))}
-
-                            <AddButton
-                                label="Adicionar outros dados"
-                                onPress={() =>
-                                    setDadosPreliminares((prev) => [
-                                        ...prev,
-                                        {
-                                            numeroVestigio: '',
-                                            unidadeOrigem: '',
-                                            procedimento: '',
-                                            naturezaVestigio: '',
-                                            naturezaOutros: '',
-                                            descricaoDetalhada: '',
-                                        },
-                                    ])
-                                }
-                            />
-
-                        </View>
-
+                <View style={styles.campoInternoSecundario}>
+                    <View style={styles.campoInterno}>
                         <View style={styles.campoInternoSecundario}>
-                            {acondicionamento.map((item, index) => (
-                                <View key={index} style={{ marginBottom: 12, gap: 12 }}>
-                                    <Text style={styles.titulos}>Coleta/Acondicionamento {index + 1}</Text>
+                            <Text style={styles.titulos}>5.1 Documentação</Text>
+                            <Text style={styles.titulos}>Croqui do Local</Text>
+                            <CroquiModal />
 
-                                    <PrimaryInput
-                                        label="Responsável pela coleta"
-                                        placeholder="Informe"
-                                        value={item.responsavelColeta}
-                                        onChangeText={(text) => {
-                                            const copia = [...acondicionamento];
-                                            copia[index].responsavelColeta = text;
-                                            setAcondicionamento(copia);
-                                        }}
-                                    />
+                            <Text style={styles.titulos}>Registros</Text>
 
-                                    <PrimaryInput
-                                        label="Matrícula"
-                                        placeholder="Informe"
-                                        value={item.matricula}
-                                        onChangeText={(text) => {
-                                            const copia = [...acondicionamento];
-                                            copia[index].matricula = text;
-                                            setAcondicionamento(copia);
-                                        }}
-                                    />
-
-                                    <LocationButton />
-
-                                    <PrimarySelect
-                                        label="Tipo de acondicionamento"
-                                        selected={item.tipoAcondicionamento}
-                                        onSelect={(value) => {
-                                            const copia = [...acondicionamento];
-                                            copia[index].tipoAcondicionamento = value;
-                                            if (value !== 'Outros') copia[index].tipoAcondicionamentoOutros = '';
-                                            setAcondicionamento(copia);
-                                        }}
-                                        placeholder="Selecione"
-                                        options={['Saco plástico', 'Frasco', 'Caixa térmica', 'Outros']}
-                                    />
-
-                                    {item.tipoAcondicionamento === 'Outros' && (
-                                        <PrimaryInput
-                                            label="Descreva o tipo de acondicionamento"
-                                            placeholder="Informe"
-                                            value={item.tipoAcondicionamentoOutros}
-                                            onChangeText={(text) => {
-                                                const copia = [...acondicionamento];
-                                                copia[index].tipoAcondicionamentoOutros = text;
-                                                setAcondicionamento(copia);
-                                            }}
-                                        />
-                                    )}
-
-                                    <PrimaryInput
-                                        label="Nº do lacre/ Invólucro de segurança"
-                                        placeholder="Informe"
-                                        value={item.numeroLacre}
-                                        onChangeText={(text) => {
-                                            const copia = [...acondicionamento];
-                                            copia[index].numeroLacre = text;
-                                            setAcondicionamento(copia);
-                                        }}
-                                    />
-
-                                    <FileUpload />
-
-                                    {index > 0 && (
-                                        <RemoveButton
-                                            label="Remover acondicionamento"
-                                            onPress={() =>
-                                                setAcondicionamento((prev) => prev.filter((_, i) => i !== index))
-                                            }
-                                        />
-                                    )}
-                                </View>
-                            ))}
-
-                            <AddButton
-                                label="Adicionar outro dado"
-                                onPress={() =>
-                                    setAcondicionamento((prev) => [
-                                        ...prev,
-                                        {
-                                            responsavelColeta: '',
-                                            matricula: '',
-                                            tipoAcondicionamento: '',
-                                            tipoAcondicionamentoOutros: '',
-                                            numeroLacre: '',
-                                        },
-                                    ])
-                                }
+                            <PrimaryInput
+                                label="Projetos"
+                                placeholder="Informe"
+                                value={documentacao.projetos}
+                                onChangeText={(text) => setDocumentacao({ ...documentacao, projetos: text })}
                             />
-                        </View>
-                    </View>
-                </View>
-            </PrimaryList>
+                            <FileUpload />
 
-            <PrimaryList title="6. Documentação">
-                <View style={styles.campos}>
-                    <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Croqui do Local</Text>
-                        <CroquiModal />
+                            <PrimaryInput
+                                label="Memorial de Cálculo"
+                                placeholder="Informe"
+                                value={documentacao.memorialCalculo}
+                                onChangeText={(text) => setDocumentacao({ ...documentacao, memorialCalculo: text })}
+                            />
+                            <FileUpload />
 
-                        <Text style={styles.titulos}>Registros</Text>
+                            <PrimaryInput
+                                label="Licenças e Alvará"
+                                placeholder="Informe"
+                                value={documentacao.licencaAlvara}
+                                onChangeText={(text) => setDocumentacao({ ...documentacao, licencaAlvara: text })}
+                            />
+                            <FileUpload />
 
-                        <PrimaryInput
-                            label="Projetos"
-                            placeholder="Informe"
-                            value={documentacao.projetos}
-                            onChangeText={(text) => setDocumentacao({ ...documentacao, projetos: text })}
-                        />
-                        <FileUpload />
+                            <PrimaryInput
+                                label="ART"
+                                placeholder="Informe"
+                                value={documentacao.art}
+                                onChangeText={(text) => setDocumentacao({ ...documentacao, art: text })}
+                            />
+                            <FileUpload />
 
-                        <PrimaryInput
-                            label="Memorial de Cálculo"
-                            placeholder="Informe"
-                            value={documentacao.memorialCalculo}
-                            onChangeText={(text) => setDocumentacao({ ...documentacao, memorialCalculo: text })}
-                        />
-                        <FileUpload />
+                            <PrimaryInput
+                                label="Plano de Manutenção"
+                                placeholder="Informe"
+                                value={documentacao.planoManutencao}
+                                onChangeText={(text) => setDocumentacao({ ...documentacao, planoManutencao: text })}
+                            />
+                            <FileUpload />
 
-                        <PrimaryInput
-                            label="Licenças e Alvará"
-                            placeholder="Informe"
-                            value={documentacao.licencaAlvara}
-                            onChangeText={(text) => setDocumentacao({ ...documentacao, licencaAlvara: text })}
-                        />
-                        <FileUpload />
+                            <PrimaryInput
+                                label="Contrato de Manutenção"
+                                placeholder="Informe"
+                                value={documentacao.contratoManutencao}
+                                onChangeText={(text) => setDocumentacao({ ...documentacao, contratoManutencao: text })}
+                            />
+                            <FileUpload />
 
-                        <PrimaryInput
-                            label="ART"
-                            placeholder="Informe"
-                            value={documentacao.art}
-                            onChangeText={(text) => setDocumentacao({ ...documentacao, art: text })}
-                        />
-                        <FileUpload />
+                            <PrimaryInput
+                                label="Registro de manutenção"
+                                placeholder="Informe"
+                                value={documentacao.registroManutencao}
+                                onChangeText={(text) => setDocumentacao({ ...documentacao, registroManutencao: text })}
+                            />
+                            <FileUpload />
 
-                        <PrimaryInput
-                            label="Plano de Manutenção"
-                            placeholder="Informe"
-                            value={documentacao.planoManutencao}
-                            onChangeText={(text) => setDocumentacao({ ...documentacao, planoManutencao: text })}
-                        />
-                        <FileUpload />
+                            <PrimaryInput
+                                label="Relatório de Inspeção Anual – RIA"
+                                placeholder="Informe"
+                                value={documentacao.relatorioRia}
+                                onChangeText={(text) => setDocumentacao({ ...documentacao, relatorioRia: text })}
+                            />
+                            <FileUpload />
 
-                        <PrimaryInput
-                            label="Contrato de Manutenção"
-                            placeholder="Informe"
-                            value={documentacao.contratoManutencao}
-                            onChangeText={(text) => setDocumentacao({ ...documentacao, contratoManutencao: text })}
-                        />
-                        <FileUpload />
+                            <PrimaryInput
+                                label="Outro (especificar)"
+                                placeholder="Informe"
+                                value={documentacao.outro}
+                                onChangeText={(text) => setDocumentacao({ ...documentacao, outro: text })}
+                            />
 
-                        <PrimaryInput
-                            label="Registro de manutenção"
-                            placeholder="Informe"
-                            value={documentacao.registroManutencao}
-                            onChangeText={(text) => setDocumentacao({ ...documentacao, registroManutencao: text })}
-                        />
-                        <FileUpload />
+                            <FileUpload />
 
-                        <PrimaryInput
-                            label="Relatório de Inspeção Anual – RIA"
-                            placeholder="Informe"
-                            value={documentacao.relatorioRia}
-                            onChangeText={(text) => setDocumentacao({ ...documentacao, relatorioRia: text })}
-                        />
-                        <FileUpload />
+                            <Text style={styles.titulos}>Observações</Text>
 
-                        <PrimaryInput
-                            label="Outro (especificar)"
-                            placeholder="Informe"
-                            value={documentacao.outro}
-                            onChangeText={(text) => setDocumentacao({ ...documentacao, outro: text })}
-                        />
-                        <FileUpload />
+                            <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
 
-                        <Text style={styles.titulos}>Observações</Text>
-                        <VoiceInput value={message} onChangeText={setMessage} />
-                        <Text style={{ marginTop: 4 }}>Texto Capturado:</Text>
-                        <Text>{message || 'Nada capturado ainda'}</Text>
-                    </View>
-                </View>
-            </PrimaryList>
-
-
-
-            <PrimaryList
-                title="8. Entrevistas"
-            >
-                <View style={styles.campos}>
-                    <View style={styles.campoInternoSecundario}>
-                        {depoimentos.map((item, index) => (
-                            <View key={index} style={{ marginBottom: 12, gap: 12 }}>
-                                <Text style={styles.titulos}>Registro e análise de depoimentos {index + 1}</Text>
-
-                                <PrimarySelect
-                                    label="Tipo do entrevistado"
-                                    selected={item.tipoEntrevistado}
-                                    onSelect={(value) => {
-                                        const copia = [...depoimentos];
-                                        copia[index].tipoEntrevistado = value;
-                                        if (value !== 'Vítimas sobreviventes') {
-                                            copia[index].genero = '';
-                                            copia[index].idade = '';
-                                            copia[index].descricaoLesoes = '';
-                                        }
-                                        setDepoimentos(copia);
+                            {vestigiosDocumentacao.map((vestigio, index) => (
+                                <ResumoVestigio
+                                    index={index}
+                                    vestigio={vestigio}
+                                    onVisualizar={() => handleVisualizarVestigio(vestigio)}
+                                    onRemover={() => {
+                                        const copia = [...vestigiosDocumentacao];
+                                        copia.splice(index, 1);
+                                        setVestigiosDocumentacao(copia);
                                     }}
-                                    placeholder="Selecione"
-                                    options={[
-                                        'Vítimas sobreviventes',
-                                        'Testemunhas',
-                                        'Síndico/Administrador',
-                                        'Zelador',
-                                        'Técnicos de manutenção',
-                                    ]}
                                 />
 
-                                {item.tipoEntrevistado && (
-                                    <>
-                                        <PrimaryInput
-                                            label="Nome"
-                                            placeholder="Informe"
-                                            value={item.nomeEntrevistado}
-                                            onChangeText={(text) => {
+                            ))}
+
+                            <AddButton
+                                label="Adicionar vestígio"
+                                onPress={() => {
+                                    setOrigemVestigio('documentacao');
+                                    setModalVestigioVisible(true);
+                                }}
+                            />
+
+
+                        </View>
+                    </View>
+                    <View style={styles.campoInternoSecundario}>
+                        <View style={styles.campoInternoSecundario}>
+                            <Text style={styles.titulos}>5.2 Equipamentos</Text>
+                            <View style={styles.campoInterno}>
+                                <View style={styles.nivel1}>
+
+                                    <View style={styles.sectionSpacing}>
+                                        <PrimaryList title="7.1 Casa de Máquinas">
+                                            <View style={styles.campos}>
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Máquina de tração"
+                                                        buttonLabel="Máquina de tração"
+                                                        campos={inspecaoCampos.maquinaTracao}
+                                                    />
+                                                </View>
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Limitador de Velocidade"
+                                                        buttonLabel="Limitador de Velocidade"
+                                                        campos={inspecaoCampos.limitadorVelocidade}
+                                                    />
+                                                </View>
+                                            </View>
+                                        </PrimaryList>
+                                    </View>
+
+                                    <View style={styles.sectionSpacing}>
+                                        <PrimaryList title="7.2 Cabos e Contrapeso">
+                                            <View style={styles.campos}>
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Cabos"
+                                                        buttonLabel="Cabos"
+                                                        campos={inspecaoCampos.cabos}
+                                                    />
+                                                </View>
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Contrapeso"
+                                                        buttonLabel="Contrapeso"
+                                                        campos={inspecaoCampos.contrapeso}
+                                                    />
+                                                </View>
+                                            </View>
+                                        </PrimaryList>
+                                    </View>
+
+                                    <View style={styles.sectionSpacing}>
+                                        <PrimaryList title="7.3 Cabine e Portas">
+                                            <View style={styles.campos}>
+
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Cabine"
+                                                        buttonLabel="Cabine"
+                                                        campos={inspecaoCampos.cabine}
+                                                    />
+                                                </View>
+
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Portas"
+                                                        buttonLabel="Portas"
+                                                        campos={inspecaoCampos.portas}
+                                                    />
+                                                </View>
+
+                                            </View>
+                                        </PrimaryList>
+                                    </View>
+
+                                    <View style={styles.sectionSpacing}>
+                                        <PrimaryList title="7.4 Freios de Emergência">
+                                            <View style={styles.campos}>
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Freios de Emergência"
+                                                        buttonLabel="Freios de Emergência"
+                                                        campos={inspecaoCampos.freiosEmergencia}
+                                                    />
+                                                </View>
+                                            </View>
+                                        </PrimaryList>
+                                    </View>
+
+                                    <View style={styles.sectionSpacing}>
+                                        <PrimaryList title="7.5 Quadro de Comando">
+                                            <View style={styles.campos}>
+
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Sistema de Controle"
+                                                        buttonLabel="Sistema de Controle"
+                                                        campos={inspecaoCampos.sistemaControle}
+                                                    />
+                                                </View>
+
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Sistema Elétrico"
+                                                        buttonLabel="Sistema Elétrico"
+                                                        campos={inspecaoCampos.sistemaEletrico}
+                                                    />
+                                                </View>
+
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Sensores"
+                                                        buttonLabel="Sensores"
+                                                        campos={inspecaoCampos.sensores}
+                                                    />
+                                                </View>
+
+                                                <View style={styles.nivel2}>
+                                                    <FormDrawer
+                                                        title="Poço do Elevador"
+                                                        buttonLabel="Poço do Elevador"
+                                                        campos={inspecaoCampos.pocoElevador}
+                                                    />
+                                                </View>
+
+                                            </View>
+
+                                        </PrimaryList>
+                                    </View>
+
+                                </View>
+
+                                {vestigiosEquipamentos.map((vestigio, index) => (
+                                    <ResumoVestigio
+                                        index={index}
+                                        vestigio={vestigio}
+                                        onVisualizar={() => handleVisualizarVestigio(vestigio)}
+                                        onRemover={() => {
+                                            const copia = [...vestigiosEquipamentos];
+                                            copia.splice(index, 1);
+                                            setVestigiosEquipamentos(copia);
+                                        }}
+                                    />
+
+                                ))}
+
+                                <AddButton
+                                    label="Adicionar vestígio"
+                                    onPress={() => {
+                                        setOrigemVestigio('equipamentos');
+                                        setModalVestigioVisible(true);
+                                    }}
+                                />
+
+
+                            </View>
+
+                            <View style={styles.campoInterno}>
+                                <Text style={styles.titulos}>5.3 Entrevistas</Text>
+                                {depoimentos.map((item, index) => (
+                                    <View key={index} style={{ marginBottom: 12, gap: 12 }}>
+                                        <Text style={styles.titulos}>Registro e análise de depoimentos {index + 1}</Text>
+
+                                        <PrimarySelect
+                                            label="Tipo do entrevistado"
+                                            selected={item.tipoEntrevistado}
+                                            onSelect={(value) => {
                                                 const copia = [...depoimentos];
-                                                copia[index].nomeEntrevistado = text;
+                                                copia[index].tipoEntrevistado = value;
+                                                if (value !== 'Vítimas sobreviventes') {
+                                                    copia[index].genero = '';
+                                                    copia[index].idade = '';
+                                                    copia[index].descricaoLesoes = '';
+                                                }
                                                 setDepoimentos(copia);
                                             }}
+                                            placeholder="Selecione"
+                                            options={[
+                                                'Vítimas sobreviventes',
+                                                'Testemunhas',
+                                                'Síndico/Administrador',
+                                                'Zelador',
+                                                'Técnicos de manutenção',
+                                            ]}
                                         />
 
-                                        <PrimaryInput
-                                            label="Identificação (CPF, RG)"
-                                            placeholder="Informe"
-                                            value={item.identificacao}
-                                            onChangeText={(text) => {
-                                                const copia = [...depoimentos];
-                                                copia[index].identificacao = text;
-                                                setDepoimentos(copia);
-                                            }}
-                                        />
-
-                                        <PrimaryInput
-                                            label="Endereço"
-                                            placeholder="Informe"
-                                            value={item.endereco}
-                                            onChangeText={(text) => {
-                                                const copia = [...depoimentos];
-                                                copia[index].endereco = text;
-                                                setDepoimentos(copia);
-                                            }}
-                                        />
-
-                                        {item.tipoEntrevistado === 'Vítimas sobreviventes' && (
+                                        {item.tipoEntrevistado && (
                                             <>
-                                                <PrimarySelect
-                                                    label="Gênero"
-                                                    selected={item.genero}
-                                                    onSelect={(value) => {
+                                                <PrimaryInput
+                                                    label="Nome"
+                                                    placeholder="Informe"
+                                                    value={item.nomeEntrevistado}
+                                                    onChangeText={(text) => {
                                                         const copia = [...depoimentos];
-                                                        copia[index].genero = value;
+                                                        copia[index].nomeEntrevistado = text;
                                                         setDepoimentos(copia);
                                                     }}
-                                                    placeholder="Selecione"
-                                                    options={['Masculino', 'Feminino']}
                                                 />
 
                                                 <PrimaryInput
-                                                    label="Idade"
+                                                    label="Identificação (CPF, RG)"
                                                     placeholder="Informe"
-                                                    value={item.idade}
+                                                    value={item.identificacao}
                                                     onChangeText={(text) => {
                                                         const copia = [...depoimentos];
-                                                        copia[index].idade = text;
+                                                        copia[index].identificacao = text;
                                                         setDepoimentos(copia);
                                                     }}
                                                 />
 
-                                                <Text style={styles.textos}>Descrição das lesões</Text>
-                                                <VoiceInput
-                                                    value={item.descricaoLesoes}
+                                                <PrimaryInput
+                                                    label="Endereço"
+                                                    placeholder="Informe"
+                                                    value={item.endereco}
                                                     onChangeText={(text) => {
                                                         const copia = [...depoimentos];
-                                                        copia[index].descricaoLesoes = text;
+                                                        copia[index].endereco = text;
                                                         setDepoimentos(copia);
                                                     }}
                                                 />
-                                                <FileUpload />
+
+                                                {item.tipoEntrevistado === 'Vítimas sobreviventes' && (
+                                                    <>
+                                                        <PrimarySelect
+                                                            label="Gênero"
+                                                            selected={item.genero}
+                                                            onSelect={(value) => {
+                                                                const copia = [...depoimentos];
+                                                                copia[index].genero = value;
+                                                                setDepoimentos(copia);
+                                                            }}
+                                                            placeholder="Selecione"
+                                                            options={['Masculino', 'Feminino']}
+                                                        />
+
+                                                        <PrimaryInput
+                                                            label="Idade"
+                                                            placeholder="Informe"
+                                                            value={item.idade}
+                                                            onChangeText={(text) => {
+                                                                const copia = [...depoimentos];
+                                                                copia[index].idade = text;
+                                                                setDepoimentos(copia);
+                                                            }}
+                                                        />
+
+                                                        <Text style={styles.textos}>Descrição das lesões</Text>
+                                                        <VoiceInput
+                                                            value={item.descricaoLesoes}
+                                                            onChangeText={(text) => {
+                                                                const copia = [...depoimentos];
+                                                                copia[index].descricaoLesoes = text;
+                                                                setDepoimentos(copia);
+                                                            }}
+                                                        />
+                                                        <FileUpload />
+                                                    </>
+                                                )}
+
+                                                <Text style={styles.textos}>Depoimento/Relato</Text>
+                                                <VoiceInput
+                                                    value={item.depoimentoRelato}
+                                                    onChangeText={(text) => {
+                                                        const copia = [...depoimentos];
+                                                        copia[index].depoimentoRelato = text;
+                                                        setDepoimentos(copia);
+                                                    }}
+                                                />
                                             </>
                                         )}
 
-                                        <Text style={styles.textos}>Depoimento/Relato</Text>
-                                        <VoiceInput
-                                            value={item.depoimentoRelato}
-                                            onChangeText={(text) => {
-                                                const copia = [...depoimentos];
-                                                copia[index].depoimentoRelato = text;
-                                                setDepoimentos(copia);
-                                            }}
-                                        />
-                                    </>
-                                )}
+                                        {index > 0 && (
+                                            <RemoveButton
+                                                label="Remover entrevista"
+                                                onPress={() =>
+                                                    setDepoimentos((prev) => prev.filter((_, i) => i !== index))
+                                                }
+                                            />
+                                        )}
+                                    </View>
+                                    
+                                ))}
 
-                                {index > 0 && (
-                                    <RemoveButton
-                                        label="Remover entrevista"
-                                        onPress={() =>
-                                            setDepoimentos((prev) => prev.filter((_, i) => i !== index))
-                                        }
+                                <AddButton
+                                    label="Adicionar outra entrevista"
+                                    onPress={() =>
+                                        setDepoimentos((prev) => [
+                                            ...prev,
+                                            {
+                                                tipoEntrevistado: '',
+                                                genero: '',
+                                                nomeEntrevistado: '',
+                                                identificacao: '',
+                                                endereco: '',
+                                                idade: '',
+                                                descricaoLesoes: '',
+                                                depoimentoRelato: '',
+                                            },
+                                        ])
+                                    }
+                                />
+
+                                {vestigiosEntrevistas.map((vestigio, index) => (
+                                    <ResumoVestigio
+                                        index={index}
+                                        vestigio={vestigio}
+                                        onVisualizar={() => handleVisualizarVestigio(vestigio)}
+                                        onRemover={() => {
+                                            const copia = [...vestigiosEntrevistas];
+                                            copia.splice(index, 1);
+                                            setVestigiosEntrevistas(copia);
+                                        }}
                                     />
-                                )}
-                            </View>
-                        ))}
 
-                        <AddButton
-                            label="Adicionar outra entrevista"
-                            onPress={() =>
-                                setDepoimentos((prev) => [
-                                    ...prev,
-                                    {
-                                        tipoEntrevistado: '',
-                                        genero: '',
-                                        nomeEntrevistado: '',
-                                        identificacao: '',
-                                        endereco: '',
-                                        idade: '',
-                                        descricaoLesoes: '',
-                                        depoimentoRelato: '',
-                                    },
-                                ])
-                            }
-                        />
+                                ))}
+
+                                <AddButton
+                                    label="Adicionar vestígio"
+                                    onPress={() => {
+                                        setOrigemVestigio('entrevistas');
+                                        setModalVestigioVisible(true);
+                                    }}
+                                />
+                            </View>
+
+                            {origemVestigio && (
+                                <>
+                                    <Modal
+                                        isVisible={modalVestigioVisible}
+                                        onBackdropPress={() => setModalVestigioVisible(false)}
+                                        onBackButtonPress={() => setModalVestigioVisible(false)}
+                                        animationIn="slideInUp"
+                                        animationOut="slideOutDown"
+                                        style={{ margin: 0, justifyContent: 'flex-end' }} // necessário para vir de baixo
+                                    >
+                                        <ScrollView style={{ padding: 16, backgroundColor: '#fff' }}>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                                                <Text style={[styles.titulos, { flex: 1 }]}>
+                                                    Vestígio - Coleta ({origemVestigio ? origemLabels[origemVestigio] : ''})
+                                                </Text>
+
+                                                <TouchableOpacity onPress={() => setModalVestigioVisible(false)}>
+                                                    <Text style={{ fontSize: 22, fontWeight: 'bold' }}>✕</Text>
+                                                </TouchableOpacity>
+                                            </View>
+
+                                            <View style={styles.campoInterno}>
+                                                <View style={{ marginBottom: 12, gap: 12 }}>
+                                                    <Text style={styles.titulos}>Dados preliminares</Text>
+
+                                                    <PrimaryInput
+                                                        label="Nº do vestígio"
+                                                        placeholder="Informe"
+                                                        value={dadosPreliminares[0].numeroVestigio}
+                                                        onChangeText={(text) => {
+                                                            const copia = [...dadosPreliminares];
+                                                            copia[0].numeroVestigio = text;
+                                                            setDadosPreliminares(copia);
+                                                        }}
+                                                    />
+
+                                                    <PrimaryInput
+                                                        label="Unidade de Origem"
+                                                        placeholder="Informe"
+                                                        value={dadosPreliminares[0].unidadeOrigem}
+                                                        onChangeText={(text) => {
+                                                            const copia = [...dadosPreliminares];
+                                                            copia[0].unidadeOrigem = text;
+                                                            setDadosPreliminares(copia);
+                                                        }}
+                                                    />
+
+                                                    <PrimaryInput
+                                                        label="Nº do Procedimento (IP/TCO/Outros)"
+                                                        placeholder="Informe"
+                                                        value={dadosPreliminares[0].procedimento}
+                                                        onChangeText={(text) => {
+                                                            const copia = [...dadosPreliminares];
+                                                            copia[0].procedimento = text;
+                                                            setDadosPreliminares(copia);
+                                                        }}
+                                                    />
+
+                                                    <PrimarySelect
+                                                        label="Natureza do Vestígio"
+                                                        selected={dadosPreliminares[0].naturezaVestigio}
+                                                        onSelect={(value) => {
+                                                            const copia = [...dadosPreliminares];
+                                                            copia[0].naturezaVestigio = value;
+                                                            if (value !== 'Outros') copia[0].naturezaOutros = '';
+                                                            setDadosPreliminares(copia);
+                                                        }}
+                                                        placeholder="Selecione"
+                                                        options={['Biológico', 'Documental', 'Equipamento', 'Material', 'Mídia de armazenamento', 'Cadáver', 'Outros']}
+                                                    />
+
+                                                    {dadosPreliminares[0].naturezaVestigio === 'Outros' && (
+                                                        <PrimaryInput
+                                                            label="Descreva a natureza"
+                                                            placeholder="Informe"
+                                                            value={dadosPreliminares[0].naturezaOutros}
+                                                            onChangeText={(text) => {
+                                                                const copia = [...dadosPreliminares];
+                                                                copia[0].naturezaOutros = text;
+                                                                setDadosPreliminares(copia);
+                                                            }}
+                                                        />
+                                                    )}
+
+                                                    <Text style={styles.textos}>Descrição Detalhada do(s) Vestígio(s)</Text>
+                                                    <Text>Quantidades, características, numerações, estado de conservação, possíveis danos, etc</Text>
+
+                                                    <VoiceInput
+                                                        value={dadosPreliminares[0].descricaoDetalhada}
+                                                        onChangeText={(text) => {
+                                                            const copia = [...dadosPreliminares];
+                                                            copia[0].descricaoDetalhada = text;
+                                                            setDadosPreliminares(copia);
+                                                        }}
+                                                    />
+
+                                                    <FileUpload />
+                                                </View>
+                                            </View>
+
+                                            <View style={styles.campoInternoSecundario}>
+                                                <View style={{ marginBottom: 12, gap: 12 }}>
+                                                    <Text style={styles.titulos}>Coleta/Acondicionamento</Text>
+
+                                                    <PrimaryInput
+                                                        label="Responsável pela coleta"
+                                                        placeholder="Informe"
+                                                        value={acondicionamento[0].responsavelColeta}
+                                                        onChangeText={(text) => {
+                                                            const copia = [...acondicionamento];
+                                                            copia[0].responsavelColeta = text;
+                                                            setAcondicionamento(copia);
+                                                        }}
+                                                    />
+
+                                                    <PrimaryInput
+                                                        label="Matrícula"
+                                                        placeholder="Informe"
+                                                        value={acondicionamento[0].matricula}
+                                                        onChangeText={(text) => {
+                                                            const copia = [...acondicionamento];
+                                                            copia[0].matricula = text;
+                                                            setAcondicionamento(copia);
+                                                        }}
+                                                    />
+
+                                                    <LocationButton />
+
+                                                    <PrimarySelect
+                                                        label="Tipo de acondicionamento"
+                                                        selected={acondicionamento[0].tipoAcondicionamento}
+                                                        onSelect={(value) => {
+                                                            const copia = [...acondicionamento];
+                                                            copia[0].tipoAcondicionamento = value;
+                                                            if (value !== 'Outros') copia[0].tipoAcondicionamentoOutros = '';
+                                                            setAcondicionamento(copia);
+                                                        }}
+                                                        placeholder="Selecione"
+                                                        options={['Saco plástico', 'Frasco', 'Caixa térmica', 'Outros']}
+                                                    />
+
+                                                    {acondicionamento[0].tipoAcondicionamento === 'Outros' && (
+                                                        <PrimaryInput
+                                                            label="Descreva o tipo de acondicionamento"
+                                                            placeholder="Informe"
+                                                            value={acondicionamento[0].tipoAcondicionamentoOutros}
+                                                            onChangeText={(text) => {
+                                                                const copia = [...acondicionamento];
+                                                                copia[0].tipoAcondicionamentoOutros = text;
+                                                                setAcondicionamento(copia);
+                                                            }}
+                                                        />
+                                                    )}
+
+                                                    <PrimaryInput
+                                                        label="Nº do lacre/ Invólucro de segurança"
+                                                        placeholder="Informe"
+                                                        value={acondicionamento[0].numeroLacre}
+                                                        onChangeText={(text) => {
+                                                            const copia = [...acondicionamento];
+                                                            copia[0].numeroLacre = text;
+                                                            setAcondicionamento(copia);
+                                                        }}
+                                                    />
+
+                                                    <FileUpload />
+                                                </View>
+                                            </View>
+                                        </ScrollView>
+
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 24 }}>
+                                            <TouchableOpacity
+                                                style={{
+                                                    paddingVertical: 12,
+                                                    paddingHorizontal: 20,
+                                                    borderRadius: 8,
+                                                    backgroundColor: '#ccc',
+                                                }}
+                                                onPress={() => setModalVestigioVisible(false)}
+                                            >
+                                                <Text style={{ color: '#333' }}>Cancelar</Text>
+                                            </TouchableOpacity>
+
+                                            <TouchableOpacity
+                                                style={{
+                                                    paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, backgroundColor: '#0066cc',
+                                                }}
+                                                onPress={handleAvancarVestigio}
+                                            >
+                                                <Text style={{ color: '#fff' }}>Avançar</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </Modal>
+                                </>
+                            )}
+                        </View>
                     </View>
                 </View>
             </PrimaryList>
+
+
         </View>
     );
 }
@@ -946,9 +1238,6 @@ const styles = StyleSheet.create({
         gap: 10,
         paddingHorizontal: 1,
         width: "100%",
-    },
-    campos: {
-        gap: 20
     },
     titulos: {
         color: "#000",
@@ -982,7 +1271,7 @@ const styles = StyleSheet.create({
         color: colors.primaryDark,
     },
     nivel1: {
-        padding: 10,
+        padding: 1,
         backgroundColor: '#f8f9fa',
         borderRadius: 8,
         marginBottom: 16,
@@ -1020,5 +1309,6 @@ const styles = StyleSheet.create({
     sectionSpacing: {
         marginBottom: 16,
     },
+
 
 });

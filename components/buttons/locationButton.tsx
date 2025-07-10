@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, fontSize } from '~/theme';
+import { border, colors, fontSize } from '~/theme';
+import MainButton from './mainButton';
 
 const OPENCAGE_API_KEY = '25cec5c47001443785b8c9c55021bb44'; // Coloque aqui a chave do OpenCage
 
@@ -98,9 +99,8 @@ export default function LocationButton() {
             )}
           />
 
-          <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-            <Text style={styles.closeText}>Fechar</Text>
-          </TouchableOpacity>
+<MainButton title='Fechar' type="secondary" onPress={() => setModalVisible(false)} />
+
         </View>
       </Modal>
 
@@ -130,24 +130,32 @@ const styles = StyleSheet.create({
   },
   modal: {
     padding: 20,
-    marginTop: 50,
+    marginTop: 5,
   },
   title: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 10,
+    marginBottom: 20,
+    color: colors.primaryDark
   },
   link: {
-    color: '#173A64',
-    marginBottom: 10,
+    color: colors.primaryLight,
+    paddingVertical: 16,
+    paddingHorizontal: 10,
+    fontSize: 18,
+    backgroundColor: colors.mainColor,
+    borderRadius: border.radius,
+    marginBottom: 20,
+
   },
   input: {
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 10,
+    paddingVertical: 16,
+    marginBottom: 20,
+    fontSize: 18,
   },
   result: {
     paddingVertical: 8,
@@ -160,6 +168,7 @@ const styles = StyleSheet.create({
   closeText: {
     color: 'red',
     fontWeight: '600',
+    borderWidth: 1,
   },
   info: {
     marginTop: 2,

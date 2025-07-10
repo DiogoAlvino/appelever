@@ -1,6 +1,7 @@
+import React, { useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { ScrollView, View, StyleSheet, Text, ImageBackground } from "react-native";
+import { RefreshControl, ScrollView, View, StyleSheet, Text, ImageBackground } from "react-native";
 import BlockButton from "~/components/buttons/blockButton";
 import MenuButton from "~/components/buttons/menuButton";
 import PrimaryChart from "~/components/charts/primaryChart";
@@ -9,6 +10,15 @@ import { auth } from "~/utils/firebase";
 
 
 export default function HomePage() {
+
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        // Aqui você pode recarregar dados da API se quiser
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setRefreshing(false);
+    };
 
     function goToEquipmentRegistration() {
         router.push("/equipmentRegistration")
@@ -27,7 +37,13 @@ export default function HomePage() {
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+        <ScrollView
+            contentContainerStyle={styles.container}
+            style={{ flex: 1 }}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+        >
             <ImageBackground source={require('~/assets/bg-login.png')} style={styles.card}>
                 <View style={styles.cardButtons}>
                     <MenuButton />

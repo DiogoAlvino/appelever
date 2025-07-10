@@ -12,21 +12,36 @@ export const useForensic = () => {
         numeroVitimas: '',
         condicaoVitimas: '',
         autoridadePolicial: '',
+        reconhecimento: '',
+
     });
 
     const [equipePericial, setEquipePericial] = useState([
         { nome: '', cargo: '', matricula: '' }
     ]);
 
-
-    const [message, setMessage] = useState('');
-    
     const [informacoes, setInformacoes] = useState([
         {
             descricao: '',
             observacao: '',
         }
     ]);
+
+    const [reconhecimentoArea, setReconhecimentoArea] = useState('');
+    const [medidasMitigadoras, setMedidasMitigadoras] = useState('');
+    const [relatorioRia, setRelatorioRia] = useState('');
+    const [outroDocumento, setOutroDocumento] = useState('');
+    const [descricaoLesoes, setDescricaoLesoes] = useState('');
+    const [depoimentoRelato, setDepoimentoRelato] = useState('');
+    const [descricaoDetalhada, setDescricaoDetalhada] = useState('');
+    const [mensagemInformacoesGerais, setMensagemInformacoesGerais] = useState<string[]>(['']);  // Para cada item em informacoes
+    const [mensagemDepoimentos, setMensagemDepoimentos] = useState<string[]>(['']);  // Para cada item em depoimentos
+    const [mensagemLesoesDepoimentos, setMensagemLesoesDepoimentos] = useState<string[]>(['']);  // Para descrever lesões em vítimas, quando aplicável
+    const [mensagemRiscoAPR, setMensagemRiscoAPR] = useState<string>('');  // Campo de texto: medidasMitigatoria
+    const [mensagemDescricaoVestigio, setMensagemDescricaoVestigio] = useState<string>('');  // Descrição do vestígio
+    const [mensagemDescricaoPreliminar, setMensagemDescricaoPreliminar] = useState<string[]>(['']);  // Campo: descricaoDetalhada
+    const [mensagemAcondicionamentoOutro, setMensagemAcondicionamentoOutro] = useState<string[]>(['']);  // Campo: tipoAcondicionamentoOutros
+    const [mensagemDocumentacaoOutro, setMensagemDocumentacaoOutro] = useState<string>('');  // Outro tipo de documento
 
 
     const [riscoAPR, setRiscoAPR] = useState({
@@ -53,7 +68,6 @@ export const useForensic = () => {
     const [outros, setOutros] = useState([
         { nome: '', matricula: '' }
     ]);
-
 
     const [vestigio, setVestigio] = useState({
         numeroVestigio: '',
@@ -86,8 +100,6 @@ export const useForensic = () => {
         }
     ]);
 
-
-
     const [documentacao, setDocumentacao] = useState({
         projetos: '',
         memorialCalculo: '',
@@ -112,7 +124,6 @@ export const useForensic = () => {
             depoimentoRelato: '',
         }
     ]);
-
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -140,7 +151,6 @@ export const useForensic = () => {
         setter(prev => prev.filter((_, index) => index !== indexToRemove));
     };
 
-
     const clearFieldError = (field: string) => {
         if (errors[field]) {
             const updatedErrors = { ...errors };
@@ -161,8 +171,8 @@ export const useForensic = () => {
             numeroVitimas: '',
             condicaoVitimas: '',
             autoridadePolicial: '',
+            reconhecimento: '',
         });
-        setMessage('');
         setRiscoAPR({
             riscoAcidente: '',
             riscoFisico: '',
@@ -235,9 +245,14 @@ export const useForensic = () => {
                 descricao: '',
                 observacao: '',
             }
-        ])
-
-
+        ]);
+        setReconhecimentoArea('');
+        setMedidasMitigadoras('');
+        setRelatorioRia('');
+        setOutroDocumento('');
+        setDescricaoLesoes('');
+        setDepoimentoRelato('');
+        setDescricaoDetalhada('');
         setErrors({});
     };
 
@@ -256,8 +271,6 @@ export const useForensic = () => {
         setDadosPreliminares,
         acondicionamento,
         setAcondicionamento,
-        message,
-        setMessage,
         informacoes,
         setInformacoes,
         depoimentos,
@@ -268,6 +281,20 @@ export const useForensic = () => {
         setVestigio,
         documentacao,
         setDocumentacao,
+        reconhecimentoArea,
+        setReconhecimentoArea,
+        medidasMitigadoras,
+        setMedidasMitigadoras,
+        relatorioRia,
+        setRelatorioRia,
+        outroDocumento,
+        setOutroDocumento,
+        descricaoLesoes,
+        setDescricaoLesoes,
+        depoimentoRelato,
+        setDepoimentoRelato,
+        descricaoDetalhada,
+        setDescricaoDetalhada,
         adicionarCampo,
         atualizarCampo,
         removerCampo,
@@ -275,5 +302,21 @@ export const useForensic = () => {
         clearFieldError,
         errors,
         setErrors,
+        mensagemInformacoesGerais,
+        setMensagemInformacoesGerais,
+        mensagemDepoimentos,
+        setMensagemDepoimentos,
+        mensagemLesoesDepoimentos,
+        setMensagemLesoesDepoimentos,
+        mensagemRiscoAPR,
+        setMensagemRiscoAPR,
+        mensagemDescricaoVestigio,
+        setMensagemDescricaoVestigio,
+        mensagemDescricaoPreliminar,
+        setMensagemDescricaoPreliminar,
+        mensagemAcondicionamentoOutro,
+        setMensagemAcondicionamentoOutro,
+        mensagemDocumentacaoOutro,
+        setMensagemDocumentacaoOutro,
     };
 };
