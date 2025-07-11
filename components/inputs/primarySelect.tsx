@@ -67,7 +67,6 @@ export default function PrimarySelect({ label, placeholder = 'Selecione', option
 const styles = StyleSheet.create({
   wrapper: {
     width: '100%',
-    marginVertical: 8,
   },
   label: {
     fontSize: fontSize.label,

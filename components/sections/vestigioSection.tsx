@@ -26,7 +26,6 @@ export default function ResumoVestigio({ index, vestigio, onVisualizar, onRemove
 
       <View style={styles.content}>
         <Text style={styles.texto}>Nº: {vestigio.dadosCompletos?.dadosPreliminares?.[0]?.numeroVestigio ?? '---'}</Text>
-        <Text style={styles.texto}>Unidade: {vestigio.dadosCompletos?.dadosPreliminares?.[0]?.unidadeOrigem ?? '---'}</Text>
         <Text style={styles.texto}>Natureza: {vestigio.dadosCompletos?.dadosPreliminares?.[0]?.naturezaVestigio ?? '---'}</Text>
 
         <View style={styles.buttons}>

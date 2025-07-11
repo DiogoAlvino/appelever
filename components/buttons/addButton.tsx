@@ -1,12 +1,3 @@
-/* uso:
-
-<AddButton label="Adicionar outra formação" onPress={() => console.log('Adicionar')} />
-
-
-*/
-
-
-
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
@@ -15,12 +6,17 @@ interface AddButtonProps {
   label: string;
   onPress: () => void;
   style?: ViewStyle;
+  icon?: 'plus' | 'minus'; // nova prop opcional
 }
 
-export default function AddButton({ label, onPress, style }: AddButtonProps) {
+export default function AddButton({ label, onPress, style, icon = 'plus' }: AddButtonProps) {
   return (
     <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
-      <Feather name="plus-circle" size={19} color="#1666db" />
+      <Feather
+        name={icon === 'plus' ? 'plus-circle' : 'minus-circle'}
+        size={19}
+        color="#1666db"
+      />
       <Text style={styles.label}>{label}</Text>
     </TouchableOpacity>
   );

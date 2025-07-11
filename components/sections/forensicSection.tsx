@@ -58,13 +58,16 @@ export default function ForensicSection() {
     } = useForensic();
 
     const [modalVestigioVisible, setModalVestigioVisible] = useState(false);
-    const [origemVestigio, setOrigemVestigio] = useState<'equipamentos' | 'entrevistas' | 'documentacao' | null>(null);
+    const [origemVestigio, setOrigemVestigio] = useState<'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia' | null>(null);
 
     const [vestigiosEquipamentos, setVestigiosEquipamentos] = useState<VestigioResumo[]>([]);
     const [vestigiosEntrevistas, setVestigiosEntrevistas] = useState<VestigioResumo[]>([]);
     const [vestigiosDocumentacao, setVestigiosDocumentacao] = useState<VestigioResumo[]>([]);
+    const [vestigiosperinecroscopia, setVestigiosperinecroscopia] = useState<VestigioResumo[]>([]);
 
     const [vestigioSelecionado, setVestigioSelecionado] = useState<VestigioResumo | null>(null);
+
+    const [mostrarRegistros, setMostrarRegistros] = useState(false);
 
 
     const [vestigioTemp, setVestigioTemp] = useState({
@@ -84,7 +87,7 @@ export default function ForensicSection() {
     type VestigioResumo = {
         numeroVestigio: string;
         naturezaVestigio: string;
-        origem: 'equipamentos' | 'entrevistas' | 'documentacao';
+        origem: 'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia';
         dadosCompletos: {
             dadosPreliminares: {
                 numeroVestigio: string;
@@ -119,7 +122,7 @@ export default function ForensicSection() {
         const resumoVestigio: VestigioResumo = {
             numeroVestigio: dadosPreliminares[0].numeroVestigio,
             naturezaVestigio: dadosPreliminares[0].naturezaVestigio,
-            origem: origemVestigio as 'equipamentos' | 'entrevistas' | 'documentacao',
+            origem: origemVestigio as 'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia',
             dadosCompletos: {
                 dadosPreliminares,
                 acondicionamento,
@@ -130,21 +133,22 @@ export default function ForensicSection() {
             setVestigiosEquipamentos(prev => [...prev, resumoVestigio]);
         } if (origemVestigio === 'entrevistas') {
             setVestigiosEntrevistas(prev => [...prev, resumoVestigio]);
-        } else {
+        } if (origemVestigio === 'documentacao') {
             setVestigiosDocumentacao(prev => [...prev, resumoVestigio]);
+        } else {
+            setVestigiosperinecroscopia(prev => [...prev, resumoVestigio]);
         }
 
         setModalVestigioVisible(false);
     }
 
 
-    const origemLabels: Record<'equipamentos' | 'entrevistas' | 'documentacao', string> = {
+    const origemLabels: Record<'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia', string> = {
         equipamentos: 'Equipamentos',
         entrevistas: 'Entrevistas',
         documentacao: 'Documentação',
+        perinecroscopia: 'Perinecroscopia',
     };
-
-
 
     return (
         <View style={styles.section}>
@@ -599,85 +603,96 @@ export default function ForensicSection() {
                     <View style={styles.campoInterno}>
                         <View style={styles.campoInternoSecundario}>
                             <Text style={styles.titulos}>5.1 Documentação</Text>
-                            <Text style={styles.titulos}>Croqui do Local</Text>
+                            <Text style={styles.textos}>Croqui (detalhamento ou observações)</Text>
                             <CroquiModal />
 
-                            <Text style={styles.titulos}>Registros</Text>
+                            <Text style={styles.textos}>Registros</Text>
 
-                            <PrimaryInput
-                                label="Projetos"
-                                placeholder="Informe"
-                                value={documentacao.projetos}
-                                onChangeText={(text) => setDocumentacao({ ...documentacao, projetos: text })}
-                            />
-                            <FileUpload />
-
-                            <PrimaryInput
-                                label="Memorial de Cálculo"
-                                placeholder="Informe"
-                                value={documentacao.memorialCalculo}
-                                onChangeText={(text) => setDocumentacao({ ...documentacao, memorialCalculo: text })}
-                            />
-                            <FileUpload />
-
-                            <PrimaryInput
-                                label="Licenças e Alvará"
-                                placeholder="Informe"
-                                value={documentacao.licencaAlvara}
-                                onChangeText={(text) => setDocumentacao({ ...documentacao, licencaAlvara: text })}
-                            />
-                            <FileUpload />
-
-                            <PrimaryInput
-                                label="ART"
-                                placeholder="Informe"
-                                value={documentacao.art}
-                                onChangeText={(text) => setDocumentacao({ ...documentacao, art: text })}
-                            />
-                            <FileUpload />
-
-                            <PrimaryInput
-                                label="Plano de Manutenção"
-                                placeholder="Informe"
-                                value={documentacao.planoManutencao}
-                                onChangeText={(text) => setDocumentacao({ ...documentacao, planoManutencao: text })}
-                            />
-                            <FileUpload />
-
-                            <PrimaryInput
-                                label="Contrato de Manutenção"
-                                placeholder="Informe"
-                                value={documentacao.contratoManutencao}
-                                onChangeText={(text) => setDocumentacao({ ...documentacao, contratoManutencao: text })}
-                            />
-                            <FileUpload />
-
-                            <PrimaryInput
-                                label="Registro de manutenção"
-                                placeholder="Informe"
-                                value={documentacao.registroManutencao}
-                                onChangeText={(text) => setDocumentacao({ ...documentacao, registroManutencao: text })}
-                            />
-                            <FileUpload />
-
-                            <PrimaryInput
-                                label="Relatório de Inspeção Anual – RIA"
-                                placeholder="Informe"
-                                value={documentacao.relatorioRia}
-                                onChangeText={(text) => setDocumentacao({ ...documentacao, relatorioRia: text })}
-                            />
-                            <FileUpload />
-
-                            <PrimaryInput
-                                label="Outro (especificar)"
-                                placeholder="Informe"
-                                value={documentacao.outro}
-                                onChangeText={(text) => setDocumentacao({ ...documentacao, outro: text })}
+                            <AddButton
+                                label={mostrarRegistros ? 'Ocultar registros' : 'Adicionar registros'}
+                                icon={mostrarRegistros ? 'minus' : 'plus'}
+                                onPress={() => setMostrarRegistros(prev => !prev)}
                             />
 
-                            <FileUpload />
+                            {mostrarRegistros && (
+                                <>
+                                    <PrimaryInput
+                                        label="Projetos"
+                                        placeholder="Informe"
+                                        value={documentacao.projetos}
+                                        onChangeText={(text) => setDocumentacao({ ...documentacao, projetos: text })}
+                                    />
+                                    <FileUpload />
 
-                            <Text style={styles.titulos}>Observações</Text>
+                                    <PrimaryInput
+                                        label="Memorial de Cálculo"
+                                        placeholder="Informe"
+                                        value={documentacao.memorialCalculo}
+                                        onChangeText={(text) => setDocumentacao({ ...documentacao, memorialCalculo: text })}
+                                    />
+                                    <FileUpload />
+
+                                    <PrimaryInput
+                                        label="Licenças e Alvará"
+                                        placeholder="Informe"
+                                        value={documentacao.licencaAlvara}
+                                        onChangeText={(text) => setDocumentacao({ ...documentacao, licencaAlvara: text })}
+                                    />
+                                    <FileUpload />
+
+                                    <PrimaryInput
+                                        label="ART"
+                                        placeholder="Informe"
+                                        value={documentacao.art}
+                                        onChangeText={(text) => setDocumentacao({ ...documentacao, art: text })}
+                                    />
+                                    <FileUpload />
+
+                                    <PrimaryInput
+                                        label="Plano de Manutenção"
+                                        placeholder="Informe"
+                                        value={documentacao.planoManutencao}
+                                        onChangeText={(text) => setDocumentacao({ ...documentacao, planoManutencao: text })}
+                                    />
+                                    <FileUpload />
+
+                                    <PrimaryInput
+                                        label="Contrato de Manutenção"
+                                        placeholder="Informe"
+                                        value={documentacao.contratoManutencao}
+                                        onChangeText={(text) => setDocumentacao({ ...documentacao, contratoManutencao: text })}
+                                    />
+                                    <FileUpload />
+
+                                    <PrimaryInput
+                                        label="Registro de manutenção"
+                                        placeholder="Informe"
+                                        value={documentacao.registroManutencao}
+                                        onChangeText={(text) => setDocumentacao({ ...documentacao, registroManutencao: text })}
+                                    />
+                                    <FileUpload />
+
+                                    <PrimaryInput
+                                        label="Relatório de Inspeção Anual – RIA"
+                                        placeholder="Informe"
+                                        value={documentacao.relatorioRia}
+                                        onChangeText={(text) => setDocumentacao({ ...documentacao, relatorioRia: text })}
+                                    />
+                                    <FileUpload />
+
+                                    <PrimaryInput
+                                        label="Outro (especificar)"
+                                        placeholder="Informe"
+                                        value={documentacao.outro}
+                                        onChangeText={(text) => setDocumentacao({ ...documentacao, outro: text })}
+                                    />
+
+                                    <FileUpload />
+
+                                </>
+                            )}
+
+                            <Text style={styles.textos}>Observações</Text>
 
                             <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
 
@@ -702,6 +717,7 @@ export default function ForensicSection() {
                                     setModalVestigioVisible(true);
                                 }}
                             />
+
 
 
                         </View>
@@ -927,7 +943,7 @@ export default function ForensicSection() {
                                                 {item.tipoEntrevistado === 'Vítimas sobreviventes' && (
                                                     <>
                                                         <PrimarySelect
-                                                            label="Gênero"
+                                                            label="Sexo"
                                                             selected={item.genero}
                                                             onSelect={(value) => {
                                                                 const copia = [...depoimentos];
@@ -983,7 +999,7 @@ export default function ForensicSection() {
                                             />
                                         )}
                                     </View>
-                                    
+
                                 ))}
 
                                 <AddButton
@@ -1026,6 +1042,101 @@ export default function ForensicSection() {
                                         setModalVestigioVisible(true);
                                     }}
                                 />
+                            </View>
+
+                            <View style={styles.campoInternoSecundario}>
+                                <Text style={styles.titulos}>5.4. Perinecroscopia</Text>
+                                <Text style={styles.textos}>Caracterização do Cadáver</Text>
+                                <PrimarySelect
+                                    label="Sexo"
+                                    onSelect={(value) => {
+                                        const copia = [...depoimentos];
+                                        setDepoimentos(copia);
+                                    }}
+                                    placeholder="Selecione"
+                                    options={['Masculino', 'Feminino']}
+                                />
+                                <PrimarySelect
+                                    label="Cor da pele"
+                                    onSelect={(value) => {
+                                        const copia = [...depoimentos];
+                                        setDepoimentos(copia);
+                                    }}
+                                    placeholder="Selecione"
+                                    options={['Branco', 'Preto', 'Pardo', 'Amarelo', 'Roxo']}
+                                />
+                                <PrimaryInput
+                                    label="Características do Cabelo"
+                                    placeholder="Informe"
+                                    value={'teste'}
+                                    onChangeText={(text) => {
+                                        const copia = [...depoimentos];
+                                        setDepoimentos(copia);
+                                    }}
+                                />
+                                <PrimaryInput
+                                    label="Sinais identificadores (tatuagem)"
+                                    placeholder="Informe"
+                                    value={'teste'}
+                                    onChangeText={(text) => {
+                                        const copia = [...depoimentos];
+                                        setDepoimentos(copia);
+                                    }}
+                                />
+                                <PrimaryInput
+                                    label="Descrição das vestes e pertences pessoais"
+                                    placeholder="Informe"
+                                    value={'teste'}
+                                    onChangeText={(text) => {
+                                        const copia = [...depoimentos];
+                                        setDepoimentos(copia);
+                                    }}
+                                />
+                                <PrimaryInput
+                                    label="Outro"
+                                    placeholder="Informe"
+                                    value={'teste'}
+                                    onChangeText={(text) => {
+                                        const copia = [...depoimentos];
+                                        setDepoimentos(copia);
+                                    }}
+                                />
+                                <Text style={styles.titulos}>Analise da disposição do Cadáver</Text>
+                                <FileUpload />
+                                <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+
+                                <Text style={styles.titulos}>Descrição dos sinais tanatológicos</Text>
+                                <FileUpload />
+                                <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+
+                                <Text style={styles.titulos}>Descrição das lesões</Text>
+                                <FileUpload />
+                                <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+
+                                {vestigiosperinecroscopia.map((vestigio, index) => (
+                                    <ResumoVestigio
+                                        index={index}
+                                        vestigio={vestigio}
+                                        onVisualizar={() => handleVisualizarVestigio(vestigio)}
+                                        onRemover={() => {
+                                            const copia = [...vestigiosperinecroscopia];
+                                            copia.splice(index, 1);
+                                            setVestigiosperinecroscopia(copia);
+                                        }}
+                                    />
+
+                                ))}
+
+                                <AddButton
+                                    label="Adicionar vestígio"
+                                    onPress={() => {
+                                        setOrigemVestigio('perinecroscopia');
+                                        setModalVestigioVisible(true);
+                                    }}
+                                />
+
+
+
                             </View>
 
                             {origemVestigio && (
@@ -1258,7 +1369,6 @@ const styles = StyleSheet.create({
     },
     campoInternoSecundario: {
         gap: 15,
-        paddingBottom: 20,
     },
     checkboxRow: {
         flexDirection: 'row',
