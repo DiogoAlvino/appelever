@@ -1,11 +1,5 @@
 import { useState } from 'react';
-
-export type FileItem = {
-    name: string;
-    uri: string;
-    type: 'image' | 'file' | 'photo';
-    size: number;
-};
+import { FileItem, VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR } from '~/types/forensicTypes';
 
 export const useForensic = () => {
     const [dadosIniciais, setDadosIniciais] = useState({
@@ -22,118 +16,16 @@ export const useForensic = () => {
         reconhecimento: '',
     });
 
-    const [equipePericial, setEquipePericial] = useState([{ nome: '', cargo: '', matricula: '' }]);
-    const [informacoes, setInformacoes] = useState([{ descricao: '', observacao: '' }]);
-    const [peritoAuxiliar, setPeritoAuxiliar] = useState([{ nome: '', matricula: '' }]);
-    const [tecnico, setTecnico] = useState([{ nome: '', matricula: '' }]);
-    const [outros, setOutros] = useState([{ nome: '', matricula: '' }]);
-
-    const [reconhecimentoArea, setReconhecimentoArea] = useState('');
-    const [condicoesAmbientais, setCondicoesAmbientais] = useState('');
-    const [caracteristicasLocal, setCaracteristicasLocal] = useState('');
-    const [observacoesDocumentacao, setObservacoesDocumentacao] = useState('');
-    const [cadaverSexo, setCadaverSexo] = useState('');
-    const [cadaverCorPele, setCadaverCorPele] = useState('');
-    const [cadaverCabelo, setCadaverCabelo] = useState('');
-    const [cadaverSinaisIdentificadores, setCadaverSinaisIdentificadores] = useState('');
-    const [cadaverDescricaoVestes, setCadaverDescricaoVestes] = useState('');
-    const [cadaverOutro, setCadaverOutro] = useState('');
-    const [analiseDisposicaoCadaver, setAnaliseDisposicaoCadaver] = useState('');
-    const [sinaisTanatologicos, setSinaisTanatologicos] = useState('');
-    const [descricaoLesoesCadaver, setDescricaoLesoesCadaver] = useState('');
-
-    const [arquivosProjetos, setArquivosProjetos] = useState<FileItem[]>([]);
-    const [arquivosMemorial, setArquivosMemorial] = useState<FileItem[]>([]);
-    const [arquivosLicenca, setArquivosLicenca] = useState<FileItem[]>([]);
-    const [arquivosArt, setArquivosArt] = useState<FileItem[]>([]);
-    const [arquivosPlano, setArquivosPlano] = useState<FileItem[]>([]);
-    const [arquivosContrato, setArquivosContrato] = useState<FileItem[]>([]);
-    const [arquivosRegistro, setArquivosRegistro] = useState<FileItem[]>([]);
-    const [arquivosRia, setArquivosRia] = useState<FileItem[]>([]);
-    const [arquivosOutro, setArquivosOutro] = useState<FileItem[]>([]);
-    const [arquivosVestigioDescricao, setArquivosVestigioDescricao] = useState<FileItem[]>([]);
-    const [arquivosAcondicionamento, setArquivosAcondicionamento] = useState<FileItem[]>([]);
-    const [arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver] = useState<FileItem[]>([]);
-    const [arquivosTanatologicos, setArquivosTanatologicos] = useState<FileItem[]>([]);
-    const [arquivosLesoesCadaver, setArquivosLesoesCadaver] = useState<FileItem[]>([]);
-
-    const [medidasMitigadoras, setMedidasMitigadoras] = useState('');
-    const [relatorioRia, setRelatorioRia] = useState('');
-    const [outroDocumento, setOutroDocumento] = useState('');
-    const [descricaoLesoes, setDescricaoLesoes] = useState('');
-    const [depoimentoRelato, setDepoimentoRelato] = useState('');
-    const [descricaoDetalhada, setDescricaoDetalhada] = useState('');
-
-    const [mensagemInformacoesGerais, setMensagemInformacoesGerais] = useState<string[]>(['']);
-    const [mensagemDepoimentos, setMensagemDepoimentos] = useState<string[]>(['']);
-    const [mensagemLesoesDepoimentos, setMensagemLesoesDepoimentos] = useState<string[]>(['']);
-    const [mensagemRiscoAPR, setMensagemRiscoAPR] = useState<string>('');
-    const [mensagemDescricaoVestigio, setMensagemDescricaoVestigio] = useState<string>('');
-    const [mensagemDescricaoPreliminar, setMensagemDescricaoPreliminar] = useState<string[]>(['']);
-    const [mensagemAcondicionamentoOutro, setMensagemAcondicionamentoOutro] = useState<string[]>(['']);
-    const [mensagemDocumentacaoOutro, setMensagemDocumentacaoOutro] = useState<string>('');
-
-    const [materialOutroDescricao, setMaterialOutroDescricao] = useState('');
-
-    const [vestigiosDocumentacao, setVestigiosDocumentacao] = useState<any[]>([]);
-
-    const [maquinaTracao, setMaquinaTracao] = useState<{
-        [id: number]: { texto: string; arquivos: FileItem[] }
-    }>({});
-
-    const [limitadorVelocidade, setLimitadorVelocidade] = useState<{
-        [id: number]: { texto: string; arquivos: FileItem[] }
-    }>({});
-
-    const [cabos, setCabos] = useState<{
-        [id: number]: { texto: string; arquivos: FileItem[] }
-    }>({});
-
-    const [contrapeso, setContrapeso] = useState<{
-        [id: number]: { texto: string; arquivos: FileItem[] }
-    }>({});
-
-    const [cabine, setCabine] = useState<{
-        [id: number]: { texto: string; arquivos: FileItem[] }
-    }>({});
-
-    const [portas, setPortas] = useState<{
-        [id: number]: { texto: string; arquivos: FileItem[] }
-    }>({});
-
-    const [freiosEmergencia, setFreiosEmergencia] = useState<{
-        [id: number]: { texto: string; arquivos: FileItem[] }
-    }>({});
-
-    const [sistemaControle, setSistemaControle] = useState<{ [id: number]: { texto: string; arquivos: FileItem[] } }>({});
-    const [sistemaEletrico, setSistemaEletrico] = useState<{ [id: number]: { texto: string; arquivos: FileItem[] } }>({});
-    const [sensores, setSensores] = useState<{ [id: number]: { texto: string; arquivos: FileItem[] } }>({});
-    const [pocoElevador, setPocoElevador] = useState<{ [id: number]: { texto: string; arquivos: FileItem[] } }>({});
-
-    const [vestigiosPerinecroscopia, setVestigiosPerinecroscopia] = useState<any[]>([]);
-
-
-    const [riscoAPR, setRiscoAPR] = useState({
-        riscoAcidente: '',
-        riscoFisico: '',
-        gravidade: '',
-        probabilidade: '',
-        riscoQuimico: false,
-        riscoBiologico: false,
-        autoridadePolicial: '',
+    const [riscoAPR, setRiscoAPR] = useState<RiscoAPR>({
         peritoResponsavel: '',
         peritoMatricula: '',
+        riscoAcidente: '',
+        riscoFisico: '',
+        riscoQuimico: false,
+        riscoBiologico: false,
+        gravidade: '',
+        probabilidade: '',
         medidasMitigatoria: '',
-    });
-
-    const [vestigio, setVestigio] = useState({
-        numeroVestigio: '',
-        unidadeOrigem: '',
-        procedimento: '',
-        responsavelColeta: '',
-        responsavelMatricula: '',
-        numeroLacre: '',
-        outroDocumento: '',
     });
 
     const [dadosPreliminares, setDadosPreliminares] = useState([{
@@ -146,7 +38,6 @@ export const useForensic = () => {
         descricaoDetalhadaArquivos: [] as FileItem[],
     }]);
 
-
     const [acondicionamento, setAcondicionamento] = useState([{
         responsavelColeta: '',
         matricula: '',
@@ -156,30 +47,58 @@ export const useForensic = () => {
         arquivos: [] as FileItem[],
     }]);
 
+    const [equipePericial, setEquipePericial] = useState([{ nome: '', cargo: '', matricula: '' }]);
+    const [informacoes, setInformacoes] = useState([{ descricao: '', observacao: '' }]);
 
-    const [documentacao, setDocumentacao] = useState({
+    const [peritoAuxiliar, setPeritoAuxiliar] = useState([{ nome: '', matricula: '' }]);
+    const [tecnico, setTecnico] = useState([{ nome: '', matricula: '' }]);
+    const [outros, setOutros] = useState([{ nome: '', matricula: '' }]);
+
+    const [materialOutroDescricao, setMaterialOutroDescricao] = useState('');
+
+    const [reconhecimentoArea, setReconhecimentoArea] = useState('');
+    const [condicoesAmbientais, setCondicoesAmbientais] = useState('');
+    const [caracteristicasLocal, setCaracteristicasLocal] = useState('');
+    const [arquivosReconhecimentoArea, setArquivosReconhecimentoArea] = useState<FileItem[]>([]);
+
+    const [documentacao, setDocumentacao] = useState<Documentacao>({
         projetos: '',
-        projetosArquivos: [] as FileItem[],
+        projetosArquivos: [],
         memorialCalculo: '',
-        memorialCalculoArquivos: [] as FileItem[],
+        memorialCalculoArquivos: [],
         licencaAlvara: '',
-        licencaAlvaraArquivos: [] as FileItem[],
+        licencaAlvaraArquivos: [],
         art: '',
-        artArquivos: [] as FileItem[],
+        artArquivos: [],
         planoManutencao: '',
-        planoManutencaoArquivos: [] as FileItem[],
+        planoManutencaoArquivos: [],
         contratoManutencao: '',
-        contratoManutencaoArquivos: [] as FileItem[],
+        contratoManutencaoArquivos: [],
         registroManutencao: '',
-        registroManutencaoArquivos: [] as FileItem[],
+        registroManutencaoArquivos: [],
         relatorioRia: '',
-        relatorioRiaArquivos: [] as FileItem[],
+        relatorioRiaArquivos: [],
         outro: '',
-        outroArquivos: [] as FileItem[],
+        outroArquivos: [],
     });
 
+    const [observacoesDocumentacao, setObservacoesDocumentacao] = useState('');
+    const [vestigiosDocumentacao, setVestigiosDocumentacao] = useState<VestigioResumo[]>([]);
 
-    const [depoimentos, setDepoimentos] = useState([
+    const [maquinaTracao, setMaquinaTracao] = useState<CampoChecklist[]>([]);
+    const [limitadorVelocidade, setLimitadorVelocidade] = useState<CampoChecklist[]>([]);
+    const [cabos, setCabos] = useState<CampoChecklist[]>([]);
+    const [contrapeso, setContrapeso] = useState<CampoChecklist[]>([]);
+    const [cabine, setCabine] = useState<CampoChecklist[]>([]);
+    const [portas, setPortas] = useState<CampoChecklist[]>([]);
+    const [freiosEmergencia, setFreiosEmergencia] = useState<CampoChecklist[]>([]);
+    const [sistemaControle, setSistemaControle] = useState<CampoChecklist[]>([]);
+    const [sistemaEletrico, setSistemaEletrico] = useState<CampoChecklist[]>([]);
+    const [sensores, setSensores] = useState<CampoChecklist[]>([]);
+    const [pocoElevador, setPocoElevador] = useState<CampoChecklist[]>([]);
+    const [vestigiosEquipamentos, setVestigiosEquipamentos] = useState<VestigioResumo[]>([]);
+
+    const [depoimentos, setDepoimentos] = useState<Depoimento[]>([
         {
             tipoEntrevistado: '',
             genero: '',
@@ -189,8 +108,23 @@ export const useForensic = () => {
             idade: '',
             descricaoLesoes: '',
             depoimentoRelato: '',
-        }
+        },
     ]);
+    const [vestigiosEntrevistas, setVestigiosEntrevistas] = useState<VestigioResumo[]>([]);
+
+    const [cadaverSexo, setCadaverSexo] = useState('');
+    const [cadaverCorPele, setCadaverCorPele] = useState('');
+    const [cadaverCabelo, setCadaverCabelo] = useState('');
+    const [cadaverSinaisIdentificadores, setCadaverSinaisIdentificadores] = useState('');
+    const [cadaverDescricaoVestes, setCadaverDescricaoVestes] = useState('');
+    const [cadaverOutro, setCadaverOutro] = useState('');
+    const [analiseDisposicaoCadaver, setAnaliseDisposicaoCadaver] = useState('');
+    const [arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver] = useState<FileItem[]>([]);
+    const [sinaisTanatologicos, setSinaisTanatologicos] = useState('');
+    const [arquivosTanatologicos, setArquivosTanatologicos] = useState<FileItem[]>([]);
+    const [descricaoLesoesCadaver, setDescricaoLesoesCadaver] = useState('');
+    const [arquivosLesoesCadaver, setArquivosLesoesCadaver] = useState<FileItem[]>([]);
+    const [vestigiosPerinecroscopia, setVestigiosPerinecroscopia] = useState<VestigioResumo[]>([]);
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -232,56 +166,10 @@ export const useForensic = () => {
         reconhecimentoArea, setReconhecimentoArea,
         condicoesAmbientais, setCondicoesAmbientais,
         caracteristicasLocal, setCaracteristicasLocal,
-        observacoesDocumentacao, setObservacoesDocumentacao,
-        cadaverSexo, setCadaverSexo,
-        cadaverCorPele, setCadaverCorPele,
-        cadaverCabelo, setCadaverCabelo,
-        cadaverSinaisIdentificadores, setCadaverSinaisIdentificadores,
-        cadaverDescricaoVestes, setCadaverDescricaoVestes,
-        cadaverOutro, setCadaverOutro,
-        analiseDisposicaoCadaver, setAnaliseDisposicaoCadaver,
-        sinaisTanatologicos, setSinaisTanatologicos,
-        descricaoLesoesCadaver, setDescricaoLesoesCadaver,
-        arquivosProjetos, setArquivosProjetos,
-        arquivosMemorial, setArquivosMemorial,
-        arquivosLicenca, setArquivosLicenca,
-        arquivosArt, setArquivosArt,
-        arquivosPlano, setArquivosPlano,
-        arquivosContrato, setArquivosContrato,
-        arquivosRegistro, setArquivosRegistro,
-        arquivosRia, setArquivosRia,
-        arquivosOutro, setArquivosOutro,
-        arquivosVestigioDescricao, setArquivosVestigioDescricao,
-        arquivosAcondicionamento, setArquivosAcondicionamento,
-        arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver,
-        arquivosTanatologicos, setArquivosTanatologicos,
-        arquivosLesoesCadaver, setArquivosLesoesCadaver,
-        medidasMitigadoras, setMedidasMitigadoras,
-        relatorioRia, setRelatorioRia,
-        outroDocumento, setOutroDocumento,
-        descricaoLesoes, setDescricaoLesoes,
-        depoimentoRelato, setDepoimentoRelato,
-        descricaoDetalhada, setDescricaoDetalhada,
+        arquivosReconhecimentoArea, setArquivosReconhecimentoArea,
         documentacao, setDocumentacao,
-        vestigiosDocumentacao,
-        setVestigiosDocumentacao,
-        riscoAPR, setRiscoAPR,
-        vestigio, setVestigio,
-        dadosPreliminares, setDadosPreliminares,
-        acondicionamento, setAcondicionamento,
-        depoimentos, setDepoimentos,
-        informacoes, setInformacoes,
-        mensagemInformacoesGerais, setMensagemInformacoesGerais,
-        mensagemDepoimentos, setMensagemDepoimentos,
-        mensagemLesoesDepoimentos, setMensagemLesoesDepoimentos,
-        mensagemRiscoAPR, setMensagemRiscoAPR,
-        mensagemDescricaoVestigio, setMensagemDescricaoVestigio,
-        mensagemDescricaoPreliminar, setMensagemDescricaoPreliminar,
-        mensagemAcondicionamentoOutro, setMensagemAcondicionamentoOutro,
-        mensagemDocumentacaoOutro, setMensagemDocumentacaoOutro,
-        adicionarCampo, atualizarCampo, removerCampo,
-        clearFieldError, errors, setErrors,
-        materialOutroDescricao, setMaterialOutroDescricao,
+        observacoesDocumentacao, setObservacoesDocumentacao,
+        vestigiosDocumentacao, setVestigiosDocumentacao,
         maquinaTracao, setMaquinaTracao,
         limitadorVelocidade, setLimitadorVelocidade,
         cabos, setCabos,
@@ -293,6 +181,28 @@ export const useForensic = () => {
         sistemaEletrico, setSistemaEletrico,
         sensores, setSensores,
         pocoElevador, setPocoElevador,
-        vestigiosPerinecroscopia, setVestigiosPerinecroscopia
+        vestigiosEquipamentos, setVestigiosEquipamentos,
+        depoimentos, setDepoimentos,
+        vestigiosEntrevistas, setVestigiosEntrevistas,
+        cadaverSexo, setCadaverSexo,
+        cadaverCorPele, setCadaverCorPele,
+        cadaverCabelo, setCadaverCabelo,
+        cadaverSinaisIdentificadores, setCadaverSinaisIdentificadores,
+        cadaverDescricaoVestes, setCadaverDescricaoVestes,
+        cadaverOutro, setCadaverOutro,
+        analiseDisposicaoCadaver, setAnaliseDisposicaoCadaver,
+        arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver,
+        sinaisTanatologicos, setSinaisTanatologicos,
+        arquivosTanatologicos, setArquivosTanatologicos,
+        descricaoLesoesCadaver, setDescricaoLesoesCadaver,
+        arquivosLesoesCadaver, setArquivosLesoesCadaver,
+        vestigiosPerinecroscopia, setVestigiosPerinecroscopia,
+        materialOutroDescricao, setMaterialOutroDescricao,
+        informacoes, setInformacoes,
+        adicionarCampo, atualizarCampo, removerCampo,
+        errors, setErrors, clearFieldError,
+        riscoAPR, setRiscoAPR,
+        dadosPreliminares, setDadosPreliminares,
+        acondicionamento, setAcondicionamento
     };
 };

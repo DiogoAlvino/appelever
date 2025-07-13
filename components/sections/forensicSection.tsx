@@ -22,6 +22,7 @@ import Modal from 'react-native-modal';
 
 import { saveForensic } from '~/services/saveForensic';
 import MainButton from '../buttons/mainButton';
+import { ForensicModel } from '~/models/forensicModel';
 
 export default function ForensicSection() {
     const {
@@ -43,19 +44,9 @@ export default function ForensicSection() {
 
         // 4. APR
         riscoAPR, setRiscoAPR,
-        medidasMitigadoras, setMedidasMitigadoras,
 
         // 5. Exames e Documentação
         documentacao, setDocumentacao,
-        arquivosProjetos, setArquivosProjetos,
-        arquivosMemorial, setArquivosMemorial,
-        arquivosLicenca, setArquivosLicenca,
-        arquivosArt, setArquivosArt,
-        arquivosPlano, setArquivosPlano,
-        arquivosContrato, setArquivosContrato,
-        arquivosRegistro, setArquivosRegistro,
-        arquivosRia, setArquivosRia,
-        arquivosOutro, setArquivosOutro,
 
         // 5.3 Entrevistas
         depoimentos, setDepoimentos,
@@ -77,25 +68,6 @@ export default function ForensicSection() {
         // Vestígios
         dadosPreliminares, setDadosPreliminares,
         acondicionamento, setAcondicionamento,
-        arquivosVestigioDescricao, setArquivosVestigioDescricao,
-        arquivosAcondicionamento, setArquivosAcondicionamento,
-
-        // Textos extras
-        relatorioRia, setRelatorioRia,
-        outroDocumento, setOutroDocumento,
-        descricaoLesoes, setDescricaoLesoes,
-        depoimentoRelato, setDepoimentoRelato,
-        descricaoDetalhada, setDescricaoDetalhada,
-
-        // Mensagens de validação
-        mensagemInformacoesGerais, setMensagemInformacoesGerais,
-        mensagemDepoimentos, setMensagemDepoimentos,
-        mensagemLesoesDepoimentos, setMensagemLesoesDepoimentos,
-        mensagemRiscoAPR, setMensagemRiscoAPR,
-        mensagemDescricaoVestigio, setMensagemDescricaoVestigio,
-        mensagemDescricaoPreliminar, setMensagemDescricaoPreliminar,
-        mensagemAcondicionamentoOutro, setMensagemAcondicionamentoOutro,
-        mensagemDocumentacaoOutro, setMensagemDocumentacaoOutro,
 
         // Utilitários
         adicionarCampo, atualizarCampo, removerCampo,
@@ -118,6 +90,7 @@ export default function ForensicSection() {
         pocoElevador, setPocoElevador,
 
         vestigiosPerinecroscopia, setVestigiosPerinecroscopia,
+        arquivosReconhecimentoArea, setArquivosReconhecimentoArea,
     } = useForensic();
 
     const [modalVestigioVisible, setModalVestigioVisible] = useState(false);
@@ -174,24 +147,70 @@ export default function ForensicSection() {
 
     const handleSave = async () => {
         try {
-            const payload = {
+            const payload: ForensicModel = {
                 dadosIniciais,
                 equipePericial,
                 materiais: {
                     selecionados: materiaisSelecionados,
                     outroDescricao: materialOutroDescricao,
                 },
-            };
+                analisePreliminar: {
+                    reconhecimentoArea,
+                    condicoesAmbientais,
+                    caracteristicasLocal,
+                    informacoes,
+                    arquivosReconhecimentoArea,
+                },
+                risco: {
+                    riscoAPR,
+                    peritoAuxiliar,
+                    tecnico,
+                    outros,
+                },
+                exames: {
+                    documentacao,
+                    observacoesDocumentacao,
+                    vestigiosDocumentacao,
 
-            console.log('Payload:', payload);
+                    maquinaTracao,
+                    limitadorVelocidade,
+                    cabos,
+                    contrapeso,
+                    cabine,
+                    portas,
+                    freiosEmergencia,
+                    sistemaControle,
+                    sistemaEletrico,
+                    sensores,
+                    pocoElevador,
+                    vestigiosEquipamentos,
+
+                    depoimentos,
+                    vestigiosEntrevistas,
+
+                    cadaverSexo,
+                    cadaverCorPele,
+                    cadaverCabelo,
+                    cadaverSinaisIdentificadores,
+                    cadaverDescricaoVestes,
+                    cadaverOutro,
+                    analiseDisposicaoCadaver,
+                    arquivosDisposicaoCadaver,
+                    sinaisTanatologicos,
+                    arquivosTanatologicos,
+                    descricaoLesoesCadaver,
+                    arquivosLesoesCadaver,
+                    vestigiosPerinecroscopia,
+                },
+            };
 
             await saveForensic(payload);
             alert('Dados salvos com sucesso!');
         } catch (error) {
+            console.error(error);
             alert('Erro ao salvar dados.');
         }
     };
-
 
     function handleVisualizarVestigio(vestigio: VestigioResumo) {
         setVestigioSelecionado(vestigio);
@@ -229,10 +248,6 @@ export default function ForensicSection() {
         documentacao: 'Documentação',
         perinecroscopia: 'Perinecroscopia',
     };
-
-    const camposMaquinaTracao = inspecaoCampos.maquinaTracao;
-    const [drawerMaquinaTracaoVisible, setDrawerMaquinaTracaoVisible] = useState(false);
-    const [preenchidoMaquinaTracao, setPreenchidoMaquinaTracao] = useState(false);
 
 
     return (
@@ -441,7 +456,10 @@ export default function ForensicSection() {
                     {/* Reconhecimento da área */}
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
-                        <FileUpload />
+                        <FileUpload
+                            value={arquivosReconhecimentoArea}
+                            onChange={setArquivosReconhecimentoArea}
+                        />
                         <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
                     </View>
 

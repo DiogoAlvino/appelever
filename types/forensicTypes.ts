@@ -1,4 +1,9 @@
-import { FileItem } from "~/types/forensicTypes";
+export type FileItem = {
+  name: string;
+  uri: string;
+  type: 'image' | 'file' | 'photo';
+  size: number;
+};
 
 export type CampoChecklist = {
   id: number;
@@ -96,10 +101,7 @@ export type MembroSimples = {
 export type ForensicModel = {
   dadosIniciais: DadosIniciais;
   equipePericial: MembroEquipe[];
-  materiais: {
-    selecionados: number[];
-    outroDescricao: string;
-  };
+  materiais: Materiais;
   analisePreliminar: {
     reconhecimentoArea: string;
     condicoesAmbientais: string;
@@ -107,14 +109,12 @@ export type ForensicModel = {
     informacoes: InformacaoFato[];
     arquivosReconhecimentoArea: FileItem[];
   };
-
   risco: {
     riscoAPR: RiscoAPR;
     peritoAuxiliar: MembroSimples[];
     tecnico: MembroSimples[];
     outros: MembroSimples[];
   };
-
   exames: {
     documentacao: Documentacao;
     observacoesDocumentacao: string;
