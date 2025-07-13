@@ -117,7 +117,7 @@ export default function ForensicSection() {
         sensores, setSensores,
         pocoElevador, setPocoElevador,
 
-        vestigiosPerinecroscopia, setVestigiosPerinecroscopia
+        vestigiosPerinecroscopia, setVestigiosPerinecroscopia,
     } = useForensic();
 
     const [modalVestigioVisible, setModalVestigioVisible] = useState(false);
@@ -130,6 +130,10 @@ export default function ForensicSection() {
 
     const [vestigioSelecionado, setVestigioSelecionado] = useState<VestigioResumo | null>(null);
     const [mostrarRegistros, setMostrarRegistros] = useState(false);
+
+    const [materiaisSelecionados, setMateriaisSelecionados] = useState<number[]>([]);
+    const [materialOutroDescricao, setMaterialOutroDescricao] = useState('');
+
 
     const [vestigioTemp, setVestigioTemp] = useState({
         numeroVestigio: '',
@@ -173,7 +177,13 @@ export default function ForensicSection() {
             const payload = {
                 dadosIniciais,
                 equipePericial,
+                materiais: {
+                    selecionados: materiaisSelecionados,
+                    outroDescricao: materialOutroDescricao,
+                },
             };
+
+            console.log('Payload:', payload);
 
             await saveForensic(payload);
             alert('Dados salvos com sucesso!');
@@ -181,6 +191,7 @@ export default function ForensicSection() {
             alert('Erro ao salvar dados.');
         }
     };
+
 
     function handleVisualizarVestigio(vestigio: VestigioResumo) {
         setVestigioSelecionado(vestigio);
@@ -412,7 +423,13 @@ export default function ForensicSection() {
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
                         {/* Lista de materiais, equipamentos, EPIs e EPCs */}
-                        <MaterialList />
+                        <MaterialList
+                            materiaisSelecionados={materiaisSelecionados}
+                            setMateriaisSelecionados={setMateriaisSelecionados}
+                            materialOutroDescricao={materialOutroDescricao}
+                            setMaterialOutroDescricao={setMaterialOutroDescricao}
+                        />
+
                     </View>
                 </View>
             </PrimaryList>

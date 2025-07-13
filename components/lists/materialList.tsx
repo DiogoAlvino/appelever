@@ -2,32 +2,48 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { materials } from '~/data/materials';
 import CheckBox from '../inputs/CheckBox';
 import PrimaryInput from '../inputs/primaryInput';
-import { useForensic } from '~/hooks/useForensic';
 
-export default function MaterialList() {
-  const {
-    materiaisSelecionados,
-    setMateriaisSelecionados,
-    materialOutroDescricao,
-    setMaterialOutroDescricao,
-  } = useForensic();
+type Props = {
+  materiaisSelecionados: number[];
+  setMateriaisSelecionados: (val: number[]) => void;
+  materialOutroDescricao: string;
+  setMaterialOutroDescricao: (val: string) => void;
+};
 
+export default function MaterialList({
+  materiaisSelecionados,
+  setMateriaisSelecionados,
+  materialOutroDescricao,
+  setMaterialOutroDescricao,
+}: Props) {
   const toggleItem = (id: number) => {
-    if (materiaisSelecionados.includes(id)) {
-      setMateriaisSelecionados(materiaisSelecionados.filter(i => i !== id));
-    } else {
-      setMateriaisSelecionados([...materiaisSelecionados, id]);
-    }
+    const jaSelecionado = materiaisSelecionados.includes(id);
+    const novos = jaSelecionado
+      ? materiaisSelecionados.filter(i => i !== id)
+      : [...materiaisSelecionados, id];
+
+    console.log('[toggleItem] ID:', id);
+    console.log('[toggleItem] Já selecionado:', jaSelecionado);
+    console.log('[toggleItem] Novo estado:', novos);
+
+    setMateriaisSelecionados(novos);
   };
 
   const marcarTodos = (ids: number[]) => {
     const novos = Array.from(new Set([...materiaisSelecionados, ...ids]));
+    console.log('[marcarTodos] IDs marcados:', ids);
+    console.log('[marcarTodos] Novo estado:', novos);
     setMateriaisSelecionados(novos);
   };
 
   const desmarcarTodos = (ids: number[]) => {
-    setMateriaisSelecionados(materiaisSelecionados.filter(i => !ids.includes(i)));
+    const novos = materiaisSelecionados.filter(i => !ids.includes(i));
+    console.log('[desmarcarTodos] IDs desmarcados:', ids);
+    console.log('[desmarcarTodos] Novo estado:', novos);
+    setMateriaisSelecionados(novos);
   };
+
+  console.log('[render] materiaisSelecionados:', materiaisSelecionados);
 
   return (
     <View style={styles.container}>
@@ -63,13 +79,15 @@ export default function MaterialList() {
             </TouchableOpacity>
           </View>
 
-          {/* Mostrar campo extra se "Outro" (id 149) estiver selecionado */}
           {materiaisSelecionados.includes(149) && grupo.id === 1 && (
             <PrimaryInput
               label="Descreva o outro material"
               placeholder="Informe"
               value={materialOutroDescricao}
-              onChangeText={setMaterialOutroDescricao}
+              onChangeText={(text) => {
+                console.log('[PrimaryInput] outroDescricao:', text);
+                setMaterialOutroDescricao(text);
+              }}
             />
           )}
         </View>

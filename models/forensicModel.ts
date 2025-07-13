@@ -17,7 +17,13 @@ export type MembroEquipe = {
   matricula: string;
 };
 
+export type Materiais = {
+  selecionados: number[];
+  outroDescricao?: string;
+};
+
 export type ForensicModel = {
   dadosIniciais: DadosIniciais;
   equipePericial: MembroEquipe[];
+  materiais: Materiais;
 };

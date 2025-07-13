@@ -1,23 +1,9 @@
-import Feather from "@expo/vector-icons/build/Feather";
-import { useState } from "react";
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import AlertMessage from "~/components/messages/alertMessage";
 import { colors, fontSize } from '~/theme';
-import { router, useLocalSearchParams } from "expo-router";
-import MainButton from "~/components/buttons/mainButton";
 import ForensicSection from "~/components/sections/forensicSection";
 
 export default function ForensicPage() {
-
-  const handleReport = () => {
-    router.push({
-      pathname: '/equipments',
-    });
-  };
-
-  function goToDashboard() {
-    router.push("/")
-  }
 
   return (
     <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>

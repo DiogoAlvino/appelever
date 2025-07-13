@@ -73,7 +73,6 @@ export const useForensic = () => {
     const [mensagemAcondicionamentoOutro, setMensagemAcondicionamentoOutro] = useState<string[]>(['']);
     const [mensagemDocumentacaoOutro, setMensagemDocumentacaoOutro] = useState<string>('');
 
-    const [materiaisSelecionados, setMateriaisSelecionados] = useState<number[]>([]);
     const [materialOutroDescricao, setMaterialOutroDescricao] = useState('');
 
     const [vestigiosDocumentacao, setVestigiosDocumentacao] = useState<any[]>([]);
@@ -282,7 +281,6 @@ export const useForensic = () => {
         mensagemDocumentacaoOutro, setMensagemDocumentacaoOutro,
         adicionarCampo, atualizarCampo, removerCampo,
         clearFieldError, errors, setErrors,
-        materiaisSelecionados, setMateriaisSelecionados,
         materialOutroDescricao, setMaterialOutroDescricao,
         maquinaTracao, setMaquinaTracao,
         limitadorVelocidade, setLimitadorVelocidade,
