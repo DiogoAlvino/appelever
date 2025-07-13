@@ -151,3 +151,12 @@ export type ForensicModel = {
     vestigiosPerinecroscopia: VestigioResumo[];
   };
 };
+
+export type VestigioCompleto = VestigioResumo & {
+  dadosCompletos: {
+    dadosPreliminares?: {
+      numeroVestigio: string;
+      naturezaVestigio: string;
+    }[];
+  };
+};

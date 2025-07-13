@@ -2,10 +2,11 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors } from '~/theme';
+import { VestigioCompleto } from '~/types/forensicTypes';
 
 interface VestigioResumoProps {
   index: number;
-  vestigio: any;
+  vestigio: VestigioCompleto;
   onVisualizar: () => void;
   onRemover: () => void;
 }
