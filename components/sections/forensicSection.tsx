@@ -24,37 +24,99 @@ import Modal from 'react-native-modal';
 
 export default function ForensicSection() {
     const {
+        // 1. Dados Iniciais
         dadosIniciais, setDadosIniciais,
-        informacoes, setInformacoes,
-        peritoAuxiliar, setPeritoAuxiliar,
         equipePericial, setEquipePericial,
+        peritoAuxiliar, setPeritoAuxiliar,
         tecnico, setTecnico,
         outros, setOutros,
+
+        // 2. Informações Gerais
+        informacoes, setInformacoes,
+
+        // 3. Análise do local
+        reconhecimentoArea, setReconhecimentoArea,
+        condicoesAmbientais, setCondicoesAmbientais,
+        caracteristicasLocal, setCaracteristicasLocal,
+        observacoesDocumentacao, setObservacoesDocumentacao,
+
+        // 4. APR
+        riscoAPR, setRiscoAPR,
+        medidasMitigadoras, setMedidasMitigadoras,
+
+        // 5. Exames e Documentação
+        documentacao, setDocumentacao,
+        arquivosProjetos, setArquivosProjetos,
+        arquivosMemorial, setArquivosMemorial,
+        arquivosLicenca, setArquivosLicenca,
+        arquivosArt, setArquivosArt,
+        arquivosPlano, setArquivosPlano,
+        arquivosContrato, setArquivosContrato,
+        arquivosRegistro, setArquivosRegistro,
+        arquivosRia, setArquivosRia,
+        arquivosOutro, setArquivosOutro,
+
+        // 5.3 Entrevistas
+        depoimentos, setDepoimentos,
+
+        // 5.4 Perinecroscopia
+        cadaverSexo, setCadaverSexo,
+        cadaverCorPele, setCadaverCorPele,
+        cadaverCabelo, setCadaverCabelo,
+        cadaverSinaisIdentificadores, setCadaverSinaisIdentificadores,
+        cadaverDescricaoVestes, setCadaverDescricaoVestes,
+        cadaverOutro, setCadaverOutro,
+        analiseDisposicaoCadaver, setAnaliseDisposicaoCadaver,
+        sinaisTanatologicos, setSinaisTanatologicos,
+        descricaoLesoesCadaver, setDescricaoLesoesCadaver,
+        arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver,
+        arquivosTanatologicos, setArquivosTanatologicos,
+        arquivosLesoesCadaver, setArquivosLesoesCadaver,
+
+        // Vestígios
         dadosPreliminares, setDadosPreliminares,
         acondicionamento, setAcondicionamento,
-        documentacao, setDocumentacao,
-        depoimentos, setDepoimentos,
-        riscoAPR, setRiscoAPR,
+        arquivosVestigioDescricao, setArquivosVestigioDescricao,
+        arquivosAcondicionamento, setArquivosAcondicionamento,
+
+        // Textos extras
+        relatorioRia, setRelatorioRia,
+        outroDocumento, setOutroDocumento,
+        descricaoLesoes, setDescricaoLesoes,
+        depoimentoRelato, setDepoimentoRelato,
+        descricaoDetalhada, setDescricaoDetalhada,
+
+        // Mensagens de validação
+        mensagemInformacoesGerais, setMensagemInformacoesGerais,
+        mensagemDepoimentos, setMensagemDepoimentos,
+        mensagemLesoesDepoimentos, setMensagemLesoesDepoimentos,
+        mensagemRiscoAPR, setMensagemRiscoAPR,
+        mensagemDescricaoVestigio, setMensagemDescricaoVestigio,
+        mensagemDescricaoPreliminar, setMensagemDescricaoPreliminar,
+        mensagemAcondicionamentoOutro, setMensagemAcondicionamentoOutro,
+        mensagemDocumentacaoOutro, setMensagemDocumentacaoOutro,
+
+        // Utilitários
         adicionarCampo, atualizarCampo, removerCampo,
-        clearFieldError, errors,
-        reconhecimentoArea,
-        setReconhecimentoArea,
-        mensagemInformacoesGerais,
-        setMensagemInformacoesGerais,
-        mensagemDepoimentos,
-        setMensagemDepoimentos,
-        mensagemLesoesDepoimentos,
-        setMensagemLesoesDepoimentos,
-        mensagemRiscoAPR,
-        setMensagemRiscoAPR,
-        mensagemDescricaoVestigio,
-        setMensagemDescricaoVestigio,
-        mensagemDescricaoPreliminar,
-        setMensagemDescricaoPreliminar,
-        mensagemAcondicionamentoOutro,
-        setMensagemAcondicionamentoOutro,
-        mensagemDocumentacaoOutro,
-        setMensagemDocumentacaoOutro,
+        clearFieldError, errors, setErrors,
+
+        maquinaTracao, setMaquinaTracao,
+        limitadorVelocidade, setLimitadorVelocidade,
+
+        cabos, setCabos,
+        contrapeso, setContrapeso,
+
+        cabine, setCabine,
+        portas, setPortas,
+
+        freiosEmergencia, setFreiosEmergencia,
+
+        sistemaControle, setSistemaControle,
+        sistemaEletrico, setSistemaEletrico,
+        sensores, setSensores,
+        pocoElevador, setPocoElevador,
+
+        vestigiosPerinecroscopia, setVestigiosPerinecroscopia
     } = useForensic();
 
     const [modalVestigioVisible, setModalVestigioVisible] = useState(false);
@@ -66,9 +128,7 @@ export default function ForensicSection() {
     const [vestigiosperinecroscopia, setVestigiosperinecroscopia] = useState<VestigioResumo[]>([]);
 
     const [vestigioSelecionado, setVestigioSelecionado] = useState<VestigioResumo | null>(null);
-
     const [mostrarRegistros, setMostrarRegistros] = useState(false);
-
 
     const [vestigioTemp, setVestigioTemp] = useState({
         numeroVestigio: '',
@@ -113,12 +173,7 @@ export default function ForensicSection() {
         setModalVestigioVisible(true);
     }
 
-    const camposMaquinaTracao = inspecaoCampos.maquinaTracao;
-
-    const [drawerMaquinaTracaoVisible, setDrawerMaquinaTracaoVisible] = useState(false);
-    const [preenchidoMaquinaTracao, setPreenchidoMaquinaTracao] = useState(false);
-
-    function handleAvancarVestigio() {
+    const handleAvancarVestigio = () => {
         const resumoVestigio: VestigioResumo = {
             numeroVestigio: dadosPreliminares[0].numeroVestigio,
             naturezaVestigio: dadosPreliminares[0].naturezaVestigio,
@@ -131,17 +186,16 @@ export default function ForensicSection() {
 
         if (origemVestigio === 'equipamentos') {
             setVestigiosEquipamentos(prev => [...prev, resumoVestigio]);
-        } if (origemVestigio === 'entrevistas') {
+        } else if (origemVestigio === 'entrevistas') {
             setVestigiosEntrevistas(prev => [...prev, resumoVestigio]);
-        } if (origemVestigio === 'documentacao') {
+        } else if (origemVestigio === 'documentacao') {
             setVestigiosDocumentacao(prev => [...prev, resumoVestigio]);
-        } else {
+        } else if (origemVestigio === 'perinecroscopia') {
             setVestigiosperinecroscopia(prev => [...prev, resumoVestigio]);
         }
 
         setModalVestigioVisible(false);
-    }
-
+    };
 
     const origemLabels: Record<'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia', string> = {
         equipamentos: 'Equipamentos',
@@ -149,6 +203,11 @@ export default function ForensicSection() {
         documentacao: 'Documentação',
         perinecroscopia: 'Perinecroscopia',
     };
+
+    const camposMaquinaTracao = inspecaoCampos.maquinaTracao;
+    const [drawerMaquinaTracaoVisible, setDrawerMaquinaTracaoVisible] = useState(false);
+    const [preenchidoMaquinaTracao, setPreenchidoMaquinaTracao] = useState(false);
+
 
     return (
         <View style={styles.section}>
@@ -159,29 +218,41 @@ export default function ForensicSection() {
                 helperDescription="Insira as informações referentes ao local onde o equipamento está instalado."
             >
                 <View style={styles.campos}>
+
+                    {/* Perito Responsável */}
                     <View style={styles.campoInterno}>
-                        <Text style={styles.titulos}>Perito responsavel</Text>
+                        <Text style={styles.titulos}>Perito responsável</Text>
+
                         <PrimaryInput
                             label="Nome completo"
                             placeholder="Informe"
                             value={dadosIniciais.peritoResponsavel}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, peritoResponsavel: text })}
+                            onChangeText={(text) =>
+                                setDadosIniciais((prev) => ({ ...prev, peritoResponsavel: text }))
+                            }
                         />
+
                         <PrimaryInput
                             label="Cargo"
                             placeholder="Informe"
                             value={dadosIniciais.cargoPerito}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, cargoPerito: text })}
+                            onChangeText={(text) =>
+                                setDadosIniciais((prev) => ({ ...prev, cargoPerito: text }))
+                            }
                             mask="99999-999"
                         />
+
                         <PrimaryInput
-                            label="Matricula"
+                            label="Matrícula"
                             placeholder="Informe"
                             value={dadosIniciais.matriculaPerito}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, matriculaPerito: text })}
+                            onChangeText={(text) =>
+                                setDadosIniciais((prev) => ({ ...prev, matriculaPerito: text }))
+                            }
                         />
                     </View>
 
+                    {/* Equipe Pericial */}
                     <View style={styles.campoInterno}>
                         {equipePericial.map((membro, index) => (
                             <View key={index} style={{ marginBottom: 12, gap: 12 }}>
@@ -210,7 +281,7 @@ export default function ForensicSection() {
                                 />
 
                                 <PrimaryInput
-                                    label="Matricula"
+                                    label="Matrícula"
                                     placeholder="Informe"
                                     value={membro.matricula}
                                     onChangeText={(text) => {
@@ -234,11 +305,15 @@ export default function ForensicSection() {
                         <AddButton
                             label="Adicionar mais um membro da equipe"
                             onPress={() =>
-                                setEquipePericial((prev) => [...prev, { nome: '', cargo: '', matricula: '' }])
+                                setEquipePericial((prev) => [
+                                    ...prev,
+                                    { nome: '', cargo: '', matricula: '' },
+                                ])
                             }
                         />
                     </View>
 
+                    {/* Solicitação */}
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Solicitação</Text>
 
@@ -246,87 +321,116 @@ export default function ForensicSection() {
                             label="Data e hora"
                             placeholder="Informe"
                             value={dadosIniciais.dataHora.toLocaleString()}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, dataHora: new Date() })}
+                            onChangeText={(text) =>
+                                setDadosIniciais((prev) => ({ ...prev, dataHora: new Date() }))
+                            }
                         />
+
                         <PrimaryInput
-                            label="Tipo de ocorrencia"
+                            label="Tipo de ocorrência"
                             placeholder="Informe"
                             value={dadosIniciais.tipoOcorrencia}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, tipoOcorrencia: text })}
+                            onChangeText={(text) =>
+                                setDadosIniciais((prev) => ({ ...prev, tipoOcorrencia: text }))
+                            }
                             mask="99999-999"
                         />
+
                         <PrimaryInput
                             label="Autoridade policial solicitante"
                             placeholder="Informe"
                             value={dadosIniciais.autoridadePolicialNome}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, autoridadePolicialNome: text })}
+                            onChangeText={(text) =>
+                                setDadosIniciais((prev) => ({ ...prev, autoridadePolicialNome: text }))
+                            }
                         />
-
                     </View>
 
+                    {/* Atendimento */}
                     <View style={styles.campoInternoSecundario}>
                         <Text style={styles.titulos}>Atendimento</Text>
 
                         <LocationButton />
+
                         <PrimaryInput
                             label="Viatura (placa)"
                             placeholder="Informe"
                             value={dadosIniciais.viatura}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, viatura: text })}
+                            onChangeText={(text) =>
+                                setDadosIniciais((prev) => ({ ...prev, viatura: text }))
+                            }
                             mask="99999-999"
                         />
+
                         <PrimaryInput
-                            label="Numero de vitimas (Obitos, feridos)"
+                            label="Número de vítimas (Óbitos, feridos)"
                             placeholder="Informe"
                             value={dadosIniciais.numeroVitimas}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, numeroVitimas: text })}
+                            onChangeText={(text) =>
+                                setDadosIniciais((prev) => ({ ...prev, numeroVitimas: text }))
+                            }
                         />
+
                         <PrimaryInput
-                            label="Condição das vitimas (Obitos, feridos)"
+                            label="Condição das vítimas (Óbitos, feridos)"
                             placeholder="Informe"
                             value={dadosIniciais.condicaoVitimas}
-                            onChangeText={(text) => setDadosIniciais({ ...dadosIniciais, condicaoVitimas: text })}
+                            onChangeText={(text) =>
+                                setDadosIniciais((prev) => ({ ...prev, condicaoVitimas: text }))
+                            }
                         />
+
                         <PrimarySelect
                             label="Autoridade policial no local"
                             selected={dadosIniciais.autoridadePolicial}
-                            onSelect={(value) => setDadosIniciais({ ...dadosIniciais, autoridadePolicial: value })}
+                            onSelect={(value) =>
+                                setDadosIniciais((prev) => ({ ...prev, autoridadePolicial: value }))
+                            }
                             placeholder="Selecione"
                             options={['Sim', 'Não']}
                         />
                     </View>
+
                 </View>
             </PrimaryList>
 
-            <PrimaryList title="2. Materiais, equipamentos, EPI e EPC">
+            <PrimaryList
+                title="2. Materiais, Equipamentos, EPI e EPC"
+            >
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
+                        {/* Lista de materiais, equipamentos, EPIs e EPCs */}
                         <MaterialList />
                     </View>
                 </View>
             </PrimaryList>
 
+
             <PrimaryList title="3. Análise preliminar do local">
                 <View style={styles.campos}>
+
+                    {/* Reconhecimento da área */}
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
                         <FileUpload />
                         <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
-
                     </View>
 
+                    {/* Condições ambientais */}
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Condições ambientais</Text>
                         <Text>Descreva as condições como: barulho, fumaça, iluminação e etc</Text>
-                        <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+                        <VoiceInput value={condicoesAmbientais} onChangeText={setCondicoesAmbientais} />
                     </View>
 
+                    {/* Características do local */}
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Características do local</Text>
                         <Text>Condições especiais relevantes</Text>
-                        <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+                        <VoiceInput value={caracteristicasLocal} onChangeText={setCaracteristicasLocal} />
                     </View>
 
+                    {/* Informações do fato */}
                     <View style={styles.campoInternoSecundario}>
                         <Text style={styles.titulos}>Informações do fato</Text>
                         <Text>Você pode informar testemunhas, técnico, policial e etc</Text>
@@ -360,36 +464,33 @@ export default function ForensicSection() {
                                 adicionarCampo(setInformacoes, { descricao: '', observacao: '' })
                             }
                         />
-
                     </View>
+
                 </View>
             </PrimaryList>
 
-            <PrimaryList
-                title="4. Análise preliminar de risco (APR)"
-            >
+
+            <PrimaryList title="4. Análise preliminar de risco (APR)">
                 <View style={styles.campos}>
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Composição da Equipe</Text>
                         <PrimaryInput
-                            label="Perito responsavel"
+                            label="Perito responsável"
                             placeholder="Informe"
                             value={riscoAPR.peritoResponsavel}
                             onChangeText={(text) => setRiscoAPR({ ...riscoAPR, peritoResponsavel: text })}
                         />
                         <PrimaryInput
-                            label="Matricula"
+                            label="Matrícula"
                             placeholder="Informe"
                             value={riscoAPR.peritoMatricula}
                             onChangeText={(text) => setRiscoAPR({ ...riscoAPR, peritoMatricula: text })}
                         />
                     </View>
-                    <View style={styles.campoInterno}>
-                        <Text style={styles.titulos}>Peritos auxiliares</Text>
 
+                    <View style={styles.campoInterno}>
                         <View style={styles.campoInternoSecundario}>
                             <Text style={styles.titulos}>Peritos auxiliares</Text>
-
                             {peritoAuxiliar.map((auxiliar, index) => (
                                 <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                     <PrimaryInput
@@ -402,7 +503,6 @@ export default function ForensicSection() {
                                             setPeritoAuxiliar(copia);
                                         }}
                                     />
-
                                     <PrimaryInput
                                         label="Matrícula"
                                         placeholder="Informe a matrícula"
@@ -413,7 +513,6 @@ export default function ForensicSection() {
                                             setPeritoAuxiliar(copia);
                                         }}
                                     />
-
                                     {index > 0 && (
                                         <RemoveButton
                                             label="Remover perito auxiliar"
@@ -424,7 +523,6 @@ export default function ForensicSection() {
                                     )}
                                 </View>
                             ))}
-
                             <AddButton
                                 label="Adicionar outro perito auxiliar"
                                 onPress={() =>
@@ -436,7 +534,6 @@ export default function ForensicSection() {
 
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Técnicos</Text>
-
                         {tecnico.map((item, index) => (
                             <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                 <PrimaryInput
@@ -449,7 +546,6 @@ export default function ForensicSection() {
                                         setTecnico(copia);
                                     }}
                                 />
-
                                 <PrimaryInput
                                     label="Matrícula"
                                     placeholder="Informe a matrícula"
@@ -460,7 +556,6 @@ export default function ForensicSection() {
                                         setTecnico(copia);
                                     }}
                                 />
-
                                 {index > 0 && (
                                     <RemoveButton
                                         label="Remover técnico"
@@ -471,7 +566,6 @@ export default function ForensicSection() {
                                 )}
                             </View>
                         ))}
-
                         <AddButton
                             label="Adicionar outro técnico"
                             onPress={() => setTecnico((prev) => [...prev, { nome: '', matricula: '' }])}
@@ -480,7 +574,6 @@ export default function ForensicSection() {
 
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Outros</Text>
-
                         {outros.map((item, index) => (
                             <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                 <PrimaryInput
@@ -493,7 +586,6 @@ export default function ForensicSection() {
                                         setOutros(copia);
                                     }}
                                 />
-
                                 <PrimaryInput
                                     label="Matrícula"
                                     placeholder="Informe a matrícula"
@@ -504,7 +596,6 @@ export default function ForensicSection() {
                                         setOutros(copia);
                                     }}
                                 />
-
                                 {index > 0 && (
                                     <RemoveButton
                                         label="Remover"
@@ -515,7 +606,6 @@ export default function ForensicSection() {
                                 )}
                             </View>
                         ))}
-
                         <AddButton
                             label="Adicionar outros"
                             onPress={() => setOutros((prev) => [...prev, { nome: '', matricula: '' }])}
@@ -565,23 +655,24 @@ export default function ForensicSection() {
                         </View>
 
                         <View style={styles.campoInterno}>
-                            <Text style={styles.titulos}>Avalição do risco</Text>
-                            <PrimarySelect label="Gravidade"
-                                selected={riscoAPR.gravidade}
-                                onSelect={(value) => {
-                                    setRiscoAPR({ ...riscoAPR, gravidade: value });
-                                }}
-                                placeholder="Selecione"
-                                options={['Baixo', 'Moderado', 'Alto']} />
+                            <Text style={styles.titulos}>Avaliação do risco</Text>
 
-                            <PrimarySelect label="Probabilidade"
-                                selected={riscoAPR.probabilidade}
-                                onSelect={(value) => {
-                                    setRiscoAPR({ ...riscoAPR, probabilidade: value });
-                                }}
+                            <PrimarySelect
+                                label="Gravidade"
+                                selected={riscoAPR.gravidade}
+                                onSelect={(value) => setRiscoAPR({ ...riscoAPR, gravidade: value })}
                                 placeholder="Selecione"
-                                options={['Baixa', 'Moderada', 'Alta']} />
-                        </View >
+                                options={['Baixo', 'Moderado', 'Alto']}
+                            />
+
+                            <PrimarySelect
+                                label="Probabilidade"
+                                selected={riscoAPR.probabilidade}
+                                onSelect={(value) => setRiscoAPR({ ...riscoAPR, probabilidade: value })}
+                                placeholder="Selecione"
+                                options={['Baixa', 'Moderada', 'Alta']}
+                            />
+                        </View>
 
                         <View style={styles.campoInternoSecundario}>
                             <Text style={styles.titulos}>Medidas Mitigatórias</Text>
@@ -591,10 +682,11 @@ export default function ForensicSection() {
                                 value={riscoAPR.medidasMitigatoria}
                                 onChangeText={(text) => setRiscoAPR({ ...riscoAPR, medidasMitigatoria: text })}
                             />
-                        </View >
+                        </View>
                     </View>
                 </View>
             </PrimaryList>
+
 
             <PrimaryList
                 title="5. Exames"
@@ -607,7 +699,6 @@ export default function ForensicSection() {
                             <CroquiModal />
 
                             <Text style={styles.textos}>Registros</Text>
-
                             <AddButton
                                 label={mostrarRegistros ? 'Ocultar registros' : 'Adicionar registros'}
                                 icon={mostrarRegistros ? 'minus' : 'plus'}
@@ -622,7 +713,10 @@ export default function ForensicSection() {
                                         value={documentacao.projetos}
                                         onChangeText={(text) => setDocumentacao({ ...documentacao, projetos: text })}
                                     />
-                                    <FileUpload />
+                                    <FileUpload
+                                        value={documentacao.projetosArquivos}
+                                        onChange={(arquivos) => setDocumentacao({ ...documentacao, projetosArquivos: arquivos })}
+                                    />
 
                                     <PrimaryInput
                                         label="Memorial de Cálculo"
@@ -630,7 +724,10 @@ export default function ForensicSection() {
                                         value={documentacao.memorialCalculo}
                                         onChangeText={(text) => setDocumentacao({ ...documentacao, memorialCalculo: text })}
                                     />
-                                    <FileUpload />
+                                    <FileUpload
+                                        value={documentacao.memorialCalculoArquivos}
+                                        onChange={(arquivos) => setDocumentacao({ ...documentacao, memorialCalculoArquivos: arquivos })}
+                                    />
 
                                     <PrimaryInput
                                         label="Licenças e Alvará"
@@ -638,7 +735,10 @@ export default function ForensicSection() {
                                         value={documentacao.licencaAlvara}
                                         onChangeText={(text) => setDocumentacao({ ...documentacao, licencaAlvara: text })}
                                     />
-                                    <FileUpload />
+                                    <FileUpload
+                                        value={documentacao.licencaAlvaraArquivos}
+                                        onChange={(arquivos) => setDocumentacao({ ...documentacao, licencaAlvaraArquivos: arquivos })}
+                                    />
 
                                     <PrimaryInput
                                         label="ART"
@@ -646,7 +746,10 @@ export default function ForensicSection() {
                                         value={documentacao.art}
                                         onChangeText={(text) => setDocumentacao({ ...documentacao, art: text })}
                                     />
-                                    <FileUpload />
+                                    <FileUpload
+                                        value={documentacao.artArquivos}
+                                        onChange={(arquivos) => setDocumentacao({ ...documentacao, artArquivos: arquivos })}
+                                    />
 
                                     <PrimaryInput
                                         label="Plano de Manutenção"
@@ -654,7 +757,10 @@ export default function ForensicSection() {
                                         value={documentacao.planoManutencao}
                                         onChangeText={(text) => setDocumentacao({ ...documentacao, planoManutencao: text })}
                                     />
-                                    <FileUpload />
+                                    <FileUpload
+                                        value={documentacao.planoManutencaoArquivos}
+                                        onChange={(arquivos) => setDocumentacao({ ...documentacao, planoManutencaoArquivos: arquivos })}
+                                    />
 
                                     <PrimaryInput
                                         label="Contrato de Manutenção"
@@ -662,7 +768,10 @@ export default function ForensicSection() {
                                         value={documentacao.contratoManutencao}
                                         onChangeText={(text) => setDocumentacao({ ...documentacao, contratoManutencao: text })}
                                     />
-                                    <FileUpload />
+                                    <FileUpload
+                                        value={documentacao.contratoManutencaoArquivos}
+                                        onChange={(arquivos) => setDocumentacao({ ...documentacao, contratoManutencaoArquivos: arquivos })}
+                                    />
 
                                     <PrimaryInput
                                         label="Registro de manutenção"
@@ -670,7 +779,10 @@ export default function ForensicSection() {
                                         value={documentacao.registroManutencao}
                                         onChangeText={(text) => setDocumentacao({ ...documentacao, registroManutencao: text })}
                                     />
-                                    <FileUpload />
+                                    <FileUpload
+                                        value={documentacao.registroManutencaoArquivos}
+                                        onChange={(arquivos) => setDocumentacao({ ...documentacao, registroManutencaoArquivos: arquivos })}
+                                    />
 
                                     <PrimaryInput
                                         label="Relatório de Inspeção Anual – RIA"
@@ -678,7 +790,10 @@ export default function ForensicSection() {
                                         value={documentacao.relatorioRia}
                                         onChangeText={(text) => setDocumentacao({ ...documentacao, relatorioRia: text })}
                                     />
-                                    <FileUpload />
+                                    <FileUpload
+                                        value={documentacao.relatorioRiaArquivos}
+                                        onChange={(arquivos) => setDocumentacao({ ...documentacao, relatorioRiaArquivos: arquivos })}
+                                    />
 
                                     <PrimaryInput
                                         label="Outro (especificar)"
@@ -686,18 +801,22 @@ export default function ForensicSection() {
                                         value={documentacao.outro}
                                         onChangeText={(text) => setDocumentacao({ ...documentacao, outro: text })}
                                     />
-
-                                    <FileUpload />
-
+                                    <FileUpload
+                                        value={documentacao.outroArquivos}
+                                        onChange={(arquivos) => setDocumentacao({ ...documentacao, outroArquivos: arquivos })}
+                                    />
                                 </>
                             )}
 
                             <Text style={styles.textos}>Observações</Text>
-
-                            <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+                            <VoiceInput
+                                value={observacoesDocumentacao}
+                                onChangeText={setObservacoesDocumentacao}
+                            />
 
                             {vestigiosDocumentacao.map((vestigio, index) => (
                                 <ResumoVestigio
+                                    key={index}
                                     index={index}
                                     vestigio={vestigio}
                                     onVisualizar={() => handleVisualizarVestigio(vestigio)}
@@ -707,7 +826,6 @@ export default function ForensicSection() {
                                         setVestigiosDocumentacao(copia);
                                     }}
                                 />
-
                             ))}
 
                             <AddButton
@@ -717,11 +835,10 @@ export default function ForensicSection() {
                                     setModalVestigioVisible(true);
                                 }}
                             />
-
-
-
                         </View>
                     </View>
+
+
                     <View style={styles.campoInternoSecundario}>
                         <View style={styles.campoInternoSecundario}>
                             <Text style={styles.titulos}>5.2 Equipamentos</Text>
@@ -736,6 +853,8 @@ export default function ForensicSection() {
                                                         title="Máquina de tração"
                                                         buttonLabel="Máquina de tração"
                                                         campos={inspecaoCampos.maquinaTracao}
+                                                        valor={maquinaTracao}
+                                                        onChange={setMaquinaTracao}
                                                     />
                                                 </View>
                                                 <View style={styles.nivel2}>
@@ -743,11 +862,14 @@ export default function ForensicSection() {
                                                         title="Limitador de Velocidade"
                                                         buttonLabel="Limitador de Velocidade"
                                                         campos={inspecaoCampos.limitadorVelocidade}
+                                                        valor={limitadorVelocidade}
+                                                        onChange={setLimitadorVelocidade}
                                                     />
                                                 </View>
                                             </View>
                                         </PrimaryList>
                                     </View>
+
 
                                     <View style={styles.sectionSpacing}>
                                         <PrimaryList title="7.2 Cabos e Contrapeso">
@@ -757,6 +879,8 @@ export default function ForensicSection() {
                                                         title="Cabos"
                                                         buttonLabel="Cabos"
                                                         campos={inspecaoCampos.cabos}
+                                                        valor={cabos}
+                                                        onChange={setCabos}
                                                     />
                                                 </View>
                                                 <View style={styles.nivel2}>
@@ -764,21 +888,25 @@ export default function ForensicSection() {
                                                         title="Contrapeso"
                                                         buttonLabel="Contrapeso"
                                                         campos={inspecaoCampos.contrapeso}
+                                                        valor={contrapeso}
+                                                        onChange={setContrapeso}
                                                     />
                                                 </View>
                                             </View>
                                         </PrimaryList>
                                     </View>
 
+
                                     <View style={styles.sectionSpacing}>
                                         <PrimaryList title="7.3 Cabine e Portas">
                                             <View style={styles.campos}>
-
                                                 <View style={styles.nivel2}>
                                                     <FormDrawer
                                                         title="Cabine"
                                                         buttonLabel="Cabine"
                                                         campos={inspecaoCampos.cabine}
+                                                        valor={cabine}
+                                                        onChange={setCabine}
                                                     />
                                                 </View>
 
@@ -787,12 +915,14 @@ export default function ForensicSection() {
                                                         title="Portas"
                                                         buttonLabel="Portas"
                                                         campos={inspecaoCampos.portas}
+                                                        valor={portas}
+                                                        onChange={setPortas}
                                                     />
                                                 </View>
-
                                             </View>
                                         </PrimaryList>
                                     </View>
+
 
                                     <View style={styles.sectionSpacing}>
                                         <PrimaryList title="7.4 Freios de Emergência">
@@ -802,11 +932,14 @@ export default function ForensicSection() {
                                                         title="Freios de Emergência"
                                                         buttonLabel="Freios de Emergência"
                                                         campos={inspecaoCampos.freiosEmergencia}
+                                                        valor={freiosEmergencia}
+                                                        onChange={setFreiosEmergencia}
                                                     />
                                                 </View>
                                             </View>
                                         </PrimaryList>
                                     </View>
+
 
                                     <View style={styles.sectionSpacing}>
                                         <PrimaryList title="7.5 Quadro de Comando">
@@ -817,6 +950,8 @@ export default function ForensicSection() {
                                                         title="Sistema de Controle"
                                                         buttonLabel="Sistema de Controle"
                                                         campos={inspecaoCampos.sistemaControle}
+                                                        valor={sistemaControle}
+                                                        onChange={setSistemaControle}
                                                     />
                                                 </View>
 
@@ -825,6 +960,8 @@ export default function ForensicSection() {
                                                         title="Sistema Elétrico"
                                                         buttonLabel="Sistema Elétrico"
                                                         campos={inspecaoCampos.sistemaEletrico}
+                                                        valor={sistemaEletrico}
+                                                        onChange={setSistemaEletrico}
                                                     />
                                                 </View>
 
@@ -833,6 +970,8 @@ export default function ForensicSection() {
                                                         title="Sensores"
                                                         buttonLabel="Sensores"
                                                         campos={inspecaoCampos.sensores}
+                                                        valor={sensores}
+                                                        onChange={setSensores}
                                                     />
                                                 </View>
 
@@ -841,18 +980,21 @@ export default function ForensicSection() {
                                                         title="Poço do Elevador"
                                                         buttonLabel="Poço do Elevador"
                                                         campos={inspecaoCampos.pocoElevador}
+                                                        valor={pocoElevador}
+                                                        onChange={setPocoElevador}
                                                     />
                                                 </View>
 
                                             </View>
-
                                         </PrimaryList>
                                     </View>
+
 
                                 </View>
 
                                 {vestigiosEquipamentos.map((vestigio, index) => (
                                     <ResumoVestigio
+                                        key={index}
                                         index={index}
                                         vestigio={vestigio}
                                         onVisualizar={() => handleVisualizarVestigio(vestigio)}
@@ -862,8 +1004,8 @@ export default function ForensicSection() {
                                             setVestigiosEquipamentos(copia);
                                         }}
                                     />
-
                                 ))}
+
 
                                 <AddButton
                                     label="Adicionar vestígio"
@@ -878,6 +1020,7 @@ export default function ForensicSection() {
 
                             <View style={styles.campoInterno}>
                                 <Text style={styles.titulos}>5.3 Entrevistas</Text>
+
                                 {depoimentos.map((item, index) => (
                                     <View key={index} style={{ marginBottom: 12, gap: 12 }}>
                                         <Text style={styles.titulos}>Registro e análise de depoimentos {index + 1}</Text>
@@ -888,11 +1031,13 @@ export default function ForensicSection() {
                                             onSelect={(value) => {
                                                 const copia = [...depoimentos];
                                                 copia[index].tipoEntrevistado = value;
+
                                                 if (value !== 'Vítimas sobreviventes') {
                                                     copia[index].genero = '';
                                                     copia[index].idade = '';
                                                     copia[index].descricaoLesoes = '';
                                                 }
+
                                                 setDepoimentos(copia);
                                             }}
                                             placeholder="Selecione"
@@ -905,7 +1050,7 @@ export default function ForensicSection() {
                                             ]}
                                         />
 
-                                        {item.tipoEntrevistado && (
+                                        {item.tipoEntrevistado !== '' && (
                                             <>
                                                 <PrimaryInput
                                                     label="Nome"
@@ -974,7 +1119,7 @@ export default function ForensicSection() {
                                                                 setDepoimentos(copia);
                                                             }}
                                                         />
-                                                        <FileUpload />
+                                                        {/* <FileUpload value={...} onChange={(arquivos) => {}} /> */}
                                                     </>
                                                 )}
 
@@ -993,13 +1138,12 @@ export default function ForensicSection() {
                                         {index > 0 && (
                                             <RemoveButton
                                                 label="Remover entrevista"
-                                                onPress={() =>
-                                                    setDepoimentos((prev) => prev.filter((_, i) => i !== index))
-                                                }
+                                                onPress={() => {
+                                                    setDepoimentos((prev) => prev.filter((_, i) => i !== index));
+                                                }}
                                             />
                                         )}
                                     </View>
-
                                 ))}
 
                                 <AddButton
@@ -1023,6 +1167,7 @@ export default function ForensicSection() {
 
                                 {vestigiosEntrevistas.map((vestigio, index) => (
                                     <ResumoVestigio
+                                        key={index}
                                         index={index}
                                         vestigio={vestigio}
                                         onVisualizar={() => handleVisualizarVestigio(vestigio)}
@@ -1032,7 +1177,6 @@ export default function ForensicSection() {
                                             setVestigiosEntrevistas(copia);
                                         }}
                                     />
-
                                 ))}
 
                                 <AddButton
@@ -1044,87 +1188,98 @@ export default function ForensicSection() {
                                 />
                             </View>
 
+
                             <View style={styles.campoInternoSecundario}>
                                 <Text style={styles.titulos}>5.4. Perinecroscopia</Text>
+
                                 <Text style={styles.textos}>Caracterização do Cadáver</Text>
+
                                 <PrimarySelect
                                     label="Sexo"
-                                    onSelect={(value) => {
-                                        const copia = [...depoimentos];
-                                        setDepoimentos(copia);
-                                    }}
+                                    selected={cadaverSexo}
+                                    onSelect={setCadaverSexo}
                                     placeholder="Selecione"
                                     options={['Masculino', 'Feminino']}
                                 />
+
                                 <PrimarySelect
                                     label="Cor da pele"
-                                    onSelect={(value) => {
-                                        const copia = [...depoimentos];
-                                        setDepoimentos(copia);
-                                    }}
+                                    selected={cadaverCorPele}
+                                    onSelect={setCadaverCorPele}
                                     placeholder="Selecione"
                                     options={['Branco', 'Preto', 'Pardo', 'Amarelo', 'Roxo']}
                                 />
+
                                 <PrimaryInput
                                     label="Características do Cabelo"
                                     placeholder="Informe"
-                                    value={'teste'}
-                                    onChangeText={(text) => {
-                                        const copia = [...depoimentos];
-                                        setDepoimentos(copia);
-                                    }}
+                                    value={cadaverCabelo}
+                                    onChangeText={setCadaverCabelo}
                                 />
+
                                 <PrimaryInput
                                     label="Sinais identificadores (tatuagem)"
                                     placeholder="Informe"
-                                    value={'teste'}
-                                    onChangeText={(text) => {
-                                        const copia = [...depoimentos];
-                                        setDepoimentos(copia);
-                                    }}
+                                    value={cadaverSinaisIdentificadores}
+                                    onChangeText={setCadaverSinaisIdentificadores}
                                 />
+
                                 <PrimaryInput
                                     label="Descrição das vestes e pertences pessoais"
                                     placeholder="Informe"
-                                    value={'teste'}
-                                    onChangeText={(text) => {
-                                        const copia = [...depoimentos];
-                                        setDepoimentos(copia);
-                                    }}
+                                    value={cadaverDescricaoVestes}
+                                    onChangeText={setCadaverDescricaoVestes}
                                 />
+
                                 <PrimaryInput
                                     label="Outro"
                                     placeholder="Informe"
-                                    value={'teste'}
-                                    onChangeText={(text) => {
-                                        const copia = [...depoimentos];
-                                        setDepoimentos(copia);
-                                    }}
+                                    value={cadaverOutro}
+                                    onChangeText={setCadaverOutro}
                                 />
-                                <Text style={styles.titulos}>Analise da disposição do Cadáver</Text>
-                                <FileUpload />
-                                <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+
+                                <Text style={styles.titulos}>Análise da disposição do Cadáver</Text>
+                                <FileUpload
+                                    value={arquivosDisposicaoCadaver}
+                                    onChange={setArquivosDisposicaoCadaver}
+                                />
+                                <VoiceInput
+                                    value={analiseDisposicaoCadaver}
+                                    onChangeText={setAnaliseDisposicaoCadaver}
+                                />
 
                                 <Text style={styles.titulos}>Descrição dos sinais tanatológicos</Text>
-                                <FileUpload />
-                                <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+                                <FileUpload
+                                    value={arquivosTanatologicos}
+                                    onChange={setArquivosTanatologicos}
+                                />
+                                <VoiceInput
+                                    value={sinaisTanatologicos}
+                                    onChangeText={setSinaisTanatologicos}
+                                />
 
                                 <Text style={styles.titulos}>Descrição das lesões</Text>
-                                <FileUpload />
-                                <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+                                <FileUpload
+                                    value={arquivosLesoesCadaver}
+                                    onChange={setArquivosLesoesCadaver}
+                                />
+                                <VoiceInput
+                                    value={descricaoLesoesCadaver}
+                                    onChangeText={setDescricaoLesoesCadaver}
+                                />
 
-                                {vestigiosperinecroscopia.map((vestigio, index) => (
+                                {vestigiosPerinecroscopia.map((vestigio, index) => (
                                     <ResumoVestigio
+                                        key={index}
                                         index={index}
                                         vestigio={vestigio}
                                         onVisualizar={() => handleVisualizarVestigio(vestigio)}
                                         onRemover={() => {
-                                            const copia = [...vestigiosperinecroscopia];
+                                            const copia = [...vestigiosPerinecroscopia];
                                             copia.splice(index, 1);
-                                            setVestigiosperinecroscopia(copia);
+                                            setVestigiosPerinecroscopia(copia);
                                         }}
                                     />
-
                                 ))}
 
                                 <AddButton
@@ -1134,10 +1289,8 @@ export default function ForensicSection() {
                                         setModalVestigioVisible(true);
                                     }}
                                 />
-
-
-
                             </View>
+
 
                             {origemVestigio && (
                                 <>
@@ -1147,7 +1300,7 @@ export default function ForensicSection() {
                                         onBackButtonPress={() => setModalVestigioVisible(false)}
                                         animationIn="slideInUp"
                                         animationOut="slideOutDown"
-                                        style={{ margin: 0, justifyContent: 'flex-end' }} // necessário para vir de baixo
+                                        style={{ margin: 0, justifyContent: 'flex-end' }}
                                     >
                                         <ScrollView style={{ padding: 16, backgroundColor: '#fff' }}>
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -1235,7 +1388,14 @@ export default function ForensicSection() {
                                                         }}
                                                     />
 
-                                                    <FileUpload />
+                                                    <FileUpload
+                                                        value={dadosPreliminares[0].descricaoDetalhadaArquivos || []}
+                                                        onChange={(arquivos) => {
+                                                            const copia = [...dadosPreliminares];
+                                                            copia[0].descricaoDetalhadaArquivos = arquivos;
+                                                            setDadosPreliminares(copia);
+                                                        }}
+                                                    />
                                                 </View>
                                             </View>
 
@@ -1304,7 +1464,14 @@ export default function ForensicSection() {
                                                         }}
                                                     />
 
-                                                    <FileUpload />
+                                                    <FileUpload
+                                                        value={acondicionamento[0].arquivos || []}
+                                                        onChange={(arquivos) => {
+                                                            const copia = [...acondicionamento];
+                                                            copia[0].arquivos = arquivos;
+                                                            setAcondicionamento(copia);
+                                                        }}
+                                                    />
                                                 </View>
                                             </View>
                                         </ScrollView>
@@ -1334,6 +1501,7 @@ export default function ForensicSection() {
                                     </Modal>
                                 </>
                             )}
+
                         </View>
                     </View>
                 </View>
@@ -1419,6 +1587,8 @@ const styles = StyleSheet.create({
     sectionSpacing: {
         marginBottom: 16,
     },
+    campos: {
 
+    }
 
 });

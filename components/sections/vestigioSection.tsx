@@ -1,16 +1,21 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { colors } from '~/theme'; 
 import { Feather } from '@expo/vector-icons';
+import { colors } from '~/theme';
 
 interface VestigioResumoProps {
   index: number;
   vestigio: any;
   onVisualizar: () => void;
-  onRemover: () => void; // <- nova prop para remover
+  onRemover: () => void;
 }
 
-export default function ResumoVestigio({ index, vestigio, onVisualizar, onRemover }: VestigioResumoProps) {
+export default function ResumoVestigio({
+  index,
+  vestigio,
+  onVisualizar,
+  onRemover,
+}: VestigioResumoProps) {
   return (
     <View style={styles.etiqueta}>
       <View style={styles.header}>
@@ -25,18 +30,21 @@ export default function ResumoVestigio({ index, vestigio, onVisualizar, onRemove
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.texto}>Nº: {vestigio.dadosCompletos?.dadosPreliminares?.[0]?.numeroVestigio ?? '---'}</Text>
-        <Text style={styles.texto}>Natureza: {vestigio.dadosCompletos?.dadosPreliminares?.[0]?.naturezaVestigio ?? '---'}</Text>
+        <Text style={styles.texto}>
+          Nº: {vestigio.dadosCompletos?.dadosPreliminares?.[0]?.numeroVestigio ?? '---'}
+        </Text>
+        <Text style={styles.texto}>
+          Natureza: {vestigio.dadosCompletos?.dadosPreliminares?.[0]?.naturezaVestigio ?? '---'}
+        </Text>
 
         <View style={styles.buttons}>
-            <TouchableOpacity onPress={onVisualizar}>
-                <Text style={styles.link}>Visualizar completo</Text>
-            </TouchableOpacity>
+          <TouchableOpacity onPress={onVisualizar}>
+            <Text style={styles.link}>Visualizar completo</Text>
+          </TouchableOpacity>
 
-        
-            <TouchableOpacity onPress={onRemover} style={styles.trashButton}>
-                <Feather name="trash-2" size={20} color="red" />
-            </TouchableOpacity>
+          <TouchableOpacity onPress={onRemover} style={styles.trashButton}>
+            <Feather name="trash-2" size={20} color="red" />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -50,7 +58,6 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderRadius: 10,
     overflow: 'hidden',
-    
   },
   header: {
     flexDirection: 'row',
@@ -97,5 +104,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 15,
-  }
+  },
 });
