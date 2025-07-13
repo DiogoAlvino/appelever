@@ -13,7 +13,6 @@ import CheckBox from '../inputs/CheckBox';
 import { useForensic } from '~/hooks/useForensic';
 import { inspecaoCampos } from '~/data/inspecaoCampos';
 import { useState } from 'react';
-import MaquinaTracaoDrawer from '../modal/formDrawer';
 import FormDrawer from '../modal/formDrawer';
 
 import CroquiModal from '../croqui';
@@ -21,6 +20,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import ResumoVestigio from './vestigioSection';
 import Modal from 'react-native-modal';
 
+import { saveForensic } from '~/services/saveForensic';
+import MainButton from '../buttons/mainButton';
 
 export default function ForensicSection() {
     const {
@@ -167,6 +168,20 @@ export default function ForensicSection() {
         };
     };
 
+    const handleSave = async () => {
+        try {
+            const payload = {
+                dadosIniciais,
+                equipePericial,
+            };
+
+            await saveForensic(payload);
+            alert('Dados salvos com sucesso!');
+        } catch (error) {
+            alert('Erro ao salvar dados.');
+        }
+    };
+
     function handleVisualizarVestigio(vestigio: VestigioResumo) {
         setVestigioSelecionado(vestigio);
         setOrigemVestigio(vestigio.origem);
@@ -239,7 +254,6 @@ export default function ForensicSection() {
                             onChangeText={(text) =>
                                 setDadosIniciais((prev) => ({ ...prev, cargoPerito: text }))
                             }
-                            mask="99999-999"
                         />
 
                         <PrimaryInput
@@ -333,7 +347,6 @@ export default function ForensicSection() {
                             onChangeText={(text) =>
                                 setDadosIniciais((prev) => ({ ...prev, tipoOcorrencia: text }))
                             }
-                            mask="99999-999"
                         />
 
                         <PrimaryInput
@@ -359,7 +372,6 @@ export default function ForensicSection() {
                             onChangeText={(text) =>
                                 setDadosIniciais((prev) => ({ ...prev, viatura: text }))
                             }
-                            mask="99999-999"
                         />
 
                         <PrimaryInput
@@ -1506,6 +1518,11 @@ export default function ForensicSection() {
                     </View>
                 </View>
             </PrimaryList>
+
+            <View style={{ width: '100%', gap: 10 }}>
+                <MainButton title="Finalizar" onPress={handleSave} />
+                <MainButton title="Cancelar" type="secondary" />
+            </View>
 
 
         </View>

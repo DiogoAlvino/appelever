@@ -34,13 +34,6 @@ export default function ForensicPage() {
 
       <ForensicSection />
 
-
-      <View style={{ width: '100%', gap: 10 }}>
-        <MainButton title="Finalizar" onPress={handleReport} />
-        <MainButton title="Cancelar" onPress={goToDashboard} type="secondary" />
-      </View>
-
-
     </ScrollView>
   );
 }
