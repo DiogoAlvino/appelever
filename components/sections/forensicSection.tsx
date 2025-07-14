@@ -103,6 +103,7 @@ export default function ForensicSection() {
 
     const [vestigioSelecionado, setVestigioSelecionado] = useState<VestigioResumo | null>(null);
     const [mostrarRegistros, setMostrarRegistros] = useState(false);
+    const [mostrarPerinecroscopia, setMostrarPerinecroscopia] = useState(false);
 
     const [materiaisSelecionados, setMateriaisSelecionados] = useState<number[]>([]);
     const [materialOutroDescricao, setMaterialOutroDescricao] = useState('');
@@ -1166,7 +1167,7 @@ export default function ForensicSection() {
                                                                 setDepoimentos(copia);
                                                             }}
                                                         />
-                                                        {/* <FileUpload value={...} onChange={(arquivos) => {}} /> */}
+                                                        <FileUpload />
                                                     </>
                                                 )}
 
@@ -1240,102 +1241,114 @@ export default function ForensicSection() {
                                 <Text style={styles.titulos}>5.4. Perinecroscopia</Text>
 
                                 <Text style={styles.textos}>Caracterização do Cadáver</Text>
-
-                                <PrimarySelect
-                                    label="Sexo"
-                                    selected={cadaverSexo}
-                                    onSelect={setCadaverSexo}
-                                    placeholder="Selecione"
-                                    options={['Masculino', 'Feminino']}
-                                />
-
-                                <PrimarySelect
-                                    label="Cor da pele"
-                                    selected={cadaverCorPele}
-                                    onSelect={setCadaverCorPele}
-                                    placeholder="Selecione"
-                                    options={['Branco', 'Preto', 'Pardo', 'Amarelo', 'Roxo']}
-                                />
-
-                                <PrimaryInput
-                                    label="Características do Cabelo"
-                                    placeholder="Informe"
-                                    value={cadaverCabelo}
-                                    onChangeText={setCadaverCabelo}
-                                />
-
-                                <PrimaryInput
-                                    label="Sinais identificadores (tatuagem)"
-                                    placeholder="Informe"
-                                    value={cadaverSinaisIdentificadores}
-                                    onChangeText={setCadaverSinaisIdentificadores}
-                                />
-
-                                <PrimaryInput
-                                    label="Descrição das vestes e pertences pessoais"
-                                    placeholder="Informe"
-                                    value={cadaverDescricaoVestes}
-                                    onChangeText={setCadaverDescricaoVestes}
-                                />
-
-                                <PrimaryInput
-                                    label="Outro"
-                                    placeholder="Informe"
-                                    value={cadaverOutro}
-                                    onChangeText={setCadaverOutro}
-                                />
-
-                                <Text style={styles.titulos}>Análise da disposição do Cadáver</Text>
-                                <FileUpload
-                                    value={arquivosDisposicaoCadaver}
-                                    onChange={setArquivosDisposicaoCadaver}
-                                />
-                                <VoiceInput
-                                    value={analiseDisposicaoCadaver}
-                                    onChangeText={setAnaliseDisposicaoCadaver}
-                                />
-
-                                <Text style={styles.titulos}>Descrição dos sinais tanatológicos</Text>
-                                <FileUpload
-                                    value={arquivosTanatologicos}
-                                    onChange={setArquivosTanatologicos}
-                                />
-                                <VoiceInput
-                                    value={sinaisTanatologicos}
-                                    onChangeText={setSinaisTanatologicos}
-                                />
-
-                                <Text style={styles.titulos}>Descrição das lesões</Text>
-                                <FileUpload
-                                    value={arquivosLesoesCadaver}
-                                    onChange={setArquivosLesoesCadaver}
-                                />
-                                <VoiceInput
-                                    value={descricaoLesoesCadaver}
-                                    onChangeText={setDescricaoLesoesCadaver}
-                                />
-
-                                {vestigiosPerinecroscopia.map((vestigio, index) => (
-                                    <ResumoVestigio
-                                        key={index}
-                                        index={index}
-                                        vestigio={vestigio}
-                                        onVisualizar={() => handleVisualizarVestigio(vestigio)}
-                                        onRemover={() => {
-                                            const copia = [...vestigiosPerinecroscopia];
-                                            copia.splice(index, 1);
-                                            setVestigiosPerinecroscopia(copia);
-                                        }}
-                                    />
-                                ))}
-
                                 <AddButton
-                                    label="Adicionar vestígio"
-                                    onPress={() => {
-                                        setOrigemVestigio('perinecroscopia');
-                                        setModalVestigioVisible(true);
-                                    }}
+                                    label={mostrarPerinecroscopia ? 'Ocultar Perinecroscopia' : 'Adicionar Perinecroscopia'}
+                                    icon={mostrarPerinecroscopia ? 'minus' : 'plus'}
+                                    onPress={() => setMostrarPerinecroscopia(prev => !prev)}
                                 />
+
+
+                                {mostrarPerinecroscopia && (
+                                    <>
+
+                                        <PrimarySelect
+                                            label="Sexo"
+                                            selected={cadaverSexo}
+                                            onSelect={setCadaverSexo}
+                                            placeholder="Selecione"
+                                            options={['Masculino', 'Feminino']}
+                                        />
+
+                                        <PrimarySelect
+                                            label="Cor da pele"
+                                            selected={cadaverCorPele}
+                                            onSelect={setCadaverCorPele}
+                                            placeholder="Selecione"
+                                            options={['Branco', 'Preto', 'Pardo', 'Amarelo', 'Roxo']}
+                                        />
+
+                                        <PrimaryInput
+                                            label="Características do Cabelo"
+                                            placeholder="Informe"
+                                            value={cadaverCabelo}
+                                            onChangeText={setCadaverCabelo}
+                                        />
+
+                                        <PrimaryInput
+                                            label="Sinais identificadores (tatuagem)"
+                                            placeholder="Informe"
+                                            value={cadaverSinaisIdentificadores}
+                                            onChangeText={setCadaverSinaisIdentificadores}
+                                        />
+
+                                        <PrimaryInput
+                                            label="Descrição das vestes e pertences pessoais"
+                                            placeholder="Informe"
+                                            value={cadaverDescricaoVestes}
+                                            onChangeText={setCadaverDescricaoVestes}
+                                        />
+
+                                        <PrimaryInput
+                                            label="Outro"
+                                            placeholder="Informe"
+                                            value={cadaverOutro}
+                                            onChangeText={setCadaverOutro}
+                                        />
+
+                                        <Text style={styles.titulos}>Análise da disposição do Cadáver</Text>
+                                        <FileUpload
+                                            value={arquivosDisposicaoCadaver}
+                                            onChange={setArquivosDisposicaoCadaver}
+                                        />
+                                        <VoiceInput
+                                            value={analiseDisposicaoCadaver}
+                                            onChangeText={setAnaliseDisposicaoCadaver}
+                                        />
+
+                                        <Text style={styles.titulos}>Descrição dos sinais tanatológicos</Text>
+                                        <FileUpload
+                                            value={arquivosTanatologicos}
+                                            onChange={setArquivosTanatologicos}
+                                        />
+                                        <VoiceInput
+                                            value={sinaisTanatologicos}
+                                            onChangeText={setSinaisTanatologicos}
+                                        />
+
+                                        <Text style={styles.titulos}>Descrição das lesões</Text>
+                                        <FileUpload
+                                            value={arquivosLesoesCadaver}
+                                            onChange={setArquivosLesoesCadaver}
+                                        />
+                                        <VoiceInput
+                                            value={descricaoLesoesCadaver}
+                                            onChangeText={setDescricaoLesoesCadaver}
+                                        />
+
+                                        {vestigiosPerinecroscopia.map((vestigio, index) => (
+                                            <ResumoVestigio
+                                                key={index}
+                                                index={index}
+                                                vestigio={vestigio}
+                                                onVisualizar={() => handleVisualizarVestigio(vestigio)}
+                                                onRemover={() => {
+                                                    const copia = [...vestigiosPerinecroscopia];
+                                                    copia.splice(index, 1);
+                                                    setVestigiosPerinecroscopia(copia);
+                                                }}
+                                            />
+                                        ))}
+
+                                        <AddButton
+                                            label="Adicionar vestígio"
+                                            onPress={() => {
+                                                setOrigemVestigio('perinecroscopia');
+                                                setModalVestigioVisible(true);
+                                            }}
+                                        />
+                                    </>
+                                )}
+
                             </View>
 
 
@@ -1347,7 +1360,7 @@ export default function ForensicSection() {
                                         onBackButtonPress={() => setModalVestigioVisible(false)}
                                         animationIn="slideInUp"
                                         animationOut="slideOutDown"
-                                        style={{ margin: 0, justifyContent: 'flex-end' }}
+                                        style={{ margin: 0, justifyContent: 'flex-end', backgroundColor: '#fff' }}
                                     >
                                         <ScrollView style={{ padding: 16, backgroundColor: '#fff' }}>
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -1523,7 +1536,7 @@ export default function ForensicSection() {
                                             </View>
                                         </ScrollView>
 
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 24 }}>
+                                        <View style={styles.modalVestigio}>
                                             <TouchableOpacity
                                                 style={{
                                                     paddingVertical: 12,
@@ -1554,7 +1567,7 @@ export default function ForensicSection() {
                 </View>
             </PrimaryList>
 
-            <View style={{ width: '100%', gap: 10 }}>
+            <View style={{ width: '100%', gap: 10, bottom: 0, }}>
                 <MainButton title="Finalizar" onPress={handleSave} />
                 <MainButton title="Cancelar" type="secondary" />
             </View>
@@ -1639,7 +1652,13 @@ const styles = StyleSheet.create({
     sectionSpacing: {
         marginBottom: 16,
     },
-    campos: {
+    modalVestigio: {
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        marginTop: 24,
+        backgroundColor: '#fff',
+        paddingHorizontal: 16,
+        paddingVertical: 5
 
     }
 

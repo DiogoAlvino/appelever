@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import FeedbackModal from '~/components/modal/feedbackModal';
 import { router, useLocalSearchParams } from 'expo-router';
 import { UploadModel } from '~/models/uploadModel';
+import AlertMessage from '~/components/messages/alertMessage';
 
 export default function EquipmentRegistration() {
   const {
@@ -106,6 +107,11 @@ export default function EquipmentRegistration() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <AlertMessage
+        type="info"
+        message="Os campos de CNPJ exigem um número válido e existente."
+      />
+
       <PrimarySection title="Local de Instalação">
         <PrimaryInput label="Edificação" value={local.edificacao} onChangeText={(text) => { setLocal({ ...local, edificacao: text }); clearFieldError('edificacao'); }} placeholder="Informe" error={!!errors.edificacao} errorMessage={errors.edificacao} />
         <PrimaryInput label="CEP" value={local.cep} onChangeText={(text) => { setLocal({ ...local, cep: text }); clearFieldError('cep'); }} placeholder="Informe" error={!!errors.cep} errorMessage={errors.cep} mask="99999-999" />

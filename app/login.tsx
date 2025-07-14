@@ -10,8 +10,12 @@ import { auth } from "~/utils/firebase";
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
 
     const handleLogin = () => {
+        setLoading(true);
+
         signInWithEmailAndPassword(auth, email, password)
             .then(userCredential => {
                 console.log("Usuário logado:", userCredential.user);
@@ -20,6 +24,8 @@ export default function Login() {
             .catch(error => {
                 console.error("Erro ao logar:", error.message);
                 Alert.alert("Erro ao logar", error.message);
+            }).finally(() => {
+                setLoading(false);
             });
     };
 
@@ -50,7 +56,7 @@ export default function Login() {
                     <Link href="/signUp" style={styles.linkText}>Cadastre-se aqui!</Link>
                 </View>
                 <View style={styles.buttons}>
-                    <MainButton title="Acessar" type="primary" onPress={handleLogin} />
+                    <MainButton title="Acessar" type="primary" onPress={handleLogin} loading={loading}/>
                 </View>
             </View>
         </ScrollView>

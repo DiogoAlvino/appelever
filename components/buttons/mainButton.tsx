@@ -1,13 +1,14 @@
-import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, GestureResponderEvent } from 'react-native';
 import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
 
 interface MainButtonProps {
   title: string;
   onPress?: (event: GestureResponderEvent) => void;
   type?: 'primary' | 'secondary';
+  loading?: boolean;
 }
 
-export default function MainButton({ title, onPress, type = 'primary' }: MainButtonProps) {
+export default function MainButton({ title, onPress, type = 'primary', loading = false }: MainButtonProps) {
   const isSecondary = type === 'secondary';
 
   return (
@@ -17,11 +18,16 @@ export default function MainButton({ title, onPress, type = 'primary' }: MainBut
         isSecondary && styles.secondaryButton,
       ]}
       onPress={onPress}
+      disabled={loading}
       activeOpacity={0.8}
     >
-      <Text style={[styles.text, isSecondary && styles.secondaryText]}>
-        {title}
-      </Text>
+      {loading ? (
+        <ActivityIndicator color={isSecondary ? colors.mainColor : colors.primaryLight} />
+      ) : (
+        <Text style={[styles.text, isSecondary && styles.secondaryText]}>
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 }

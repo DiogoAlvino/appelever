@@ -75,11 +75,15 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
         }}
       >
         <Text style={{
-          color: preenchido ? '#28a745' : '#0066cc',
-          fontWeight: '600'
+          color: preenchido ? '#173A64' : '#0066cc',
+          fontWeight: '600',
+          fontSize: 16,
         }}>
-          {preenchido ? `${title} preenchido ✅` : buttonLabel}
-        </Text>
+          {preenchido ? `${title} preenchido `  : buttonLabel}
+          {preenchido && (
+            <Feather name="check-circle" size={20} color="#173A64" />
+          )}
+        </Text> 
       </TouchableOpacity>
 
       <Modal
@@ -129,8 +133,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#fff',
     padding: 16,
-    borderTopLeftRadius: 12,
-    borderBottomLeftRadius: 12,
+    borderRadius: 12, 
   },
   header: {
     flexDirection: 'row',

@@ -35,7 +35,6 @@ export default function Equipments() {
       <ScrollView contentContainerStyle={styles.container}>
         <SearchInput onSearch={reload} />
         <View style={styles.bar}>
-          <Text>Filtro</Text>
           <Text>Total: {equipments.length}</Text>
         </View>
         <EquipmentList

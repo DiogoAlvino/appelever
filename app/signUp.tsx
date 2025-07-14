@@ -12,6 +12,7 @@ export default function SignUp() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSignUp = () => {
         if (password !== confirmPassword) {
@@ -20,19 +21,21 @@ export default function SignUp() {
         }
 
         createUserWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-            const user = userCredential.user;
+            .then(async (userCredential) => {
+                const user = userCredential.user;
 
-            await updateProfile(user, {
-                displayName: name
+                await updateProfile(user, {
+                    displayName: name
+                });
+
+                router.push("/");
+            })
+            .catch(error => {
+                console.error("Erro ao criar usuário:", error.message);
+                Alert.alert("Erro", error.message);
+            }).finally(() => {
+                setLoading(false);
             });
-
-            router.push("/");
-        })
-        .catch(error => {
-            console.error("Erro ao criar usuário:", error.message);
-            Alert.alert("Erro", error.message);
-        });
     };
 
     return (
@@ -49,7 +52,7 @@ export default function SignUp() {
                 <PrimaryInput label="Confirme sua senha" placeholder="Confirme sua senha" type="password" value={confirmPassword} onChangeText={setConfirmPassword} />
 
                 <View style={styles.buttons}>
-                    <MainButton title="Cadastrar" type="primary" onPress={handleSignUp} />
+                    <MainButton title="Cadastrar" type="primary" onPress={handleSignUp} loading={loading} />
                     <MainButton title="Cancelar" type="secondary" onPress={() => router.push("/login")} />
                 </View>
             </View>

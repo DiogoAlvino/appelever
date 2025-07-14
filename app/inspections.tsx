@@ -33,7 +33,6 @@ export default function Inspections() {
       <ScrollView contentContainerStyle={styles.container}>
         <SearchInput onSearch={() => fetchInspections(user?.email || '')} />
         <View style={styles.bar}>
-          <Text>Filtro</Text>
           <Text>Total: {inspections.length}</Text>
         </View>
 
