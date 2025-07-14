@@ -4,14 +4,25 @@ import Modal from 'react-native-modal';
 import { Feather } from '@expo/vector-icons';
 import VoiceInput from '../inputs/voiceInput';
 import FileUpload from '../inputs/fileUpload';
-import { CampoChecklist, FileItem } from '~/types/forensicTypes';
+
+interface Campo {
+  id: number;
+  titulo: string;
+}
+
+interface FileItem {
+  name: string;
+  uri: string;
+  type: 'image' | 'file' | 'photo';
+  size: number;
+}
 
 interface Props {
   title: string;
   buttonLabel: string;
-  campos: CampoChecklist[];
-  valor: CampoChecklist[];
-  onChange: (valores: CampoChecklist[]) => void;
+  campos: Campo[];
+  valor: { [id: number]: { texto: string; arquivos: FileItem[] } };
+  onChange: (valores: { [id: number]: { texto: string; arquivos: FileItem[] } }) => void;
 }
 
 export default function FormDrawer({ title, buttonLabel, campos, valor, onChange }: Props) {
@@ -22,24 +33,33 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
     verificarSePreenchido(valor);
   }, [valor]);
 
-  const verificarSePreenchido = (valores: CampoChecklist[]) => {
-    const algumPreenchido = valores.some(campo =>
-      campo.observacao?.trim() || (campo.arquivos?.length ?? 0) > 0
-    );
+  const verificarSePreenchido = (valores: { [id: number]: { texto: string; arquivos: FileItem[] } }) => {
+    const algumPreenchido = campos.some(campo => {
+      const entrada = valores[campo.id];
+      return !!entrada?.texto?.trim() || (entrada?.arquivos?.length ?? 0) > 0;
+    });
     setPreenchido(algumPreenchido);
   };
 
   const atualizarTexto = (id: number, texto: string) => {
-    const atualizados = valor.map(campo =>
-      campo.id === id ? { ...campo, observacao: texto } : campo
-    );
+    const atualizados = {
+      ...valor,
+      [id]: {
+        ...(valor[id] || { arquivos: [] }),
+        texto,
+      },
+    };
     onChange(atualizados);
   };
 
   const atualizarArquivos = (id: number, arquivos: FileItem[]) => {
-    const atualizados = valor.map(campo =>
-      campo.id === id ? { ...campo, arquivos } : campo
-    );
+    const atualizados = {
+      ...valor,
+      [id]: {
+        ...(valor[id] || { texto: '' }),
+        arquivos,
+      },
+    };
     onChange(atualizados);
   };
 
@@ -54,12 +74,10 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
           gap: 10,
         }}
       >
-        <Text
-          style={{
-            color: preenchido ? '#28a745' : '#0066cc',
-            fontWeight: '600',
-          }}
-        >
+        <Text style={{
+          color: preenchido ? '#28a745' : '#0066cc',
+          fontWeight: '600'
+        }}>
           {preenchido ? `${title} preenchido ✅` : buttonLabel}
         </Text>
       </TouchableOpacity>
@@ -80,15 +98,15 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
           </View>
 
           <ScrollView contentContainerStyle={styles.content}>
-            {valor.map((campo) => (
+            {campos.map((campo) => (
               <View key={campo.id} style={{ marginBottom: 20, gap: 10 }}>
                 <Text style={styles.label}>{campo.titulo}</Text>
                 <VoiceInput
-                  value={campo.observacao || ''}
+                  value={valor[campo.id]?.texto || ''}
                   onChangeText={(texto) => atualizarTexto(campo.id, texto)}
                 />
                 <FileUpload
-                  value={campo.arquivos || []}
+                  value={valor[campo.id]?.arquivos || []}
                   onChange={(arquivos) => atualizarArquivos(campo.id, arquivos)}
                 />
               </View>

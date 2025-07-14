@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileItem, VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR, VestigioCompleto } from '~/types/forensicTypes';
+import { FileItem, VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR } from '~/types/forensicTypes';
 
 export const useForensic = () => {
     const [dadosIniciais, setDadosIniciais] = useState({
@@ -124,7 +124,7 @@ export const useForensic = () => {
     const [arquivosTanatologicos, setArquivosTanatologicos] = useState<FileItem[]>([]);
     const [descricaoLesoesCadaver, setDescricaoLesoesCadaver] = useState('');
     const [arquivosLesoesCadaver, setArquivosLesoesCadaver] = useState<FileItem[]>([]);
-    const [vestigiosPerinecroscopia, setVestigiosPerinecroscopia] = useState<VestigioCompleto[]>([]);
+    const [vestigiosPerinecroscopia, setVestigiosPerinecroscopia] = useState<VestigioResumo[]>([]);
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
