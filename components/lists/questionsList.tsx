@@ -91,7 +91,7 @@ export default function QuestionsList({
             description={q.verification}
             selectedOption={respostas[q.id] || null}
             onSelect={(value) => onResponder(q.id, respostas[q.id] === value ? null : value)}
-            onUploadSuccess={(uploads) => onUploadImage(q.id, uploads)}
+            onUploadSuccess={(upload) => onUploadImage(q.id, [...(imagens[q.id] || []), upload])}
             uploads={imagens[q.id] || []}
           />
         );

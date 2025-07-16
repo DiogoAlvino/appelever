@@ -11,7 +11,7 @@ interface PrimaryQuestionProps {
   description: string;
   selectedOption: 'sim' | 'nao' | 'na' | null;
   onSelect: (value: 'sim' | 'nao' | 'na') => void;
-  onUploadSuccess: (uploads: UploadModel[]) => void;
+  onUploadSuccess: (upload: UploadModel) => void;
   uploads: UploadModel[];
   questionId: string;
 }
