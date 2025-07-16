@@ -29,9 +29,6 @@ export async function generatePDFWithHTML(
       });
     }
 
-
-    console.log('Tipo dataInstalacao:', typeof rawData, rawData);
-
     const respostas = Object.values(inspection.answers);
     const quantidadeRespostas = Object.values(inspection.answers).length;
     const totalNao = respostas.filter(r => r.answer === 'nao').length;

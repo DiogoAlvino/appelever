@@ -25,6 +25,35 @@ export default function InspectionList({ inspections, selectedId, onSelect, onEr
     });
   };
 
+  function formatarData(rawData: any): string {
+    if (rawData instanceof Date) {
+      return rawData.toLocaleDateString('pt-BR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    } else if (typeof rawData === 'object' && rawData?.seconds) {
+      const parsed = new Date(rawData.seconds * 1000);
+      return parsed.toLocaleDateString('pt-BR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    } else if (typeof rawData === 'string' || typeof rawData === 'number') {
+      const parsed = new Date(rawData);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toLocaleDateString('pt-BR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        });
+      }
+    }
+
+    return 'Data inválida';
+  }
+
+
   return (
     <View style={styles.wrapper}>
       {inspections.map((inspection) => {
@@ -40,8 +69,9 @@ export default function InspectionList({ inspections, selectedId, onSelect, onEr
               Responsável: {inspection.usuario}
             </Text>
             <Text style={{ color: colors.primaryDark }}>
-              Data: {new Date(inspection.dataCriacao).toLocaleDateString('pt-BR')}
+              Data: {formatarData(inspection.dataCriacao)}
             </Text>
+
             <Text style={{ color: colors.primaryDark }}>
               Itens respondidos: {Object.keys(inspection.answers || {}).length}
             </Text>
