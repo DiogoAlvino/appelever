@@ -19,6 +19,35 @@ export default function EquipmentForm() {
   const [feedbackType, setFeedbackType] = useState<'confirm' | 'loading' | 'success' | 'error'>('confirm');
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
+  function formatarData(rawData: any): string {
+    if (rawData instanceof Date) {
+      return rawData.toLocaleDateString('pt-BR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    } else if (typeof rawData === 'object' && rawData?.seconds) {
+      const parsed = new Date(rawData.seconds * 1000);
+      return parsed.toLocaleDateString('pt-BR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    } else if (typeof rawData === 'string' || typeof rawData === 'number') {
+      const parsed = new Date(rawData);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toLocaleDateString('pt-BR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        });
+      }
+    }
+
+    return 'Data inválida';
+  }
+
+
   const handleDelete = () => {
     setFeedbackType('confirm');
     setFeedbackMessage('Deseja realmente excluir este equipamento?');
@@ -104,9 +133,8 @@ export default function EquipmentForm() {
           showChevron={false}
         >
           <Text style={styles.text}>
-            {new Date(equipment.detalhes_equipamento.dataInstalacao).toLocaleDateString('pt-BR')}
+            Instalação: {formatarData(equipment.detalhes_equipamento.dataInstalacao)}
           </Text>
-          <Text style={styles.text}>ID: {equipment.id}</Text>
           <Text style={styles.text}>Fabricante: {equipment.detalhes_equipamento.fabricante}</Text>
           <Text style={styles.text}>CNPJ: {equipment.detalhes_equipamento.cnpj}</Text>
           <Text style={styles.text}>Modelo: {equipment.detalhes_equipamento.modelo}</Text>
