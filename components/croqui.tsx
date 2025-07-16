@@ -19,7 +19,7 @@ export default function CroquiModal() {
 
   return (
     <View style={styles.container}>
-      <Button title="Abrir Croqui" onPress={() => setVisible(true)} />
+      <Button title="Abrir Croqui" onPress={() => setVisible(true)} color="#173A64"/>
 
       {signatureImage && (
         <View style={styles.previewContainer}>

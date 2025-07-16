@@ -38,7 +38,7 @@ export default function Equipments() {
           <Text>Total: {equipments.length}</Text>
         </View>
         <EquipmentList
-          equipaments={equipments}
+          equipments={equipments}
           selectedId={selectedId}
           onSelect={(id) => setSelectedId((prev) => (prev === id ? null : id))}
         />
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     gap: 15,
     paddingHorizontal: 10,
     paddingTop: 10,
-    paddingBottom: 100, // espaço para não esconder conteúdo atrás do botão
+    paddingBottom: 100, 
   },
   bar: {
     flexDirection: 'row',

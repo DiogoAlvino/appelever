@@ -76,7 +76,6 @@ export async function generatePDFWithHTML(
       <div class="section">
         <h2>Dados do Equipamento</h2>
         <p><span class="label">Identificação:</span> ${equipment?.detalhes_equipamento?.identificacaoEquipamento || 'N/A'}</p>
-        <p><span class="label">ID:</span> ${equipment?.id}</p>
         <p><span class="label">Local:</span> ${equipment?.local?.edificacao || 'N/A'}</p>
         <p><span class="label">Endereço:</span> ${equipment?.local?.logradouro}, ${equipment?.local?.numero} - ${equipment?.local?.bairro}</p>
         <p><span class="label">Responsável Técnico:</span> ${equipment?.responsavel?.nome} - ${equipment?.responsavel?.funcao}</p>
@@ -98,7 +97,7 @@ export async function generatePDFWithHTML(
       `).join('')}
 
       <div class="section">
-        <h2>Dados da Inspeção</h2>
+        <h2>Responsável pela inspeção</h2>
         <p><span class="label">Responsável:</span> ${inspection?.usuario}</p>
         <p><span class="label">Data:</span> ${new Date(inspection?.dataCriacao).toLocaleDateString('pt-BR')}</p>
       </div>

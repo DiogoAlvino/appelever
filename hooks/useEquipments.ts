@@ -6,6 +6,7 @@ interface EquipmentItem {
   id: string;
   name: string;
   address: string;
+  modelo: string;
 }
 
 export const useEquipments = () => {
@@ -21,6 +22,7 @@ export const useEquipments = () => {
         id: item.id || '',
         name: item.detalhes_equipamento.identificacaoEquipamento || 'Sem nome',
         address: `${item.local.logradouro}, ${item.local.numero} - ${item.local.bairro}`,
+        modelo: item.detalhes_equipamento.modelo || 'Sem modelo',
       }));
       setEquipments(formatted);
       setError(null);

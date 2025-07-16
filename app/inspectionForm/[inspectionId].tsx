@@ -89,7 +89,7 @@ export default function InspectionForm() {
         >
           {selectedEquipment ? (
             <>
-              <Text style={styles.text}>{selectedEquipment.id}</Text>
+              <Text style={styles.text}>{selectedEquipment.detalhes_equipamento.modelo}</Text>
               <Text style={styles.text}>{selectedEquipment.local?.edificacao}</Text>
             </>
           ) : (

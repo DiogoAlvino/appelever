@@ -94,7 +94,7 @@ export default function EquipmentPage() {
         title={`${selectedEquipment.detalhes_equipamento?.identificacaoEquipamento}`}
         onPress={() => handleViewEquipment(equipmentId)}
       >
-        <Text style={styles.text}>{selectedEquipment.id}</Text>
+        <Text style={styles.text}>{selectedEquipment.detalhes_equipamento.modelo}</Text>
         <Text style={styles.text}>{selectedEquipment.local?.edificacao}</Text>
       </SecondarySection>
 
