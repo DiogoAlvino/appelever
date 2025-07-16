@@ -10,6 +10,47 @@ export async function generatePDFWithHTML(
   try {
     const dataHoraAtual = new Date().toLocaleString('pt-BR');
 
+    const rawData = equipment?.detalhes_equipamento?.dataInstalacao as any;
+
+    let dataInstalacaoEquipamento = 'N/A';
+
+    if (rawData instanceof Date) {
+      dataInstalacaoEquipamento = rawData.toLocaleDateString('pt-BR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    } else if (rawData?.seconds) {
+      const parsed = new Date(rawData.seconds * 1000);
+      dataInstalacaoEquipamento = parsed.toLocaleDateString('pt-BR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    }
+
+
+    console.log('Tipo dataInstalacao:', typeof rawData, rawData);
+
+    const respostas = Object.values(inspection.answers);
+    const quantidadeRespostas = Object.values(inspection.answers).length;
+    const totalNao = respostas.filter(r => r.answer === 'nao').length;
+
+    const prioridadeDosNConformes = respostas
+      .filter(r => r.answer === 'nao' && r.priority)
+      .map(r => r.priority?.toLowerCase());
+
+    let criticidade = 'Não aplicável';
+
+    if (prioridadeDosNConformes.includes('alto')) {
+      criticidade = "Alto";
+    } else if (prioridadeDosNConformes.includes('médio') || prioridadeDosNConformes.includes('medio')) {
+      criticidade = "Médio";
+    } else if (prioridadeDosNConformes.includes("baixo")) {
+      criticidade = "Baixo";
+    }
+
+
     const htmlContent = `
     <html>
     <head>
@@ -80,7 +121,7 @@ export async function generatePDFWithHTML(
         <p><span class="label">Endereço:</span> ${equipment?.local?.logradouro}, ${equipment?.local?.numero} - ${equipment?.local?.bairro}</p>
         <p><span class="label">Responsável Técnico:</span> ${equipment?.responsavel?.nome} - ${equipment?.responsavel?.funcao}</p>
         <p><span class="label">Contato:</span> ${equipment?.responsavel?.telefone} - ${equipment?.responsavel?.email}</p>
-        <p><span class="label">Data de Instalação:</span> ${new Date(equipment?.detalhes_equipamento?.dataInstalacao).toLocaleDateString('pt-BR')}</p>
+        <p><span class="label">Data de Instalação:</span> ${dataInstalacaoEquipamento}</p>
         <p><span class="label">Fabricante:</span> ${equipment?.detalhes_equipamento?.fabricante}</p>
         <p><span class="label">CNPJ:</span> ${equipment?.detalhes_equipamento?.cnpj}</p>
         <p><span class="label">Modelo:</span> ${equipment?.detalhes_equipamento?.modelo}</p>
@@ -103,6 +144,14 @@ export async function generatePDFWithHTML(
       </div>
 
       <div class="section">
+        <h2>Resumo da Verificação</h2>
+        <p><span class="label">Itens verificados:</span> ${quantidadeRespostas}</p>
+        <p><span class="label">Itens não conformes:</span> ${totalNao}</p>
+        <p><span class="label">Criticidade:</span> ${criticidade}</p>
+      </div>
+
+
+      <div class="section">
         <h2>Itens Verificados</h2>
         ${Object.entries(inspection.answers).map(([id, q]) => `
           <div class="item">
@@ -115,22 +164,22 @@ export async function generatePDFWithHTML(
       </div>
 
       ${Object.entries(inspection.answers).flatMap(([id, q]) =>
-        Array.isArray(q.uploads) && q.uploads.length > 0
-          ? q.uploads
-              .filter(file => !!file.arquivo && typeof file.arquivo === 'string')
-              .map(file => `
+      Array.isArray(q.uploads) && q.uploads.length > 0
+        ? q.uploads
+          .filter(file => !!file.arquivo && typeof file.arquivo === 'string')
+          .map(file => `
                 <h2 style="page-break-before: always;">Imagem do Item ${id}: ${file.nome}</h2>
                 <img src="${file.arquivo}" class="full-image" />
               `)
-          : []
-      ).join('')}
+        : []
+    ).join('')}
 
       <div class="section">
         <h2>Implementações Necessárias</h2>
         ${Object.values(inspection.answers).filter(q => q.answer === 'nao').length > 0
-          ? Object.entries(inspection.answers)
-              .filter(([, q]) => q.answer === 'nao')
-              .map(([id, q]) => `
+        ? Object.entries(inspection.answers)
+          .filter(([, q]) => q.answer === 'nao')
+          .map(([id, q]) => `
                 <div class="item">
                   <p><span class="label">Item:</span> ${id}</p>
                   <p><span class="label">Norma:</span> ${q.normaID}</p>
@@ -138,7 +187,7 @@ export async function generatePDFWithHTML(
                   <p><span class="label">Necessidade:</span> ${q.limit}</p>
                 </div>
               `).join('')
-          : `<p>Nenhuma implementação necessária.</p>`}
+        : `<p>Nenhuma implementação necessária.</p>`}
       </div>
 
       <div class="footer">
