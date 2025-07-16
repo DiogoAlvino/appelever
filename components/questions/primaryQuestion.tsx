@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, fontSize, border } from '~/theme';
 import FileUpload from '../inputs/fileUpload';
 import { UploadModel } from '~/models/uploadModel';
+import PrimaryInput from '../inputs/primaryInput';
+import { useState } from 'react';
 
 interface PrimaryQuestionProps {
   title: React.ReactNode;
@@ -29,6 +31,8 @@ export default function PrimaryQuestion({
     </TouchableOpacity>
   );
 
+  const [observacao, setObservacao] = useState('');
+
   return (
     <View style={styles.card}>
       <Text style={styles.itemTitle}>{title}</Text>
@@ -41,6 +45,7 @@ export default function PrimaryQuestion({
 
       {selectedOption && (
         <>
+        <View>
           <FileUpload onUploadSuccess={onUploadSuccess} />
           {uploads.length > 0 && (
             <View style={styles.uploadedList}>
@@ -52,6 +57,16 @@ export default function PrimaryQuestion({
               ))}
             </View>
           )}
+          <View style={{paddingTop: 15}}>
+              <PrimaryInput
+                label="Observação (opcional)"
+                value={observacao}
+                onChangeText={setObservacao}
+                placeholder='Digite uma observação'
+              />
+          </View>
+          
+        </View>
         </>
       )}
     </View>
