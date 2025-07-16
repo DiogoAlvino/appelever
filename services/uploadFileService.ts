@@ -17,5 +17,6 @@ export const uploadFileToStorage = async (file: File | Blob, fileName: string, e
     url,
     path: storagePath,
     uploadedAt: new Date(),
+    arquivo: url,
   };
 };
