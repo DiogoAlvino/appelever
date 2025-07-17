@@ -5,6 +5,7 @@ import { useCameraPermissions } from 'expo-camera';
 import { Feather } from '@expo/vector-icons';
 import { UploadWithMeta } from '~/models/uploadModel';
 import { colors } from '~/theme';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 interface Props {
   onChange?: (files: UploadWithMeta[]) => void;
@@ -13,6 +14,20 @@ interface Props {
 export default function FileUpload({ onChange }: Props) {
   const [uploads, setUploads] = useState<UploadWithMeta[]>([]);
   const [permission, requestPermission] = useCameraPermissions();
+
+  async function compressImage(uri: string, maxWidth = 800, quality = 0.5) {
+    const manipResult = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: maxWidth } }],
+      { compress: quality, format: ImageManipulator.SaveFormat.JPEG, base64: true }
+    );
+
+    return {
+      base64: manipResult.base64,
+      uri: manipResult.uri,
+      size: manipResult.uri ? (await fetch(manipResult.uri).then(res => res.blob())).size : 0,
+    };
+  }
 
   const handleAddUpload = async (source: 'camera' | 'gallery') => {
     if (source === 'camera') {
@@ -33,31 +48,27 @@ export default function FileUpload({ onChange }: Props) {
 
     const result = await picker({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.3,
-      base64: true,
+      quality: 1, // qualidade total aqui — compressão será feita depois
+      base64: false, // desnecessário agora
     });
-
-    console.log('Resultado picker:', result);
 
     if (!result.canceled && result.assets.length > 0) {
       const file = result.assets[0];
-      if (!file.base64) {
-        Alert.alert('Erro', 'Não foi possível converter a imagem.');
-        return;
-      }
+      const compressed = await compressImage(file.uri, 800, 0.4);
 
       const newUpload: UploadWithMeta = {
         id: Date.now().toString() + Math.random().toString(36).substring(2),
         nome: file.fileName || 'imagem.jpg',
-        arquivo: `data:image/jpeg;base64,${file.base64}`,
-        uri: file.uri,
-        size: file.fileSize ?? 0,
+        arquivo: `data:image/jpeg;base64,${compressed.base64}`,
+        uri: compressed.uri,
+        size: compressed.size,
       };
 
       const updated = [...uploads, newUpload];
       setUploads(updated);
       onChange?.(updated);
     }
+
   };
 
 

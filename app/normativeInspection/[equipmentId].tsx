@@ -11,6 +11,7 @@ import InspectionSection from "~/components/sections/inspectionSection";
 import { saveInspection } from '~/services/inspectionService';
 import FeedbackModal from "~/components/modal/feedbackModal";
 import { UploadModel, UploadWithMeta } from "~/models/uploadModel";
+import TabBar from "~/components/layout/tabBar";
 
 export default function EquipmentPage() {
   const { equipmentId } = useLocalSearchParams<{ equipmentId: string }>();
@@ -98,47 +99,57 @@ export default function EquipmentPage() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
-      <SecondarySection
-        icon={<Feather name="tag" size={20} color="#173A64" />}
-        title={`${selectedEquipment.detalhes_equipamento?.identificacaoEquipamento}`}
-        onPress={() => handleViewEquipment(equipmentId)}
-      >
-        <Text style={styles.text}>{selectedEquipment.detalhes_equipamento.modelo}</Text>
-        <Text style={styles.text}>{selectedEquipment.local?.edificacao}</Text>
-      </SecondarySection>
+    <>
+      <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+        <SecondarySection
+          icon={<Feather name="tag" size={20} color="#173A64" />}
+          title={`${selectedEquipment.detalhes_equipamento?.identificacaoEquipamento}`}
+          onPress={() => handleViewEquipment(equipmentId)}
+        >
+          <Text style={styles.text}>{selectedEquipment.detalhes_equipamento.modelo}</Text>
+          <Text style={styles.text}>{selectedEquipment.local?.edificacao}</Text>
+        </SecondarySection>
 
-      <AlertMessage
-        type="info"
-        message="Itens a serem verificados quanto à conformidade com a ABNT NBR 16858-1"
-      />
-      <AlertMessage
-        type="info"
-        message="Selecione pelos menos 1 item abaixo para finalizar a inspeção"
-      />
+        <AlertMessage
+          type="info"
+          message="Itens a serem verificados quanto à conformidade com a ABNT NBR 16858-1"
+        />
+        <AlertMessage
+          type="info"
+          message="Selecione pelos menos 1 item abaixo para finalizar a inspeção"
+        />
 
-      <InspectionSection
-        respostas={respostas}
-        onResponder={handleResponder}
-        onUploadImage={handleUploadImage}
-        onRemoveImage={handleRemoveImage}
-        imagens={imagens}
-      />
+        <InspectionSection
+          respostas={respostas}
+          onResponder={handleResponder}
+          onUploadImage={handleUploadImage}
+          onRemoveImage={handleRemoveImage}
+          imagens={imagens}
+        />
 
-      {Object.values(respostas).some(res => res !== null && res !== undefined) && (
-        <View style={{ width: '100%', gap: 10 }}>
-          <MainButton title="Finalizar" onPress={handleReport} />
-          <MainButton title="Cancelar" onPress={() => router.back()} type="secondary" />
-        </View>
-      )}
+        {Object.values(respostas).some(res => res !== null && res !== undefined) && (
+          <View style={{ width: '100%', gap: 10 }}>
+            <MainButton title="Finalizar" onPress={handleReport} />
+            <MainButton title="Cancelar" onPress={() => router.back()} type="secondary" />
+          </View>
+        )}
 
-      <FeedbackModal
-        visible={feedbackVisible}
-        type={feedbackType}
-        message={feedbackMessage}
-        onClose={() => setFeedbackVisible(false)}
+        <FeedbackModal
+          visible={feedbackVisible}
+          type={feedbackType}
+          message={feedbackMessage}
+          onClose={() => setFeedbackVisible(false)}
+        />
+      </ScrollView>
+      <TabBar
+        tabs={[
+          { icon: 'home', label: 'Inicio', route: '/' },
+          { icon: 'tool', label: 'Equipamentos', route: '/equipments' },
+          { icon: 'list', label: 'Inpeções', route: '/inspections' },
+        ]}
       />
-    </ScrollView>
+    </>
+    
   );
 }
 

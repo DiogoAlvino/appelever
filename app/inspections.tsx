@@ -6,6 +6,7 @@ import InspectionList from '~/components/lists/inspectionList';
 import { useInspections } from '~/hooks/useInspections';
 import FeedbackModal from '~/components/modal/feedbackModal';
 import { useAuth } from '~/hooks/useAuth';
+import TabBar from '~/components/layout/tabBar';
 
 export default function Inspections() {
   const { user } = useAuth();
@@ -46,6 +47,13 @@ export default function Inspections() {
           onSelect={() => {}}
         />
       </ScrollView>
+      <TabBar
+        tabs={[
+          { icon: 'home', label: 'Inicio', route: '/' },
+          { icon: 'plus-circle', label: 'Nova inspeção', route: '/equipments' },
+          { icon: 'tool', label: 'Cadastrar equipamento', route: '/equipmentRegistration' },
+        ]}
+      />
 
       <FeedbackModal
         visible={feedbackVisible}
@@ -53,6 +61,7 @@ export default function Inspections() {
         message={feedbackMessage}
         onClose={() => setFeedbackVisible(false)}
       />
+
     </View>
   );
 }
