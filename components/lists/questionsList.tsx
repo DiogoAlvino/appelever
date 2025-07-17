@@ -3,20 +3,23 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import PrimaryQuestion from '../questions/primaryQuestion';
 import PrimaryHelper from '../helpers/primaryHelper';
 import { Feather } from '@expo/vector-icons';
-import { UploadModel } from '~/models/uploadModel';
+import { UploadWithMeta } from '~/models/uploadModel';
 
-interface QuestionsListProps {
+export interface QuestionsListProps {
   questoes: {
     id: string;
     verification: string;
     priority: string;
     risk: string;
     mitigation: string;
+    normaID?: string;
+    limit?: string;
   }[];
   respostas: { [id: string]: 'sim' | 'nao' | 'na' | null };
   onResponder: (id: string, value: 'sim' | 'nao' | 'na' | null) => void;
-  onUploadImage: (questionId: string, uploads: UploadModel[]) => void;
-  imagens: { [questionId: string]: UploadModel[] };
+  onUploadImage: (questionId: string, uploads: UploadWithMeta[]) => void;
+  onRemoveImage: (questionId: string, uri: string) => void;
+  imagens: { [questionId: string]: UploadWithMeta[] };
 }
 
 const getPriorityColor = (priority: string) => {
@@ -38,8 +41,10 @@ export default function QuestionsList({
   respostas,
   onResponder,
   onUploadImage,
+  onRemoveImage,
   imagens,
 }: QuestionsListProps) {
+  const [observacoes, setObservacoes] = useState<{ [id: string]: string }>({});
   const [helperVisible, setHelperVisible] = useState(false);
   const [helperContent, setHelperContent] = useState<{
     title: string;
@@ -91,8 +96,16 @@ export default function QuestionsList({
             description={q.verification}
             selectedOption={respostas[q.id] || null}
             onSelect={(value) => onResponder(q.id, respostas[q.id] === value ? null : value)}
-            onUploadSuccess={(upload) => onUploadImage(q.id, [...(imagens[q.id] || []), upload])}
+            onUploadSuccess={(uploads) => onUploadImage(q.id, uploads)}
+            onRemoveImage={onRemoveImage}
             uploads={imagens[q.id] || []}
+            observation={observacoes[q.id] || ''}
+            onObservationChange={(id, text) => {
+              setObservacoes(prev => ({
+                ...prev,
+                [id]: text,
+              }));
+            }}
           />
         );
       })}

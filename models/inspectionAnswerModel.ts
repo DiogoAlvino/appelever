@@ -1,5 +1,5 @@
-// models/inspectionAnswerModel.ts
-import { UploadModel } from './uploadModel';
+import { UploadWithMeta } from './uploadModel';
+
 
 export interface InspectionAnswerModel {
   answer: 'sim' | 'nao' | 'na';
@@ -9,5 +9,5 @@ export interface InspectionAnswerModel {
   verification: string;
   normaID?: string;
   limit?: string;
-  uploads?: UploadModel[];
+  uploads?: UploadWithMeta[];
 }

@@ -3,13 +3,13 @@ import { addDoc, collection } from 'firebase/firestore';
 import { InspectionModel } from '~/models/inspectionModel';
 import { questions } from '~/data/questions';
 import { InspectionAnswerModel } from '~/models/inspectionAnswerModel';
-import { UploadModel } from '~/models/uploadModel';
+import { UploadWithMeta } from '~/models/uploadModel';
 
 export async function saveInspection(
   equipmentId: string,
   respostasUsuario: { [id: string]: 'sim' | 'nao' | 'na' | null },
   usuario: string,
-  imagens: { [questionId: string]: UploadModel[] }
+  imagens: { [questionId: string]: UploadWithMeta[] }
 ) {
   const answers: { [id: string]: InspectionAnswerModel } = {};
 

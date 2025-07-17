@@ -1,19 +1,22 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { colors, fontSize, border } from '~/theme';
 import FileUpload from '../inputs/fileUpload';
-import { UploadModel } from '~/models/uploadModel';
+import { UploadWithMeta } from '~/models/uploadModel';
 import PrimaryInput from '../inputs/primaryInput';
-import { useState } from 'react';
+import { Feather } from '@expo/vector-icons';
 
 interface PrimaryQuestionProps {
   title: React.ReactNode;
   description: string;
   selectedOption: 'sim' | 'nao' | 'na' | null;
   onSelect: (value: 'sim' | 'nao' | 'na') => void;
-  onUploadSuccess: (upload: UploadModel) => void;
-  uploads: UploadModel[];
+  onUploadSuccess: (uploads: UploadWithMeta[]) => void;
+  onRemoveImage?: (questionId: string, uri: string) => void;
+  uploads: UploadWithMeta[];
+  onObservationChange: (questionId: string, text: string) => void;
   questionId: string;
+  observation?: string;
 }
 
 export default function PrimaryQuestion({
@@ -22,8 +25,19 @@ export default function PrimaryQuestion({
   selectedOption,
   onSelect,
   onUploadSuccess,
+  onRemoveImage,
+  onObservationChange,
   uploads,
+  questionId,
+  observation = '',
 }: PrimaryQuestionProps) {
+  const [localObservation, setLocalObservation] = useState(observation);
+
+  const handleObservationChange = (text: string) => {
+    setLocalObservation(text);
+    onObservationChange(questionId, text);
+  };
+
   const Option = ({ label, value }: { label: string; value: 'sim' | 'nao' | 'na' }) => (
     <TouchableOpacity style={styles.option} onPress={() => onSelect(value)}>
       <View style={[styles.circle, selectedOption === value && styles.circleSelected]} />
@@ -31,12 +45,11 @@ export default function PrimaryQuestion({
     </TouchableOpacity>
   );
 
-  const [observacao, setObservacao] = useState('');
-
   return (
     <View style={styles.card}>
       <Text style={styles.itemTitle}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
+
       <View style={styles.optionsContainer}>
         <Option label="Sim" value="sim" />
         <Option label="Não" value="nao" />
@@ -45,28 +58,45 @@ export default function PrimaryQuestion({
 
       {selectedOption && (
         <>
-        <View>
-          <FileUpload onUploadSuccess={onUploadSuccess} />
+          <FileUpload onUploadSuccess={(newUploads) => onUploadSuccess(newUploads)} />
+
           {uploads.length > 0 && (
             <View style={styles.uploadedList}>
               <Text style={styles.uploadedTitle}>Imagens enviadas:</Text>
               {uploads.map((file, index) => (
-                <Text key={`${file.nome}-${index}`} style={styles.uploadedItem}>
-                  {file.nome}
-                </Text>
+                <View key={`${file.uri}-${index}`} style={styles.fileItem}>
+                  <Image source={{ uri: file.uri }} style={styles.thumbnail} />
+                  <View style={styles.fileDetails}>
+                    <Text numberOfLines={1}>{file.nome}</Text>
+                    <Text style={styles.fileSize}>{(file.size / (1024 * 1024)).toFixed(2)} MB</Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      // Aqui você pode implementar visualização se desejar
+                    }}
+                    style={styles.iconButton}
+                  >
+                    <Feather name="eye" size={18} color="#007bff" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => onRemoveImage?.(questionId, file.id)}
+                    style={styles.iconButton}
+                  >
+                    <Feather name="trash-2" size={18} color="#dc3545" />
+                  </TouchableOpacity>
+                </View>
               ))}
             </View>
           )}
-          <View style={{paddingTop: 15}}>
-              <PrimaryInput
-                label="Observação (opcional)"
-                value={observacao}
-                onChangeText={setObservacao}
-                placeholder='Digite uma observação'
-              />
+
+          <View style={{ paddingTop: 15 }}>
+            <PrimaryInput
+              label="Observação (opcional)"
+              value={localObservation}
+              onChangeText={handleObservationChange}
+              placeholder="Digite uma observação"
+            />
           </View>
-          
-        </View>
         </>
       )}
     </View>
@@ -127,11 +157,28 @@ const styles = StyleSheet.create({
   uploadedTitle: {
     fontSize: 13,
     fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: 6,
     color: colors.primaryDark,
   },
-  uploadedItem: {
+  fileItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginVertical: 4,
+  },
+  thumbnail: {
+    width: 40,
+    height: 40,
+    borderRadius: 4,
+  },
+  fileDetails: {
+    flex: 1,
+  },
+  fileSize: {
     fontSize: 12,
-    color: '#555',
+    color: '#888',
+  },
+  iconButton: {
+    padding: 4,
   },
 });

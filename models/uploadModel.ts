@@ -1,7 +1,10 @@
 export interface UploadModel {
-  arquivo: string | number | (string | number)[] | null | undefined;
   nome: string;
-  url: string;
-  path: string;
-  uploadedAt: Date;
+  arquivo: string;
 }
+
+export type UploadWithMeta = UploadModel & {
+  uri: string;
+  size: number;
+  id: string;
+};

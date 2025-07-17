@@ -130,7 +130,7 @@ export async function generatePDFWithHTML(
       </div>
 
       ${equipment?.uploads?.filter(u => u.arquivo).map(file => `
-        <h2 style="page-break-before: always;">Imagem do Equipamento: ${file.nome}</h2>
+        <h2 style="page-break-before: always;">Anexos do Equipamento: ${file.nome}</h2>
         <img src="${file.arquivo}" class="full-image" />
       `).join('')}
 

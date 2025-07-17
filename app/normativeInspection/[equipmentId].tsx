@@ -9,13 +9,13 @@ import MainButton from "~/components/buttons/mainButton";
 import { useEquipmentById } from '~/hooks/useEquipmentById';
 import InspectionSection from "~/components/sections/inspectionSection";
 import { saveInspection } from '~/services/inspectionService';
-import FeedbackModal from '~/components/modal/feedbackModal';
-import { UploadModel } from "~/models/uploadModel";
+import FeedbackModal from "~/components/modal/feedbackModal";
+import { UploadModel, UploadWithMeta } from "~/models/uploadModel";
 
 export default function EquipmentPage() {
   const { equipmentId } = useLocalSearchParams<{ equipmentId: string }>();
   const [respostas, setRespostas] = useState<{ [id: string]: 'sim' | 'nao' | 'na' | null }>({});
-  const [imagens, setImagens] = useState<{ [id: string]: UploadModel[] }>({});
+  const [imagens, setImagens] = useState<{ [id: string]: UploadWithMeta[] }>({});
 
   const { equipment: selectedEquipment, loading } = useEquipmentById(String(equipmentId));
 
@@ -60,8 +60,18 @@ export default function EquipmentPage() {
     setRespostas((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleUploadImage = (questionId: string, uploads: UploadModel[]) => {
-    setImagens((prev) => ({ ...prev, [questionId]: [...(prev[questionId] || []), ...uploads] }));
+  const handleUploadImage = (questionId: string, uploads: UploadWithMeta[]) => {
+    setImagens((prev) => ({
+      ...prev,
+      [questionId]: [...(prev[questionId] ?? []).map(img => ({ ...img })), ...uploads.map(img => ({ ...img }))],
+    }));
+  };
+
+  const handleRemoveImage = (questionId: string, id: string) => {
+    setImagens((prev) => {
+      const atualizadas = (prev[questionId] || []).filter((img) => img.id !== id);
+      return { ...prev, [questionId]: atualizadas };
+    });
   };
 
   const handleViewEquipment = (equipmentId: any) => {
@@ -111,6 +121,7 @@ export default function EquipmentPage() {
         respostas={respostas}
         onResponder={handleResponder}
         onUploadImage={handleUploadImage}
+        onRemoveImage={handleRemoveImage}
         imagens={imagens}
       />
 
