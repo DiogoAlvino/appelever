@@ -111,6 +111,38 @@ export default function InspectionForm() {
         </SecondarySection>
 
         <SecondarySection
+          icon={<Feather name="alert-triangle" size={20} color="#173A64" />}
+          title="Resumo da verificação"
+          showChevron={false}
+        >
+          <View style={styles.sectionContent}>
+            <Text style={styles.itemText}>
+              <Text style={styles.itemTitle}>Itens verificados: </Text>
+              {Object.keys(inspection.answers).length}
+            </Text>
+
+            <Text style={styles.itemText}>
+              <Text style={styles.itemTitle}>Itens não conformes: </Text>
+              {Object.values(inspection.answers).filter((q) => q.answer === 'nao').length}
+            </Text>
+
+            <Text style={styles.itemText}>
+              <Text style={styles.itemTitle}>Criticidade: </Text>
+              {(() => {
+                const prioridades = Object.values(inspection.answers)
+                  .filter((q) => q.answer === 'nao')
+                  .map((q) => q.priority?.toLowerCase());
+
+                if (prioridades.includes('alto')) return 'Alto';
+                if (prioridades.includes('médio') || prioridades.includes('medio')) return 'Médio';
+                if (prioridades.includes('baixo')) return 'Baixo';
+                return 'Não aplicável';
+              })()}
+            </Text>
+          </View>
+        </SecondarySection>
+
+        <SecondarySection
           icon={<Feather name="clipboard" size={20} color="#173A64" />}
           title="Itens verificados"
           showChevron={false}
