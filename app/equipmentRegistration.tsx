@@ -168,13 +168,7 @@ export default function EquipmentRegistration() {
       </PrimarySection>
 
       <PrimarySection title="Arquivos Relacionados">
-        <FileUpload
-          equipmentId={equipmentId as string || 'temp'}
-          onUploadSuccess={(uploaded: UploadModel) => setUploads(prev => [...prev, uploaded])}
-        />
-        {uploads.map((file) => (
-          <Text key={file.path}>{file.nome}</Text>
-        ))}
+        <FileUpload onChange={(newUploads) => setUploads(newUploads)} />
       </PrimarySection>
 
       <View style={styles.buttons}>

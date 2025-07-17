@@ -1,4 +1,5 @@
-import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Alert, Text, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useCameraPermissions } from 'expo-camera';
 import { Feather } from '@expo/vector-icons';
@@ -6,92 +7,97 @@ import { UploadWithMeta } from '~/models/uploadModel';
 import { colors } from '~/theme';
 
 interface Props {
-  onUploadSuccess: (files: UploadWithMeta[]) => void;
+  onChange?: (files: UploadWithMeta[]) => void;
 }
 
-export default function FileUpload({ onUploadSuccess }: Props) {
+export default function FileUpload({ onChange }: Props) {
+  const [uploads, setUploads] = useState<UploadWithMeta[]>([]);
   const [permission, requestPermission] = useCameraPermissions();
 
-  const compressAndConvert = async (
-    source: 'camera' | 'gallery'
-  ): Promise<{ base64: string; fileName: string; uri: string; fileSize: number } | null> => {
-    const pickerMethod =
-      source === 'camera'
-        ? ImagePicker.launchCameraAsync
-        : ImagePicker.launchImageLibraryAsync;
+  const handleAddUpload = async (source: 'camera' | 'gallery') => {
+    if (source === 'camera') {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissão negada', 'Você precisa permitir o uso da câmera.');
+        return;
+      }
+    } else {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissão negada', 'Você precisa permitir o acesso à galeria.');
+        return;
+      }
+    }
 
-    const result = await pickerMethod({
+    const picker = source === 'camera' ? ImagePicker.launchCameraAsync : ImagePicker.launchImageLibraryAsync;
+
+    const result = await picker({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.3,
       base64: true,
     });
 
+    console.log('Resultado picker:', result);
+
     if (!result.canceled && result.assets.length > 0) {
       const file = result.assets[0];
       if (!file.base64) {
         Alert.alert('Erro', 'Não foi possível converter a imagem.');
-        return null;
+        return;
       }
 
-      return {
-        base64: file.base64,
-        fileName: file.fileName || (source === 'camera' ? 'foto.jpg' : 'imagem.jpg'),
+      const newUpload: UploadWithMeta = {
+        id: Date.now().toString() + Math.random().toString(36).substring(2),
+        nome: file.fileName || 'imagem.jpg',
+        arquivo: `data:image/jpeg;base64,${file.base64}`,
         uri: file.uri,
-        fileSize: file.fileSize ?? 0,
+        size: file.fileSize ?? 0,
       };
-    }
 
-    return null;
+      const updated = [...uploads, newUpload];
+      setUploads(updated);
+      onChange?.(updated);
+    }
   };
 
-  const handlePickImage = async () => {
-    const result = await compressAndConvert('gallery');
-    if (!result) return;
 
-    const upload: UploadWithMeta = {
-      id: Date.now().toString() + Math.random().toString(36).substring(2),
-      nome: result.fileName,
-      arquivo: `data:image/jpeg;base64,${result.base64}`,
-      uri: result.uri,
-      size: result.fileSize,
-    };
-
-
-    onUploadSuccess([upload]);
-  };
-
-  const handleTakePhoto = async () => {
-    const { granted } = await requestPermission();
-    if (!granted) {
-      Alert.alert('Permissão negada', 'Você precisa permitir o uso da câmera.');
-      return;
-    }
-
-    const result = await compressAndConvert('camera');
-    if (!result) return;
-
-    const upload: UploadWithMeta = {
-      id: Date.now().toString() + Math.random().toString(36).substring(2),
-      nome: result.fileName,
-      arquivo: `data:image/jpeg;base64,${result.base64}`,
-      uri: result.uri,
-      size: result.fileSize,
-    };
-
-
-    onUploadSuccess([upload]);
+  const handleRemove = (id: string) => {
+    const updated = uploads.filter((file) => file.id !== id);
+    setUploads(updated);
+    onChange?.(updated);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleTakePhoto}>
+        <TouchableOpacity style={styles.button} onPress={() => handleAddUpload('camera')}>
           <Feather name="camera" size={20} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handlePickImage}>
+        <TouchableOpacity style={styles.button} onPress={() => handleAddUpload('gallery')}>
           <Feather name="image" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
+
+      {uploads.length > 0 && (
+        <View style={styles.uploadedList}>
+          <Text style={styles.uploadedTitle}>Imagens enviadas:</Text>
+          {uploads.map((file, index) => (
+            <View key={`${file.uri}-${index}`} style={styles.fileItem}>
+              <Image source={{ uri: file.uri }} style={styles.thumbnail} />
+              <View style={styles.fileDetails}>
+                <Text numberOfLines={1}>{file.nome}</Text>
+                <Text style={styles.fileSize}>{(file.size / (1024 * 1024)).toFixed(2)} MB</Text>
+              </View>
+              <TouchableOpacity onPress={() => {/* implementar visualização */ }} style={styles.iconButton}>
+                <Feather name="eye" size={18} color="#007bff" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleRemove(file.id)} style={styles.iconButton}>
+                <Feather name="trash-2" size={18} color="#dc3545" />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -110,5 +116,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
+  },
+  uploadedList: {
+    marginTop: 10,
+  },
+  uploadedTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 4,
+    color: colors.primaryDark,
+  },
+  fileItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  thumbnail: {
+    width: 40,
+    height: 40,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  fileDetails: {
+    flex: 1,
+  },
+  fileSize: {
+    fontSize: 11,
+    color: '#666',
+  },
+  iconButton: {
+    padding: 6,
   },
 });

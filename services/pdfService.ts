@@ -101,6 +101,38 @@ export async function generatePDFWithHTML(
           color: #555;
           margin-top: 40px;
         }
+
+      image-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .image-item {
+      width: calc(50% - 10px); /* 2 por linha com gap */
+      text-align: center;
+      page-break-inside: avoid;
+    }
+
+    .image-item img {
+      width: 100%;
+      height: auto;
+      max-height: 200px;
+      object-fit: contain;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .image-item p {
+      font-size: 12px;
+      margin-top: 4px;
+      color: #555;
+    }
+      .answer-section {
+    margin-bottom: 24px;
+  }
       </style>
     </head>
     <body>
@@ -129,10 +161,18 @@ export async function generatePDFWithHTML(
         <p><span class="label">Empresa Conservadora:</span> ${equipment?.empresa_conservadora?.razaoSocial} (${equipment?.empresa_conservadora?.cnpj})</p>
       </div>
 
-      ${equipment?.uploads?.filter(u => u.arquivo).map(file => `
-        <h2 style="page-break-before: always;">Anexos do Equipamento: ${file.nome}</h2>
-        <img src="${file.arquivo}" class="full-image" />
-      `).join('')}
+      ${equipment?.uploads?.filter(u => u.arquivo).length > 0 ? `
+        <h2 style="page-break-before: always;">Anexos do Equipamento</h2>
+        <div class="image-grid">
+          ${equipment.uploads.filter(u => u.arquivo).map(file => `
+            <div class="image-item">
+              <img src="${file.arquivo}" />
+               <p>${file.nome}</p>
+            </div>
+         `).join('')}
+        </div>
+      ` : ''}
+
 
       <div class="section">
         <h2>Responsável pela inspeção</h2>
@@ -160,16 +200,28 @@ export async function generatePDFWithHTML(
         `).join('')}
       </div>
 
-      ${Object.entries(inspection.answers).flatMap(([id, q]) =>
-      Array.isArray(q.uploads) && q.uploads.length > 0
-        ? q.uploads
-          .filter(file => !!file.arquivo && typeof file.arquivo === 'string')
-          .map(file => `
-                <h2 style="page-break-before: always;">Imagem do Item ${id}: ${file.nome}</h2>
-                <img src="${file.arquivo}" class="full-image" />
-              `)
-        : []
-    ).join('')}
+      ${Object.entries(inspection.answers).flatMap(([id, q]) => {
+      const uploads = Array.isArray(q.uploads)
+        ? q.uploads.filter(file => !!file.arquivo && typeof file.arquivo === 'string')
+        : [];
+
+      if (uploads.length === 0) return [];
+
+      return `
+    <div class="answer-section">
+      <h2 style="page-break-before: always;">Imagens do Item ${id}</h2>
+      <div class="image-grid">
+        ${uploads.map(file => `
+          <div class="image-item">
+            <img src="${file.arquivo}" />
+            <p>${file.nome}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+    }).join('')}
+
 
       <div class="section">
         <h2>Implementações Necessárias</h2>

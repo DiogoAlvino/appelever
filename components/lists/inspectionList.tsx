@@ -56,30 +56,28 @@ export default function InspectionList({ inspections, selectedId, onSelect, onEr
 
   return (
     <View style={styles.wrapper}>
-      {inspections.map((inspection) => {
-
-        return (
-          <SecondarySection
-            key={inspection.id}
-            icon={null}
-            title={`Inspeção #${inspection.id?.slice(-6)}`}
-            onPress={() => handleViewInspection(inspection.id)}
-            backgroundColor={colors.primaryLight}>
-            <Text style={{ color: colors.primaryDark }}>
-              Responsável: {inspection.usuario}
-            </Text>
-            <Text style={{ color: colors.primaryDark }}>
-              Data: {formatarData(inspection.dataCriacao)}
-            </Text>
-
-            <Text style={{ color: colors.primaryDark }}>
-              Itens respondidos: {Object.keys(inspection.answers || {}).length}
-            </Text>
-          </SecondarySection>
-        );
-      })}
+      {inspections.slice().reverse().map((inspection, index) => (
+        <SecondarySection
+          key={inspection.id}
+          icon={null}
+          title={`Inspeção #${index + 1}`}
+          onPress={() => handleViewInspection(inspection.id)}
+          backgroundColor={colors.primaryLight}
+        >
+          <Text style={{ color: colors.primaryDark }}>
+            Responsável: {inspection.usuario}
+          </Text>
+          <Text style={{ color: colors.primaryDark }}>
+            Data: {formatarData(inspection.dataCriacao)}
+          </Text>
+          <Text style={{ color: colors.primaryDark }}>
+            Itens respondidos: {Object.keys(inspection.answers || {}).length}
+          </Text>
+        </SecondarySection>
+      ))}
     </View>
   );
+
 }
 
 const styles = StyleSheet.create({
