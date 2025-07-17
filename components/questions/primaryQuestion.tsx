@@ -58,8 +58,10 @@ export default function PrimaryQuestion({
 
       {selectedOption && (
         <>
-          <FileUpload onChange={(newUploads) => onUploadSuccess(newUploads)} />
-
+          <FileUpload
+            value={uploads}
+            onChange={(newUploads) => onUploadSuccess(newUploads)}
+          />
           <View style={{ paddingTop: 15 }}>
             <PrimaryInput
               label="Observação (opcional)"
@@ -70,6 +72,7 @@ export default function PrimaryQuestion({
           </View>
         </>
       )}
+
     </View>
   );
 }

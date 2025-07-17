@@ -11,7 +11,7 @@ import { useEquipmentForm } from '~/hooks/useEquipmentForm';
 import { useState, useEffect } from 'react';
 import FeedbackModal from '~/components/modal/feedbackModal';
 import { router, useLocalSearchParams } from 'expo-router';
-import { UploadModel } from '~/models/uploadModel';
+import { UploadWithMeta } from '~/models/uploadModel';
 import AlertMessage from '~/components/messages/alertMessage';
 import TabBar from '~/components/layout/tabBar';
 
@@ -35,7 +35,7 @@ export default function EquipmentRegistration() {
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackType, setFeedbackType] = useState<'loading' | 'success' | 'error'>('loading');
   const [feedbackMessage, setFeedbackMessage] = useState('');
-  const [uploads, setUploads] = useState<UploadModel[]>([]);
+  const [uploads, setUploads] = useState<UploadWithMeta[]>([]);
 
   const { mode, equipmentId } = useLocalSearchParams();
 
@@ -170,7 +170,10 @@ export default function EquipmentRegistration() {
         </PrimarySection>
 
         <PrimarySection title="Arquivos Relacionados">
-          <FileUpload onChange={(newUploads) => setUploads(newUploads)} />
+          <FileUpload
+            value={uploads}
+            onChange={(newUploads) => setUploads(newUploads)}
+          />
         </PrimarySection>
 
         <View style={styles.buttons}>

@@ -61,18 +61,18 @@ export default function EquipmentPage() {
     setRespostas((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleUploadImage = (questionId: string, uploads: UploadWithMeta[]) => {
+  const handleUploadImage = (questionId: string, newUploads: UploadWithMeta[]) => {
     setImagens((prev) => ({
       ...prev,
-      [questionId]: [...(prev[questionId] ?? []).map(img => ({ ...img })), ...uploads.map(img => ({ ...img }))],
+      [questionId]: newUploads,
     }));
   };
 
   const handleRemoveImage = (questionId: string, id: string) => {
-    setImagens((prev) => {
-      const atualizadas = (prev[questionId] || []).filter((img) => img.id !== id);
-      return { ...prev, [questionId]: atualizadas };
-    });
+    setImagens((prev) => ({
+      ...prev,
+      [questionId]: prev[questionId]?.filter((img) => img.id !== id) || [],
+    }));
   };
 
   const handleViewEquipment = (equipmentId: any) => {

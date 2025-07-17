@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert, Text, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useCameraPermissions } from 'expo-camera';
@@ -9,11 +9,16 @@ import * as ImageManipulator from 'expo-image-manipulator';
 
 interface Props {
   onChange?: (files: UploadWithMeta[]) => void;
+  value?: UploadWithMeta[];
 }
 
-export default function FileUpload({ onChange }: Props) {
-  const [uploads, setUploads] = useState<UploadWithMeta[]>([]);
+export default function FileUpload({ onChange, value = [] }: Props) {
+  const [uploads, setUploads] = useState<UploadWithMeta[]>(value);
   const [permission, requestPermission] = useCameraPermissions();
+
+  useEffect(() => {
+    setUploads(value);
+  }, [value]);
 
   async function compressImage(uri: string, maxWidth = 800, quality = 0.5) {
     const manipResult = await ImageManipulator.manipulateAsync(
@@ -30,26 +35,21 @@ export default function FileUpload({ onChange }: Props) {
   }
 
   const handleAddUpload = async (source: 'camera' | 'gallery') => {
-    if (source === 'camera') {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permissão negada', 'Você precisa permitir o uso da câmera.');
-        return;
-      }
-    } else {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permissão negada', 'Você precisa permitir o acesso à galeria.');
-        return;
-      }
+    const permissionRequest = source === 'camera'
+      ? await ImagePicker.requestCameraPermissionsAsync()
+      : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionRequest.status !== 'granted') {
+      Alert.alert('Permissão negada', `Você precisa permitir o uso da ${source === 'camera' ? 'câmera' : 'galeria'}.`);
+      return;
     }
 
     const picker = source === 'camera' ? ImagePicker.launchCameraAsync : ImagePicker.launchImageLibraryAsync;
 
     const result = await picker({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1, // qualidade total aqui — compressão será feita depois
-      base64: false, // desnecessário agora
+      quality: 1,
+      base64: false,
     });
 
     if (!result.canceled && result.assets.length > 0) {
@@ -68,9 +68,7 @@ export default function FileUpload({ onChange }: Props) {
       setUploads(updated);
       onChange?.(updated);
     }
-
   };
-
 
   const handleRemove = (id: string) => {
     const updated = uploads.filter((file) => file.id !== id);
@@ -99,7 +97,7 @@ export default function FileUpload({ onChange }: Props) {
                 <Text numberOfLines={1}>{file.nome}</Text>
                 <Text style={styles.fileSize}>{(file.size / (1024 * 1024)).toFixed(2)} MB</Text>
               </View>
-              <TouchableOpacity onPress={() => {/* implementar visualização */ }} style={styles.iconButton}>
+              <TouchableOpacity onPress={() => { /* visualizar */ }} style={styles.iconButton}>
                 <Feather name="eye" size={18} color="#007bff" />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleRemove(file.id)} style={styles.iconButton}>
