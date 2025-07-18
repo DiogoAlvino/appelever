@@ -6,7 +6,8 @@ import { colors } from '~/theme';
 interface TabItem {
   icon: keyof typeof Feather.glyphMap;
   label: string;
-  route: string;
+  route?: string;
+  onPress?: () => void;
 }
 
 interface TabBarProps {
@@ -26,7 +27,7 @@ export default function TabBar({ tabs }: TabBarProps) {
           <TouchableOpacity
             key={index}
             style={[styles.tabItem, isActive && styles.activeTab]}
-            onPress={() => router.push(tab.route as any)}
+            onPress={tab.onPress ? tab.onPress : () => router.push(tab.route as any)}
           >
             <Feather
               name={tab.icon}
@@ -67,8 +68,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   activeTab: {
-    borderTopWidth: 2,
-    borderColor: colors.mainColor,
-    paddingTop: 6,
+   backgroundColor: colors.bgScreen ,
+   padding: 2,
+   borderRadius: 50,
+   width: 10
   },
 });

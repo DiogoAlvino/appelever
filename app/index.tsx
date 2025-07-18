@@ -7,6 +7,8 @@ import MenuButton from "~/components/buttons/menuButton";
 import PrimaryChart from "~/components/charts/primaryChart";
 import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
 import { auth } from "~/utils/firebase";
+import TabBar from "~/components/layout/tabBar";
+import { signOut } from "firebase/auth";
 
 
 export default function HomePage() {
@@ -15,7 +17,6 @@ export default function HomePage() {
 
     const onRefresh = async () => {
         setRefreshing(true);
-        // Aqui você pode recarregar dados da API se quiser
         await new Promise(resolve => setTimeout(resolve, 1000));
         setRefreshing(false);
     };
@@ -33,64 +34,89 @@ export default function HomePage() {
     }
 
     function goToForensicAnalysis() {
-        router.push("/forensic")
+        router.push("/forensicPage")
+    }
+
+    function goToForensicList() {
+        router.push("/forensics")
     }
 
     return (
-        <ScrollView
-            contentContainerStyle={styles.container}
-            style={{ flex: 1 }}
-            refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-        >
-            <ImageBackground source={require('~/assets/bg-login.png')} style={styles.card}>
-                <View style={styles.cardButtons}>
-                    <MenuButton />
-                </View>
-                <Text style={styles.cardTitle}>Olá, {auth.currentUser?.displayName || 'usuário'}!</Text>
-            </ImageBackground>
-            <View style={styles.services}>
-                <Text style={styles.servicesTitle}>Serviços</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingVertical: 5 }}>
-                    <View style={styles.servicesButtons}>
-                        <BlockButton
-                            icon={<MaterialCommunityIcons name="square-edit-outline" size={36} color="#fff" />}
-                            label="Cadastrar Equipamento"
-                            onPress={goToEquipmentRegistration}
-                        />
-                        <BlockButton
-                            icon={<MaterialCommunityIcons name="checkbox-marked-outline" size={36} color="#fff" />}
-                            label="Inspeção Normativa"
-                            onPress={goToNormativeInpection}
-                        />
-                        <BlockButton
-                            icon={<MaterialCommunityIcons name="format-list-bulleted" size={36} color="#fff" />}
-                            label="Lista de Inspeções"
-                            onPress={goToInspectionList}
-                        />
-                        <BlockButton
-                            icon={<MaterialCommunityIcons name="text-box-search-outline" size={36} color="#fff" />}
-                            label="Análise Forense"
-                            onPress={goToForensicAnalysis}
-                        />
-                        <BlockButton
-                            icon={<MaterialCommunityIcons name="clipboard-list-outline" size={36} color="#fff" />}
-                            label="Lista de Análises"
-                            onPress={goToForensicAnalysis}
-                        />
-
+        <>
+            <ScrollView
+                contentContainerStyle={styles.container}
+                style={{ flex: 1 }}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
+                <ImageBackground source={require('~/assets/bg-login.png')} style={styles.card}>
+                    <View style={styles.cardButtons}>
+                        <MenuButton />
                     </View>
-                </ScrollView>
+                    <Text style={styles.cardTitle}>Olá, {auth.currentUser?.displayName || 'usuário'}!</Text>
+                </ImageBackground>
+                <View style={styles.services}>
+                    <Text style={styles.servicesTitle}>Serviços</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingVertical: 5 }}>
+                        <View style={styles.servicesButtons}>
+                            <BlockButton
+                                icon={<MaterialCommunityIcons name="square-edit-outline" size={36} color="#fff" />}
+                                label="Cadastrar Equipamento"
+                                onPress={goToEquipmentRegistration}
+                            />
+                            <BlockButton
+                                icon={<MaterialCommunityIcons name="checkbox-marked-outline" size={36} color="#fff" />}
+                                label="Inspeção Normativa"
+                                onPress={goToNormativeInpection}
+                            />
+                            <BlockButton
+                                icon={<MaterialCommunityIcons name="format-list-bulleted" size={36} color="#fff" />}
+                                label="Lista de Inspeções"
+                                onPress={goToInspectionList}
+                            />
+                            <BlockButton
+                                icon={<MaterialCommunityIcons name="text-box-search-outline" size={36} color="#fff" />}
+                                label="Análise Forense"
+                                onPress={goToForensicAnalysis}
+                            />
+                            <BlockButton
+                                icon={<MaterialCommunityIcons name="clipboard-list-outline" size={36} color="#fff" />}
+                                label="Lista de Análises"
+                                onPress={goToForensicList}
+                            />
 
-            </View>
-            <View style={styles.dashboard}>
-                <Text style={styles.dashboardTitle}>Dashboard</Text>
-                <View>
-                    <PrimaryChart />
+                        </View>
+                    </ScrollView>
+
                 </View>
-            </View>
-        </ScrollView>
+                <View style={styles.dashboard}>
+                    <Text style={styles.dashboardTitle}>Dashboard</Text>
+                    <View>
+                        <PrimaryChart />
+                    </View>
+                </View>
+            </ScrollView>
+            <TabBar
+                tabs={[
+                    { icon: 'home', label: 'Início', route: '/' },
+                    {
+                        icon: 'log-out',
+                        label: 'Sair',
+                        onPress: async () => {
+                            try {
+                                await signOut(auth);
+                                router.replace('/login');
+                            } catch (error) {
+                                console.error('Erro ao sair da conta:', error);
+                            }
+                        },
+                    },
+                ]}
+            />
+   
+        </>
+        
     )
 }
 

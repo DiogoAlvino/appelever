@@ -2,25 +2,35 @@ import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from "react-nat
 import AlertMessage from "~/components/messages/alertMessage";
 import { colors, fontSize } from '~/theme';
 import ForensicSection from "~/components/sections/forensicSection";
+import TabBar from "~/components/layout/tabBar";
 
 export default function ForensicPage() {
 
   return (
-    <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+    <>
+      <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
 
-      <AlertMessage
-        type="info"
-        message="Os módulos abaixo estão relacionados à Análise Forense."
+        <AlertMessage
+          type="info"
+          message="Os módulos abaixo estão relacionados à Análise Forense."
+        />
+
+        <AlertMessage
+          type="info"
+          message="Os módulos não possuem uma ordem obrigatória de preenchimento. Preencha conforme a sua necessidade."
+        />
+
+        <ForensicSection />
+
+      </ScrollView>
+      <TabBar
+        tabs={[
+          { icon: 'home', label: 'Inicio', route: '/' },
+          { icon: 'tool', label: 'Equipamentos', route: '/equipments' },
+          { icon: 'list', label: 'Inpeções', route: '/inspections' },
+        ]}
       />
-
-      <AlertMessage
-        type="info"
-        message="Os módulos não possuem uma ordem obrigatória de preenchimento. Preencha conforme a sua necessidade."
-      />
-
-      <ForensicSection />
-
-    </ScrollView>
+    </>
   );
 }
 

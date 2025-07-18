@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View, Alert, Text } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, Text, RefreshControl } from 'react-native';
 import { saveEquipment, updateEquipment, fetchEquipmentById } from '~/services/equipmentService';
 import FileUpload from '~/components/inputs/fileUpload';
 
@@ -31,6 +31,14 @@ export default function EquipmentRegistration() {
     resetForm,
     errors,
   } = useEquipmentForm();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setRefreshing(false);
+  };
 
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackType, setFeedbackType] = useState<'loading' | 'success' | 'error'>('loading');
@@ -108,7 +116,9 @@ export default function EquipmentRegistration() {
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container} refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
         <AlertMessage
           type="info"
           message="Os campos de CNPJ exigem um número válido e existente."
@@ -203,7 +213,7 @@ export default function EquipmentRegistration() {
         ]}
       />
     </>
-    
+
   );
 }
 

@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, ActivityIndicator, RefreshControl } from 'react-native';
 
 import MainButton from '~/components/buttons/mainButton';
 import SearchInput from '~/components/inputs/searchInput';
@@ -11,6 +11,14 @@ import { useEquipments } from '~/hooks/useEquipments';
 export default function Equipments() {
   const { equipments, loading, reload } = useEquipments();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setRefreshing(false);
+  };
 
   const handleCancel = () => setSelectedId(null);
 
@@ -32,9 +40,11 @@ export default function Equipments() {
   }
 
   return (
-    <>
-      <View style={styles.page}>
-        <ScrollView contentContainerStyle={styles.container}>
+    < >
+      <View style={styles.page} >
+        <ScrollView contentContainerStyle={styles.container} refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
           <SearchInput onSearch={reload} />
           <View style={styles.bar}>
             <Text>Total: {equipments.length}</Text>

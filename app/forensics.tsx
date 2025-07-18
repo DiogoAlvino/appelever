@@ -9,7 +9,7 @@ import { useAuth } from '~/hooks/useAuth';
 
 export default function Forensics() {
   const { user } = useAuth();
-  const { inspections, loading, fetchInspections } = useInspections();
+  const { inspections, loading, fetchInspections } = useInspections(); //alterar pra useForensic
 
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -36,7 +36,7 @@ export default function Forensics() {
           <Text>Total: {inspections.length}</Text>
         </View>
 
-        <InspectionList
+        <InspectionList //
           inspections={inspections}
           onError={(msg) => {
             setFeedbackMessage(msg);

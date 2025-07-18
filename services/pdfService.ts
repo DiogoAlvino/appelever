@@ -105,7 +105,7 @@ export async function generatePDFWithHTML(
       image-grid {
       display: flex;
       flex-wrap: wrap;
-      justify-content: flex-start;
+      justify-content: center;
       gap: 10px;
       margin-top: 12px;
     }
