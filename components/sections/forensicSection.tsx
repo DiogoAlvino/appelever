@@ -255,9 +255,6 @@ export default function ForensicSection() {
         <View style={styles.section}>
             <PrimaryList
                 title="1. Dados iniciais"
-                helperEnabled
-                helperTitle="Ajuda"
-                helperDescription="Insira as informações referentes ao local onde o equipamento está instalado."
             >
                 <View style={styles.campos}>
 

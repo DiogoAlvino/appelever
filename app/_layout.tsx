@@ -54,10 +54,12 @@ export default function RootLayout() {
           <Stack.Screen name="normativeInspection/[equipmentId]" options={{ title: 'Inspeção Normativa' }} />
           <Stack.Screen name="equipmentForm/[equipmentId]" options={{ title: 'Ficha de Equipamento' }} />
           <Stack.Screen name="inspectionForm/[inspectionId]" options={{ title: 'Ficha de Inspeção' }} />
+          <Stack.Screen name="forensicForm/[forensicId]" options={{ title: 'Ficha de Análise Forense' }} />
           <Stack.Screen name="inspections" options={{ title: 'Lista de inspeções' }} />
           <Stack.Screen name="equipments" options={{ title: 'Lista de equipamentos' }} />
+          <Stack.Screen name="forensics" options={{ title: 'Lista de Análises ' }} />
           <Stack.Screen name="reportInspection/[equipmentId]" options={{ title: 'Relatório de Inspeção' }} />
-          <Stack.Screen name="forensic" options={{ title: 'Análise Forense' }} />
+          <Stack.Screen name="forensicPage" options={{ title: 'Análise Forense' }} />
           <Stack.Screen name="previewImage" options={{ title: 'Imagem' }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>

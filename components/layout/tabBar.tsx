@@ -46,11 +46,14 @@ export default function TabBar({ tabs }: TabBarProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderTopWidth: 1,
+    borderWidth: 1,
     borderColor: '#ddd',
+    borderRadius: 50,
     backgroundColor: '#fff',
     paddingVertical: 8,
     justifyContent: 'space-around',
+    marginHorizontal: 5,
+    
   },
   tabItem: {
     alignItems: 'center',

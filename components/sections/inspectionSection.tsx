@@ -36,7 +36,7 @@ export default function InspectionSection({
           <PrimaryList
             key={section.id}
             title={`${numero}. ${section.name}`}
-            helperEnabled
+
             helperTitle={`${numero}. ${section.name}`}
             helperDescription={`Descrição do item ${section.name}`}
             respondido={respondido}
