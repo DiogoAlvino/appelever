@@ -20,9 +20,10 @@ import { ScrollView } from 'react-native-gesture-handler';
 import ResumoVestigio from './vestigioSection';
 import Modal from 'react-native-modal';
 
-import { saveForensic } from '~/services/saveForensic';
+import { saveForensicModular } from '~/services/saveForensic';
 import MainButton from '../buttons/mainButton';
 import { ForensicModel } from '~/models/forensicModel';
+import FeedbackModal from '../modal/feedbackModal';
 
 export default function ForensicSection() {
     const {
@@ -88,8 +89,6 @@ export default function ForensicSection() {
         sistemaEletrico, setSistemaEletrico,
         sensores, setSensores,
         pocoElevador, setPocoElevador,
-
-        vestigiosPerinecroscopia, setVestigiosPerinecroscopia,
         arquivosReconhecimentoArea, setArquivosReconhecimentoArea,
     } = useForensic();
 
@@ -99,7 +98,7 @@ export default function ForensicSection() {
     const [vestigiosEquipamentos, setVestigiosEquipamentos] = useState<VestigioResumo[]>([]);
     const [vestigiosEntrevistas, setVestigiosEntrevistas] = useState<VestigioResumo[]>([]);
     const [vestigiosDocumentacao, setVestigiosDocumentacao] = useState<VestigioResumo[]>([]);
-    const [vestigiosperinecroscopia, setVestigiosperinecroscopia] = useState<VestigioResumo[]>([]);
+    const [vestigiosPerinecroscopia, setVestigiosPerinecroscopia] = useState<VestigioResumo[]>([]);
 
     const [vestigioSelecionado, setVestigioSelecionado] = useState<VestigioResumo | null>(null);
     const [mostrarRegistros, setMostrarRegistros] = useState(false);
@@ -107,7 +106,9 @@ export default function ForensicSection() {
 
     const [materiaisSelecionados, setMateriaisSelecionados] = useState<number[]>([]);
     const [materialOutroDescricao, setMaterialOutroDescricao] = useState('');
-
+    const [feedbackVisible, setFeedbackVisible] = useState(false);
+    const [feedbackType, setFeedbackType] = useState<'loading' | 'success' | 'error'>('loading');
+    const [feedbackMessage, setFeedbackMessage] = useState('');
 
     const [vestigioTemp, setVestigioTemp] = useState({
         numeroVestigio: '',
@@ -147,6 +148,11 @@ export default function ForensicSection() {
     };
 
     const handleSave = async () => {
+
+        setFeedbackType('loading');
+        setFeedbackMessage('Salvando análise forense...');
+        setFeedbackVisible(true);
+
         try {
             const payload: ForensicModel = {
                 dadosIniciais,
@@ -205,11 +211,15 @@ export default function ForensicSection() {
                 },
             };
 
-            await saveForensic(payload);
-            alert('Dados salvos com sucesso!');
+            await saveForensicModular(payload);
+            setFeedbackType('success');
+            setFeedbackMessage('Análise forense salva com sucesso!');
+            setTimeout(() => setFeedbackVisible(false), 1000);
         } catch (error) {
             console.error(error);
-            alert('Erro ao salvar dados.');
+            setFeedbackType('error');
+            setFeedbackMessage('Erro ao salvar análise forense.');
+            setTimeout(() => setFeedbackVisible(false), 1500);
         }
     };
 
@@ -237,7 +247,7 @@ export default function ForensicSection() {
         } else if (origemVestigio === 'documentacao') {
             setVestigiosDocumentacao(prev => [...prev, resumoVestigio]);
         } else if (origemVestigio === 'perinecroscopia') {
-            setVestigiosperinecroscopia(prev => [...prev, resumoVestigio]);
+            setVestigiosPerinecroscopia(prev => [...prev, resumoVestigio]);
         }
 
         setModalVestigioVisible(false);
@@ -1569,7 +1579,12 @@ export default function ForensicSection() {
                 <MainButton title="Cancelar" type="secondary" />
             </View>
 
-
+            <FeedbackModal
+                visible={feedbackVisible}
+                type={feedbackType}
+                message={feedbackMessage}
+                onClose={() => setFeedbackVisible(false)}
+            />
         </View>
     );
 }
@@ -1657,6 +1672,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 5
 
-    }
+    },
+    campos : {}
 
 });

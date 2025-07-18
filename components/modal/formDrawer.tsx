@@ -4,25 +4,20 @@ import Modal from 'react-native-modal';
 import { Feather } from '@expo/vector-icons';
 import VoiceInput from '../inputs/voiceInput';
 import FileUpload from '../inputs/fileUpload';
+import { CampoChecklist } from '~/types/forensicTypes';
+import { UploadWithMeta } from '~/models/uploadModel';
 
 interface Campo {
   id: number;
   titulo: string;
 }
 
-interface FileItem {
-  name: string;
-  uri: string;
-  type: 'image' | 'file' | 'photo';
-  size: number;
-}
-
 interface Props {
   title: string;
   buttonLabel: string;
   campos: Campo[];
-  valor: { [id: number]: { texto: string; arquivos: FileItem[] } };
-  onChange: (valores: { [id: number]: { texto: string; arquivos: FileItem[] } }) => void;
+  valor: CampoChecklist[];
+  onChange: (valores: CampoChecklist[]) => void;
 }
 
 export default function FormDrawer({ title, buttonLabel, campos, valor, onChange }: Props) {
@@ -33,33 +28,35 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
     verificarSePreenchido(valor);
   }, [valor]);
 
-  const verificarSePreenchido = (valores: { [id: number]: { texto: string; arquivos: FileItem[] } }) => {
+  const verificarSePreenchido = (valores: CampoChecklist[]) => {
     const algumPreenchido = campos.some(campo => {
-      const entrada = valores[campo.id];
-      return !!entrada?.texto?.trim() || (entrada?.arquivos?.length ?? 0) > 0;
+      const entrada = valores.find(v => v.id === campo.id);
+      return !!entrada?.observacao?.trim() || (entrada?.arquivos?.length ?? 0) > 0;
     });
     setPreenchido(algumPreenchido);
   };
 
   const atualizarTexto = (id: number, texto: string) => {
-    const atualizados = {
-      ...valor,
-      [id]: {
-        ...(valor[id] || { arquivos: [] }),
-        texto,
-      },
-    };
+    const atualizados = campos.map(campo =>
+      campo.id === id
+        ? {
+            ...valor.find(v => v.id === id) || { id, titulo: campo.titulo },
+            observacao: texto
+          }
+        : valor.find(v => v.id === campo.id) || { id: campo.id, titulo: campo.titulo }
+    );
     onChange(atualizados);
   };
 
-  const atualizarArquivos = (id: number, arquivos: FileItem[]) => {
-    const atualizados = {
-      ...valor,
-      [id]: {
-        ...(valor[id] || { texto: '' }),
-        arquivos,
-      },
-    };
+  const atualizarArquivos = (id: number, arquivos: UploadWithMeta[]) => {
+    const atualizados = campos.map(campo =>
+      campo.id === id
+        ? {
+            ...valor.find(v => v.id === id) || { id, titulo: campo.titulo },
+            arquivos
+          }
+        : valor.find(v => v.id === campo.id) || { id: campo.id, titulo: campo.titulo }
+    );
     onChange(atualizados);
   };
 
@@ -79,11 +76,9 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
           fontWeight: '600',
           fontSize: 16,
         }}>
-          {preenchido ? `${title} preenchido `  : buttonLabel}
-          {preenchido && (
-            <Feather name="check-circle" size={20} color="#173A64" />
-          )}
-        </Text> 
+          {preenchido ? `${title} preenchido ` : buttonLabel}
+          {preenchido && <Feather name="check-circle" size={20} color="#173A64" />}
+        </Text>
       </TouchableOpacity>
 
       <Modal
@@ -102,19 +97,22 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
           </View>
 
           <ScrollView contentContainerStyle={styles.content}>
-            {campos.map((campo) => (
-              <View key={campo.id} style={{ marginBottom: 20, gap: 10 }}>
-                <Text style={styles.label}>{campo.titulo}</Text>
-                <VoiceInput
-                  value={valor[campo.id]?.texto || ''}
-                  onChangeText={(texto) => atualizarTexto(campo.id, texto)}
-                />
-                <FileUpload
-                  value={valor[campo.id]?.arquivos || []}
-                  onChange={(arquivos) => atualizarArquivos(campo.id, arquivos)}
-                />
-              </View>
-            ))}
+            {campos.map((campo) => {
+              const entrada = valor.find(v => v.id === campo.id);
+              return (
+                <View key={campo.id} style={{ marginBottom: 20, gap: 10 }}>
+                  <Text style={styles.label}>{campo.titulo}</Text>
+                  <VoiceInput
+                    value={entrada?.observacao || ''}
+                    onChangeText={(texto) => atualizarTexto(campo.id, texto)}
+                  />
+                  <FileUpload
+                    value={entrada?.arquivos || []}
+                    onChange={(arquivos) => atualizarArquivos(campo.id, arquivos)}
+                  />
+                </View>
+              );
+            })}
           </ScrollView>
         </View>
       </Modal>
@@ -133,7 +131,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#fff',
     padding: 16,
-    borderRadius: 12, 
+    borderRadius: 12,
   },
   header: {
     flexDirection: 'row',

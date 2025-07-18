@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { FileItem, VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR } from '~/types/forensicTypes';
+import { VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR } from '~/types/forensicTypes';
+import { UploadWithMeta} from '~/models/uploadModel';
 
 export const useForensic = () => {
     const [dadosIniciais, setDadosIniciais] = useState({
@@ -35,7 +36,7 @@ export const useForensic = () => {
         naturezaVestigio: '',
         naturezaOutros: '',
         descricaoDetalhada: '',
-        descricaoDetalhadaArquivos: [] as FileItem[],
+        descricaoDetalhadaArquivos: [] as UploadWithMeta[],
     }]);
 
     const [acondicionamento, setAcondicionamento] = useState([{
@@ -44,7 +45,7 @@ export const useForensic = () => {
         tipoAcondicionamento: '',
         tipoAcondicionamentoOutros: '',
         numeroLacre: '',
-        arquivos: [] as FileItem[],
+        arquivos: [] as UploadWithMeta[],
     }]);
 
     const [equipePericial, setEquipePericial] = useState([{ nome: '', cargo: '', matricula: '' }]);
@@ -59,7 +60,7 @@ export const useForensic = () => {
     const [reconhecimentoArea, setReconhecimentoArea] = useState('');
     const [condicoesAmbientais, setCondicoesAmbientais] = useState('');
     const [caracteristicasLocal, setCaracteristicasLocal] = useState('');
-    const [arquivosReconhecimentoArea, setArquivosReconhecimentoArea] = useState<FileItem[]>([]);
+    const [arquivosReconhecimentoArea, setArquivosReconhecimentoArea] = useState<UploadWithMeta[]>([]);
 
     const [documentacao, setDocumentacao] = useState<Documentacao>({
         projetos: '',
@@ -119,11 +120,11 @@ export const useForensic = () => {
     const [cadaverDescricaoVestes, setCadaverDescricaoVestes] = useState('');
     const [cadaverOutro, setCadaverOutro] = useState('');
     const [analiseDisposicaoCadaver, setAnaliseDisposicaoCadaver] = useState('');
-    const [arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver] = useState<FileItem[]>([]);
+    const [arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver] = useState<UploadWithMeta[]>([]);
     const [sinaisTanatologicos, setSinaisTanatologicos] = useState('');
-    const [arquivosTanatologicos, setArquivosTanatologicos] = useState<FileItem[]>([]);
+    const [arquivosTanatologicos, setArquivosTanatologicos] = useState<UploadWithMeta[]>([]);
     const [descricaoLesoesCadaver, setDescricaoLesoesCadaver] = useState('');
-    const [arquivosLesoesCadaver, setArquivosLesoesCadaver] = useState<FileItem[]>([]);
+    const [arquivosLesoesCadaver, setArquivosLesoesCadaver] = useState<UploadWithMeta[]>([]);
     const [vestigiosPerinecroscopia, setVestigiosPerinecroscopia] = useState<VestigioResumo[]>([]);
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});

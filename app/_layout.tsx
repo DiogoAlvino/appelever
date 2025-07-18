@@ -57,7 +57,8 @@ export default function RootLayout() {
           <Stack.Screen name="forensicForm/[forensicId]" options={{ title: 'Ficha de Análise Forense' }} />
           <Stack.Screen name="inspections" options={{ title: 'Lista de inspeções' }} />
           <Stack.Screen name="equipments" options={{ title: 'Lista de equipamentos' }} />
-          <Stack.Screen name="forensics" options={{ title: 'Lista de Análises ' }} />
+          <Stack.Screen name="forensics" options={{ title: 'Lista de Análises' }} />
+          <Stack.Screen name="forensic" options={{ title: 'Análise Forense' }} />
           <Stack.Screen name="reportInspection/[equipmentId]" options={{ title: 'Relatório de Inspeção' }} />
           <Stack.Screen name="forensicPage" options={{ title: 'Análise Forense' }} />
           <Stack.Screen name="previewImage" options={{ title: 'Imagem' }} />
