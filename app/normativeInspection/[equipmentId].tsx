@@ -1,5 +1,5 @@
 import Feather from "@expo/vector-icons/build/Feather";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import AlertMessage from "~/components/messages/alertMessage";
 import SecondarySection from "~/components/sections/secondarySection";
@@ -8,13 +8,18 @@ import { router, useLocalSearchParams } from "expo-router";
 import MainButton from "~/components/buttons/mainButton";
 import { useEquipmentById } from '~/hooks/useEquipmentById';
 import InspectionSection from "~/components/sections/inspectionSection";
-import { saveInspection } from '~/services/inspectionService';
+import { fetchInspectionById, saveInspection } from '~/services/inspectionService';
 import FeedbackModal from "~/components/modal/feedbackModal";
-import { UploadModel, UploadWithMeta } from "~/models/uploadModel";
+import { UploadWithMeta } from "~/models/uploadModel";
 import TabBar from "~/components/layout/tabBar";
 
 export default function EquipmentPage() {
-  const { equipmentId } = useLocalSearchParams<{ equipmentId: string }>();
+  const { equipmentId, inspectionId, mode } = useLocalSearchParams<{
+    equipmentId: string;
+    inspectionId?: string;
+    mode?: string;
+  }>();
+
   const [respostas, setRespostas] = useState<{ [id: string]: 'sim' | 'nao' | 'na' | null }>({});
   const [imagens, setImagens] = useState<{ [id: string]: UploadWithMeta[] }>({});
 
@@ -23,6 +28,43 @@ export default function EquipmentPage() {
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackType, setFeedbackType] = useState<'loading' | 'success' | 'error'>('loading');
   const [feedbackMessage, setFeedbackMessage] = useState('');
+
+  useEffect(() => {
+    const loadInspection = async () => {
+      if (mode === 'edit' && inspectionId) {
+        try {
+          const inspection = await fetchInspectionById(String(inspectionId));
+          if (inspection) {
+            setRespostas(
+              Object.fromEntries(
+                Object.entries(inspection.answers).map(([id, answer]) => [id, answer.answer])
+              )
+            );
+
+            setImagens(
+              Object.fromEntries(
+                Object.entries(inspection.answers).map(([id, answer]) => [
+                  id,
+                  (answer.uploads || []).map((file, index) => ({
+                    ...file,
+                    uri: file.uri || file.arquivo,
+                    id: file.id || `${id}-${index}`,
+                    size: file.size || 0,
+                  })),
+                ])
+              )
+            );
+          }
+        } catch (err) {
+          console.error('Erro ao carregar inspeção para edição', err);
+        }
+      }
+    };
+
+    loadInspection();
+  }, [mode, inspectionId]);
+
+
 
   const handleReport = async () => {
     try {
@@ -149,7 +191,7 @@ export default function EquipmentPage() {
         ]}
       />
     </>
-    
+
   );
 }
 

@@ -1,5 +1,5 @@
 import { db } from '~/utils/firebase';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
 import { InspectionModel } from '~/models/inspectionModel';
 import { questions } from '~/data/questions';
 import { InspectionAnswerModel } from '~/models/inspectionAnswerModel';
@@ -42,4 +42,21 @@ export async function saveInspection(
   };
 
   await addDoc(collection(db, 'inspections'), novaInspecao);
+}
+
+export async function fetchInspectionById(inspectionId: string): Promise<InspectionModel | null> {
+  try {
+    const docRef = doc(db, 'inspections', inspectionId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...(docSnap.data() as InspectionModel) };
+    } else {
+      console.warn('Inspeção não encontrada');
+      return null;
+    }
+  } catch (error) {
+    console.error('Erro ao buscar inspeção por ID:', error);
+    throw error;
+  }
 }

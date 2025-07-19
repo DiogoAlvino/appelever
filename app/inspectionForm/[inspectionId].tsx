@@ -119,29 +119,29 @@ export default function InspectionForm() {
         >
           <View style={styles.sectionContent}>
             <View style={styles.inspection} >
-                <Text style={styles.itemText}>
-                  <Text style={styles.itemTitle}>Itens verificados: </Text>
-                  {Object.keys(inspection.answers).length}
-                </Text>
+              <Text style={styles.itemText}>
+                <Text style={styles.itemTitle}>Itens verificados: </Text>
+                {Object.keys(inspection.answers).length}
+              </Text>
 
-                <Text style={styles.itemText}>
-                  <Text style={styles.itemTitle}>Itens não conformes: </Text>
-                  {Object.values(inspection.answers).filter((q) => q.answer === 'nao').length}
-                </Text>
+              <Text style={styles.itemText}>
+                <Text style={styles.itemTitle}>Itens não conformes: </Text>
+                {Object.values(inspection.answers).filter((q) => q.answer === 'nao').length}
+              </Text>
 
-                <Text style={styles.itemText}>
-                  <Text style={styles.itemTitle}>Criticidade: </Text>
-                  {(() => {
-                    const prioridades = Object.values(inspection.answers)
-                      .filter((q) => q.answer === 'nao')
-                      .map((q) => q.priority?.toLowerCase());
+              <Text style={styles.itemText}>
+                <Text style={styles.itemTitle}>Criticidade: </Text>
+                {(() => {
+                  const prioridades = Object.values(inspection.answers)
+                    .filter((q) => q.answer === 'nao')
+                    .map((q) => q.priority?.toLowerCase());
 
-                    if (prioridades.includes('alto')) return 'Alto';
-                    if (prioridades.includes('médio') || prioridades.includes('medio')) return 'Médio';
-                    if (prioridades.includes('baixo')) return 'Baixo';
-                    return 'Não aplicável';
-                  })()}
-                </Text>
+                  if (prioridades.includes('alto')) return 'Alto';
+                  if (prioridades.includes('médio') || prioridades.includes('medio')) return 'Médio';
+                  if (prioridades.includes('baixo')) return 'Baixo';
+                  return 'Não aplicável';
+                })()}
+              </Text>
             </View>
           </View>
         </SecondarySection>
@@ -243,6 +243,23 @@ export default function InspectionForm() {
       </ScrollView>
 
       <View style={styles.bottomMenu}>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => {
+            router.push({
+              pathname: '/normativeInspection/[equipmentId]',
+              params: {
+                equipmentId: inspection.equipmentId,
+                inspectionId: inspection.id,
+                mode: 'edit',
+              },
+            });
+          }}
+        >
+          <Feather name="edit" size={20} color="#173A64" />
+          <Text style={styles.menuText}>Editar</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.menuButton} onPress={handleDelete}>
           <Feather name="trash-2" size={20} color="red" />
           <Text style={[styles.menuText, { color: 'red' }]}>Excluir</Text>
@@ -261,7 +278,7 @@ export default function InspectionForm() {
         </TouchableOpacity>
 
       </View>
-      
+
       <FeedbackModal
         visible={feedbackVisible}
         type={feedbackType}
