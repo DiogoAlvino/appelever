@@ -45,6 +45,8 @@ export default function EquipmentRegistration() {
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [uploads, setUploads] = useState<UploadWithMeta[]>([]);
 
+  const [dataInstalacaoTexto, setDataInstalacaoTexto] = useState('');
+
   const { mode, equipmentId } = useLocalSearchParams();
 
   useEffect(() => {
@@ -57,8 +59,14 @@ export default function EquipmentRegistration() {
             setResponsavel(equipmentData.responsavel);
             setDetalhesEquipamento({
               ...equipmentData.detalhes_equipamento,
-              dataInstalacao: new Date(equipmentData.detalhes_equipamento.dataInstalacao),
+              dataInstalacao: equipmentData.detalhes_equipamento.dataInstalacao || '',
             });
+
+            if (equipmentData.detalhes_equipamento.dataInstalacao) {
+              const [ano, mes, dia] = equipmentData.detalhes_equipamento.dataInstalacao.split('T')[0].split('-');
+              setDataInstalacaoTexto(`${dia}/${mes}/${ano}`);
+            }
+
             setEmpresaConservadora(equipmentData.empresa_conservadora);
             if (equipmentData.uploads) {
               setUploads(equipmentData.uploads);
@@ -145,21 +153,30 @@ export default function EquipmentRegistration() {
         <PrimarySection title="Dados do Equipamento">
           <PrimaryInput
             label="Data da Instalação"
-            value={
-              detalhesEquipamento.dataInstalacao instanceof Date && !isNaN(detalhesEquipamento.dataInstalacao.getTime())
-                ? detalhesEquipamento.dataInstalacao.toISOString().split('T')[0]
-                : ''
-            }
-            onChangeText={(text) =>
-              setDetalhesEquipamento({
-                ...detalhesEquipamento,
-                dataInstalacao: new Date(text),
-              })
-            }
-            placeholder="Informe"
+            value={dataInstalacaoTexto}
+            onChangeText={(text) => {
+              setDataInstalacaoTexto(text);
+
+              const [day, month, year] = text.split('/');
+              if (day && month && year && text.length === 10) {
+                setDetalhesEquipamento({
+                  ...detalhesEquipamento,
+                  dataInstalacao: `${year}-${month}-${day}`,
+                });
+              } else {
+                setDetalhesEquipamento({
+                  ...detalhesEquipamento,
+                  dataInstalacao: '',
+                });
+              }
+
+            }}
+            placeholder="dd/mm/aaaa"
             error={!!errors.dataInstalacao}
             errorMessage={errors.dataInstalacao}
+            mask="99/99/9999"
           />
+
           <PrimaryInput label="Identificação" value={detalhesEquipamento.identificacaoEquipamento} onChangeText={(text) => { setDetalhesEquipamento({ ...detalhesEquipamento, identificacaoEquipamento: text }); clearFieldError('identificacao'); }} placeholder="Informe" error={!!errors.identificacao} errorMessage={errors.identificacao} />
           <PrimaryInput label="Fabricante" value={detalhesEquipamento.fabricante} onChangeText={(text) => { setDetalhesEquipamento({ ...detalhesEquipamento, fabricante: text }); clearFieldError('fabricante'); }} placeholder="Informe" error={!!errors.fabricante} errorMessage={errors.fabricante} />
           <PrimaryInput label="CNPJ" value={detalhesEquipamento.cnpj} onChangeText={(text) => { setDetalhesEquipamento({ ...detalhesEquipamento, cnpj: text }); clearFieldError('cnpjEquipamento'); }} placeholder="Informe" error={!!errors.cnpjEquipamento} errorMessage={errors.cnpjEquipamento} mask="99.999.999/9999-99" />

@@ -1,5 +1,5 @@
 export interface EquipmentDetailsModel {
-    dataInstalacao: Date;
+    dataInstalacao?: string;
     identificacaoEquipamento: string;
     fabricante: string;
     cnpj: string;

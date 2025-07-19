@@ -26,7 +26,7 @@ export const useEquipmentForm = () => {
   });
 
   const [detalhesEquipamento, setDetalhesEquipamento] = useState<EquipmentDetailsModel>({
-    dataInstalacao: new Date(),
+    dataInstalacao: undefined,
     identificacaoEquipamento: '',
     fabricante: '',
     cnpj: '',
@@ -49,10 +49,15 @@ export const useEquipmentForm = () => {
     usuario: '',
     local,
     responsavel,
-    detalhes_equipamento: detalhesEquipamento,
+    detalhes_equipamento: {
+      ...detalhesEquipamento,
+      dataInstalacao: detalhesEquipamento.dataInstalacao || undefined,
+    },
     empresa_conservadora: empresaConservadora,
     uploads: [],
   });
+
+
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -122,7 +127,7 @@ export const useEquipmentForm = () => {
       email: '',
     });
     setDetalhesEquipamento({
-      dataInstalacao: new Date(),
+      dataInstalacao: undefined,
       identificacaoEquipamento: '',
       fabricante: '',
       cnpj: '',
