@@ -69,8 +69,16 @@ export default function EquipmentRegistration() {
 
             setEmpresaConservadora(equipmentData.empresa_conservadora);
             if (equipmentData.uploads) {
-              setUploads(equipmentData.uploads);
+              const normalizedUploads: UploadWithMeta[] = equipmentData.uploads.map((file: any, index: number) => ({
+                ...file,
+                uri: file.uri || file.arquivo,
+                size: file.size ?? 0,
+                id: file.id ?? `${Date.now()}-${index}`,
+              }));
+
+              setUploads(normalizedUploads);
             }
+
           }
         } catch (error) {
           console.error('Erro ao carregar equipamento para edição', error);
@@ -96,12 +104,20 @@ export default function EquipmentRegistration() {
     setFeedbackVisible(true);
 
     try {
-      const formData = {
+      let formData = {
         ...getFormData(),
         uploads,
       };
 
       if (mode === 'edit' && equipmentId) {
+        const existing = await fetchEquipmentById(equipmentId as string);
+
+        formData = {
+          ...formData,
+          usuario: existing.usuario,
+          dataCriacao: existing.dataCriacao,
+        };
+
         await updateEquipment(equipmentId as string, formData);
         setFeedbackType('success');
         setFeedbackMessage('Equipamento atualizado com sucesso!');
@@ -121,6 +137,7 @@ export default function EquipmentRegistration() {
       setFeedbackMessage('Erro ao salvar o equipamento.');
     }
   };
+
 
   return (
     <>

@@ -46,6 +46,11 @@ export async function fetchEquipmentById(id: string) {
   }
 }
 
-export const updateEquipment = async (id: string, data: any) => {
-  await updateDoc(doc(db, 'equipamentos', id), data);
+export const updateEquipment = async (id: string, data: Partial<EquipmentModel>) => {
+  const docRef = doc(db, 'equipamentos', id);
+
+  delete (data as any).usuario;
+  delete (data as any).dataCriacao;
+
+  await updateDoc(docRef, data);
 };

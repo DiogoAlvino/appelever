@@ -90,21 +90,29 @@ export default function FileUpload({ onChange, value = [] }: Props) {
       {uploads.length > 0 && (
         <View style={styles.uploadedList}>
           <Text style={styles.uploadedTitle}>Imagens enviadas:</Text>
-          {uploads.map((file, index) => (
-            <View key={`${file.uri}-${index}`} style={styles.fileItem}>
-              <Image source={{ uri: file.uri }} style={styles.thumbnail} />
-              <View style={styles.fileDetails}>
-                <Text numberOfLines={1}>{file.nome}</Text>
-                <Text style={styles.fileSize}>{(file.size / (1024 * 1024)).toFixed(2)} MB</Text>
+          {uploads.map((file, index) => {
+            const displayUri = file.arquivo?.startsWith('data:image') ? file.arquivo : file.uri;
+
+            return (
+              <View key={`${file.id || displayUri}-${index}`} style={styles.fileItem}>
+                <Image source={{ uri: displayUri }} style={styles.thumbnail} />
+                <View style={styles.fileDetails}>
+                  <Text numberOfLines={1}>{file.nome}</Text>
+                  {file.size !== undefined && (
+                    <Text style={styles.fileSize}>
+                      {(file.size / (1024 * 1024)).toFixed(2)} MB
+                    </Text>
+                  )}
+                </View>
+                <TouchableOpacity onPress={() => { /* visualizar */ }} style={styles.iconButton}>
+                  <Feather name="eye" size={18} color="#007bff" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleRemove(file.id)} style={styles.iconButton}>
+                  <Feather name="trash-2" size={18} color="#dc3545" />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity onPress={() => { /* visualizar */ }} style={styles.iconButton}>
-                <Feather name="eye" size={18} color="#007bff" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleRemove(file.id)} style={styles.iconButton}>
-                <Feather name="trash-2" size={18} color="#dc3545" />
-              </TouchableOpacity>
-            </View>
-          ))}
+            );
+          })}
         </View>
       )}
     </View>
