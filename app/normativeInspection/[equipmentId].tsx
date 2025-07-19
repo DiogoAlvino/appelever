@@ -80,7 +80,8 @@ export default function EquipmentPage() {
         String(equipmentId),
         respostas,
         selectedEquipment.usuario || 'Desconhecido',
-        imagens
+        imagens,
+        mode === 'edit' ? String(inspectionId) : undefined
       );
 
       setFeedbackType('success');
