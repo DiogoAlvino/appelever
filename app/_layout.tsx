@@ -4,6 +4,7 @@ import { KeyboardAvoidingView, Platform, StyleSheet, ActivityIndicator, View } f
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '~/utils/firebase';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { MenuProvider } from 'react-native-popup-menu';
 
 export default function RootLayout() {
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -36,34 +37,37 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        <Stack
-          screenOptions={{
-            contentStyle: {
-              backgroundColor: '#F5FAFF',
-            },
-          }}
+      <MenuProvider>
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <Stack.Screen name="index" options={{ headerShown: false, headerTitle: 'Menu' }} />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="signUp" options={{ headerShown: false }} />
-          <Stack.Screen name="equipmentRegistration" options={{ title: 'Cadastro de Equipamento' }} />
-          <Stack.Screen name="normativeInspection/[equipmentId]" options={{ title: 'Inspeção Normativa' }} />
-          <Stack.Screen name="equipmentForm/[equipmentId]" options={{ title: 'Ficha de Equipamento' }} />
-          <Stack.Screen name="inspectionForm/[inspectionId]" options={{ title: 'Ficha de Inspeção' }} />
-          <Stack.Screen name="forensicForm/[forensicId]" options={{ title: 'Ficha de Análise Forense' }} />
-          <Stack.Screen name="inspections" options={{ title: 'Lista de inspeções' }} />
-          <Stack.Screen name="equipments" options={{ title: 'Lista de equipamentos' }} />
-          <Stack.Screen name="forensics" options={{ title: 'Lista de Análises' }} />
-          <Stack.Screen name="reportInspection/[equipmentId]" options={{ title: 'Relatório de Inspeção' }} />
-          <Stack.Screen name="forensicPage" options={{ title: 'Análise Forense' }} />
-          <Stack.Screen name="previewImage" options={{ title: 'Imagem' }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-      </KeyboardAvoidingView>
+          <Stack
+            screenOptions={{
+              contentStyle: {
+                backgroundColor: '#F5FAFF',
+              },
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false, headerTitle: 'Menu' }} />
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="signUp" options={{ headerShown: false }} />
+            <Stack.Screen name="equipmentRegistration" options={{ title: 'Cadastro de Equipamento' }} />
+            <Stack.Screen name="normativeInspection/[equipmentId]" options={{ title: 'Inspeção Normativa' }} />
+            <Stack.Screen name="equipmentForm/[equipmentId]" options={{ title: 'Ficha de Equipamento' }} />
+            <Stack.Screen name="inspectionForm/[inspectionId]" options={{ title: 'Ficha de Inspeção' }} />
+            <Stack.Screen name="forensicForm/[forensicId]" options={{ title: 'Ficha de Análise Forense' }} />
+            <Stack.Screen name="inspections" options={{ title: 'Lista de inspeções' }} />
+            <Stack.Screen name="equipments" options={{ title: 'Lista de equipamentos' }} />
+            <Stack.Screen name="forensics" options={{ title: 'Lista de Análises' }} />
+            <Stack.Screen name="reportInspection/[equipmentId]" options={{ title: 'Relatório de Inspeção' }} />
+            <Stack.Screen name="forensicPage" options={{ title: 'Análise Forense' }} />
+            <Stack.Screen name="previewImage" options={{ title: 'Imagem' }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+        </KeyboardAvoidingView>
+
+      </MenuProvider>
     </GestureHandlerRootView>
   );
 }

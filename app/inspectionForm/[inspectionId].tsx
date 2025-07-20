@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, router } from "expo-router";
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator, TouchableOpacity, Image } from "react-native";
 import { useState } from "react";
+import HeaderMenu from "~/components/buttons/headerMenu";
 
 import SecondarySection from "~/components/sections/secondarySection";
 import FeedbackModal from "~/components/modal/feedbackModal";
@@ -13,10 +14,13 @@ import { border, colors, fontSize } from '~/theme';
 import { capitalize } from "lodash";
 import { generatePDFWithHTML } from '~/services/pdfService';
 import TabBar from "~/components/layout/tabBar";
+import { useLayoutEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 export default function InspectionForm() {
   const { inspectionId } = useLocalSearchParams();
   const { inspection, loading: loadingInspection } = useInspectionById(String(inspectionId));
+  const navigation = useNavigation();
 
   const equipmentId = inspection?.equipmentId;
   const { equipment: selectedEquipment, loading: loadingEquipment } = useEquipmentById(equipmentId ?? '');
@@ -59,6 +63,33 @@ export default function InspectionForm() {
     });
   };
 
+  useLayoutEffect(() => {
+    if (!inspection || !selectedEquipment) return;
+
+    navigation.setOptions({
+      headerRight: () => (
+        <HeaderMenu
+          onEdit={() => {
+            if (!inspection) return;
+            router.push({
+              pathname: '/normativeInspection/[equipmentId]',
+              params: {
+                equipmentId: inspection.equipmentId,
+                inspectionId: inspection.id,
+                mode: 'edit',
+              },
+            });
+          }}
+          onGeneratePDF={() => {
+            generatePDFWithHTML(inspection, selectedEquipment);
+          }}
+          onDelete={handleDelete}
+        />
+      ),
+    });
+  }, [inspection, selectedEquipment]);
+
+
   if (loadingInspection || (equipmentId && loadingEquipment)) {
     return (
       <View style={[styles.container, { justifyContent: 'center', flex: 1 }]}>
@@ -75,47 +106,11 @@ export default function InspectionForm() {
     );
   }
 
+
+
   return (
     <>
       <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
-
-
-        <View style={styles.bottomMenu}>
-          <TouchableOpacity
-            style={styles.menuButton}
-            onPress={() => {
-              router.push({
-                pathname: '/normativeInspection/[equipmentId]',
-                params: {
-                  equipmentId: inspection.equipmentId,
-                  inspectionId: inspection.id,
-                  mode: 'edit',
-                },
-              });
-            }}
-          >
-            <Feather name="edit" size={20} color="#173A64" />
-            <Text style={styles.menuText}>Editar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuButton} onPress={handleDelete}>
-            <Feather name="trash-2" size={20} color="red" />
-            <Text style={[styles.menuText, { color: 'red' }]}>Excluir</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.menuButton}
-            onPress={() => {
-              if (inspection && selectedEquipment) {
-                generatePDFWithHTML(inspection, selectedEquipment);
-              }
-            }}
-          >
-            <Feather name="download" size={20} color="#173A64" />
-            <Text style={styles.menuText}>PDF</Text>
-          </TouchableOpacity>
-
-        </View>
 
         <SecondarySection
           icon={<Feather name="tag" size={20} color="#173A64" />}

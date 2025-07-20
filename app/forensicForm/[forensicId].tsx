@@ -9,11 +9,40 @@ import { colors, fontSize } from "~/theme";
 import { generateForensicPDF } from '~/services/pdfService';
 import { Image } from 'react-native';
 import { materials } from '~/data/materials';
+import { useNavigation } from '@react-navigation/native';
+
+import { useLayoutEffect } from 'react';
+import HeaderMenu from "~/components/buttons/headerMenu";
 
 
 export default function ForensicForm() {
     const { forensicId } = useLocalSearchParams();
     const { forensic: data, loading } = useForensicById(String(forensicId));
+
+    const navigation = useNavigation();
+
+    useLayoutEffect(() => {
+        if (!data) return;
+
+        navigation.setOptions({
+            headerRight: () => (
+                <HeaderMenu
+                    onEdit={() =>
+                        router.push({
+                            pathname: '/forensicPage',
+                            params: { mode: 'edit', forensicId: String(forensicId) },
+                        })
+                    }
+                    onGeneratePDF={() => generateForensicPDF(data)}
+                    onDelete={() => {
+                        // coloque aqui a função que irá excluir a análise forense
+                        // ex: handleDeleteForensic();
+                    }}
+                />
+            ),
+        });
+    }, [data]);
+
 
     const hasError = !loading && !data;
 
@@ -332,16 +361,6 @@ export default function ForensicForm() {
                         <Text style={styles.text}>Cabelo: {data?.exames?.cadaverCabelo}</Text>
                     </SecondarySection>
                 </ScrollView>
-            )}
-
-            {data && (
-                <TouchableOpacity
-                    style={styles.menuButton}
-                    onPress={() => generateForensicPDF(data)}
-                >
-                    <Feather name="download" size={20} color="#173A64" />
-                    <Text style={styles.menuText}>PDF</Text>
-                </TouchableOpacity>
             )}
 
 

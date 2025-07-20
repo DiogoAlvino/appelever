@@ -6,6 +6,10 @@ import SecondarySection from "~/components/sections/secondarySection";
 import { border, colors, fontSize } from '~/theme';
 import { useEquipmentById } from '~/hooks/useEquipmentById';
 
+import { useLayoutEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import HeaderMenu from "~/components/buttons/headerMenu";
+
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '~/utils/firebase';
 import { useState } from "react";
@@ -14,7 +18,27 @@ import TabBar from "~/components/layout/tabBar";
 
 export default function EquipmentForm() {
   const { equipmentId } = useLocalSearchParams();
+  const navigation = useNavigation();
   const { equipment, loading } = useEquipmentById(String(equipmentId));
+
+  useLayoutEffect(() => {
+  if (!equipment) return;
+
+  navigation.setOptions({
+    headerRight: () => (
+      <HeaderMenu
+        onEdit={() =>
+          router.push({
+            pathname: '/equipmentRegistration',
+            params: { mode: 'edit', equipmentId: String(equipment.id) },
+          })
+        }
+        onDelete={handleDelete}
+      />
+    ),
+  });
+}, [equipment]);
+
 
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackType, setFeedbackType] = useState<'confirm' | 'loading' | 'success' | 'error'>('confirm');
@@ -108,31 +132,6 @@ export default function EquipmentForm() {
     
 
       <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
-
-        <View style={styles.bottomMenu}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() =>
-            router.push({
-              pathname: '/equipmentRegistration',
-              params: { mode: 'edit', equipmentId: String(equipment.id) },
-            })
-          }
-        >
-          <Feather name="edit" size={20} color="#173A64" />
-          <Text style={styles.menuText}>Editar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuButton} onPress={handleDelete}>
-          <Feather name="trash-2" size={20} color="red" />
-          <Text style={[styles.menuText, { color: 'red' }]}>Excluir</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuButton} onPress={handleInspection}>
-          <Feather name="navigation" size={20} color="#173A64" />
-          <Text style={styles.menuText}>Inspeção</Text>
-        </TouchableOpacity>
-      </View>
 
         <SecondarySection
           icon={<Feather name="map-pin" size={20} color="#173A64" />}
@@ -265,29 +264,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: fontSize.placeholder,
     color: colors.primaryDark,
-  },
-  bottomMenu: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    shadowColor: 'gray',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    width: "100%",
-    borderRadius: border.radius
-  },
-  menuButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-  },
-  menuText: {
-    marginTop: 4,
-    color: '#173A64',
-    fontSize: 10,
   },
   imageWrapper: {
     marginRight: 10,
