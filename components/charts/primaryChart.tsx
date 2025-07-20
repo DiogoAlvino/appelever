@@ -44,7 +44,7 @@ export default function PrimaryChart() {
   const data = [
     { name: 'Equipamentos', population: equipmentCount, color: '#2D5BBA', legendFontColor: '#333', legendFontSize: 14 },
     { name: 'Inspeções', population: inspectionCount, color: '#6B91E4', legendFontColor: '#333', legendFontSize: 14 },
-    { name: 'Análises Forense', population: forensicCount, color: '#122F52', legendFontColor: '#333', legendFontSize: 14 },
+    { name: 'Análises', population: forensicCount, color: '#122F52', legendFontColor: '#333', legendFontSize: 14 },
   ];
 
   return (

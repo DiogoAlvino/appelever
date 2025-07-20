@@ -1,6 +1,7 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { EquipmentModel } from '~/models/equipmentModel';
+import { ForensicModel } from '~/models/forensicModel';
 import { InspectionModel } from '~/models/inspectionModel';
 import { auth } from "~/utils/firebase";
 
@@ -192,11 +193,11 @@ export async function generatePDFWithHTML(
       <div class="section">
         <h2>Itens Verificados</h2>
           ${Object.entries(inspection.answers).map(([id, q]) => {
-            const uploads = Array.isArray(q.uploads)
-              ? q.uploads.filter(file => !!file.arquivo && typeof file.arquivo === 'string')
-              : [];
+      const uploads = Array.isArray(q.uploads)
+        ? q.uploads.filter(file => !!file.arquivo && typeof file.arquivo === 'string')
+        : [];
 
-        return `
+      return `
         <div class="item">
           <p><span class="label">Item:</span> ${id}</p>
           <p><span class="label">Resposta:</span> ${q.answer?.toUpperCase()}</p>
@@ -216,7 +217,7 @@ export async function generatePDFWithHTML(
           ` : ''}
             </div>
             `;
-              }).join('')}
+    }).join('')}
         </div>
 
 
@@ -248,5 +249,40 @@ export async function generatePDFWithHTML(
     await Sharing.shareAsync(uri);
   } catch (error) {
     console.error('Erro ao gerar PDF:', error);
+  }
+}
+
+export async function generateForensicPDF(forensic: ForensicModel) {
+  try {
+    const html = `
+      <html>
+        <body>
+          <h1>Análise Forense</h1>
+          <p><strong>Responsável:</strong> ${forensic.usuario}</p>
+          <p><strong>Data:</strong> ${new Date(forensic.dataCriacao).toLocaleDateString('pt-BR')}</p>
+
+          <h2>Análise Preliminar</h2>
+          <p>${forensic.analisePreliminar?.reconhecimentoArea || ''}</p>
+          <p>${forensic.analisePreliminar?.condicoesAmbientais || ''}</p>
+          <p>${forensic.analisePreliminar?.caracteristicasLocal || ''}</p>
+
+          <h2>Risco</h2>
+          <p><strong>Risco Acidente:</strong> ${forensic.risco?.riscoAPR?.riscoAcidente || ''}</p>
+          <p><strong>Gravidade:</strong> ${forensic.risco?.riscoAPR?.gravidade || ''}</p>
+          <p><strong>Probabilidade:</strong> ${forensic.risco?.riscoAPR?.probabilidade || ''}</p>
+        </body>
+      </html>
+    `;
+
+    const file = await Print.printToFileAsync({ html });
+
+    if (!file?.uri) {
+      console.error('Erro: URI do PDF não encontrada.');
+      return;
+    }
+
+    await Sharing.shareAsync(file.uri);
+  } catch (error) {
+    console.error('Erro ao gerar ou compartilhar o PDF:', error);
   }
 }
