@@ -133,6 +133,14 @@ export function useForensicById(forensicId: string) {
                         arquivosLesoesCadaver: examsData.arquivosLesoesCadaver || [],
                         vestigiosPerinecroscopia,
                     },
+                    condicaoVitimas: undefined,
+                    numeroVitimas: undefined,
+                    viatura: undefined,
+                    autoridadePolicialNome: undefined,
+                    tipoOcorrencia: undefined,
+                    matriculaPerito: undefined,
+                    cargoPerito: false,
+                    peritoResponsavel: undefined
                 };
 
                 setData(fullData);

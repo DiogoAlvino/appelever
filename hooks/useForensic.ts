@@ -114,6 +114,7 @@ export const useForensic = () => {
             idade: '',
             descricaoLesoes: '',
             depoimentoRelato: '',
+            arquivoLesoes: [],
         },
     ]);
     const [vestigiosEntrevistas, setVestigiosEntrevistas] = useState<VestigioResumo[]>([]);

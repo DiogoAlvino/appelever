@@ -130,7 +130,8 @@ export function isExamesRespondido(dados: ForensicModel): boolean {
       dep.endereco?.trim() !== '' ||
       dep.idade?.trim() !== '' ||
       dep.descricaoLesoes?.trim() !== '' ||
-      dep.depoimentoRelato?.trim() !== ''
+      dep.depoimentoRelato?.trim() !== '' ||
+      dep.arquivoLesoes.length > 0
     ) ||
     exames.cadaverSexo?.trim() !== '' ||
     exames.cadaverCorPele?.trim() !== '' ||

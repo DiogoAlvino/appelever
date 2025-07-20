@@ -5,7 +5,7 @@ export interface EquipmentDetailsModel {
     cnpj: string;
     modelo: string;
     capacidadeNominal: number;
-    tipoDeUso: string;
+    tipoDeUso?: string;
     numeroDeParadas: number;
     casaDeMaquinas: boolean;
 }

@@ -11,19 +11,20 @@ export type CampoChecklist = {
 
 export type VestigioResumo = {
   numeroVestigio: string;
-  naturezaVestigio: string;
+  naturezaVestigio?: string;
   origem: 'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia';
 };
 
 export type Depoimento = {
-  tipoEntrevistado: string;
-  genero: string;
+  tipoEntrevistado?: string;
+  genero?: string;
   nomeEntrevistado: string;
   identificacao: string;
   endereco: string;
   idade: string;
   descricaoLesoes: string;
   depoimentoRelato: string;
+  arquivoLesoes: UploadWithMeta[];
 };
 
 export type Documentacao = {
@@ -57,7 +58,7 @@ export type DadosIniciais = {
   viatura: string;
   numeroVitimas: string;
   condicaoVitimas: string;
-  autoridadePolicial: string;
+  autoridadePolicial?: string; 
   localizacao?: {
     address: string;
     latitude: number;
@@ -84,12 +85,12 @@ export type InformacaoFato = {
 export type RiscoAPR = {
   peritoResponsavel: string;
   peritoMatricula: string;
-  riscoAcidente: string;
-  riscoFisico: string;
+  riscoAcidente?: string;
+  riscoFisico?: string;
   riscoQuimico: boolean;
   riscoBiologico: boolean;
-  gravidade: string;
-  probabilidade: string;
+  gravidade?: string;
+  probabilidade?: string;
   medidasMitigatoria: string;
 };
 
@@ -139,7 +140,7 @@ export type ForensicModel = {
     depoimentos: Depoimento[];
     vestigiosEntrevistas: VestigioResumo[];
 
-    cadaverSexo: string;
+    cadaverSexo?: string;
     cadaverCorPele: string;
     cadaverCabelo: string;
     cadaverSinaisIdentificadores: string;

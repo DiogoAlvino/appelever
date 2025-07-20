@@ -26,6 +26,7 @@ import { ForensicModel } from '~/models/forensicModel';
 import FeedbackModal from '../modal/feedbackModal';
 import { getAuth } from 'firebase/auth';
 import { router } from 'expo-router';
+import { DepoimentoItem } from './depoimentoItem';
 
 import { isDadosIniciaisRespondido, isMateriaisRespondido, isAnalisePreliminarRespondido, isRiscoAPRRespondido, isExamesRespondido } from '~/utils/forensicUtils';
 
@@ -119,6 +120,9 @@ export default function ForensicSection() {
     const [feedbackMessage, setFeedbackMessage] = useState('');
 
     const [vestigioIndex, setVestigioIndex] = useState(0);
+
+    const [tipoSelecionado, setTipoSelecionado] = useState<string | undefined>(undefined);
+
 
 
 
@@ -1229,128 +1233,19 @@ export default function ForensicSection() {
                                 <Text style={styles.titulos}>5.3 Entrevistas</Text>
 
                                 {depoimentos.map((item, index) => (
-                                    <View key={index} style={{ marginBottom: 12, gap: 12 }}>
-                                        <Text style={styles.titulos}>Registro e análise de depoimentos {index + 1}</Text>
-
-                                        <PrimarySelect
-                                            label="Tipo do entrevistado"
-                                            selected={item.tipoEntrevistado}
-                                            onSelect={(value) => {
-                                                const copia = [...depoimentos];
-                                                copia[index].tipoEntrevistado = value;
-
-                                                if (value !== 'Vítimas sobreviventes') {
-                                                    copia[index].genero = '';
-                                                    copia[index].idade = '';
-                                                    copia[index].descricaoLesoes = '';
-                                                }
-
-                                                setDepoimentos(copia);
-                                            }}
-                                            placeholder="Selecione"
-                                            options={[
-                                                'Vítimas sobreviventes',
-                                                'Testemunhas',
-                                                'Síndico/Administrador',
-                                                'Zelador',
-                                                'Técnicos de manutenção',
-                                            ]}
-                                        />
-
-                                        {item.tipoEntrevistado !== '' && (
-                                            <>
-                                                <PrimaryInput
-                                                    label="Nome"
-                                                    placeholder="Informe"
-                                                    value={item.nomeEntrevistado}
-                                                    onChangeText={(text) => {
-                                                        const copia = [...depoimentos];
-                                                        copia[index].nomeEntrevistado = text;
-                                                        setDepoimentos(copia);
-                                                    }}
-                                                />
-
-                                                <PrimaryInput
-                                                    label="Identificação (CPF, RG)"
-                                                    placeholder="Informe"
-                                                    value={item.identificacao}
-                                                    onChangeText={(text) => {
-                                                        const copia = [...depoimentos];
-                                                        copia[index].identificacao = text;
-                                                        setDepoimentos(copia);
-                                                    }}
-                                                />
-
-                                                <PrimaryInput
-                                                    label="Endereço"
-                                                    placeholder="Informe"
-                                                    value={item.endereco}
-                                                    onChangeText={(text) => {
-                                                        const copia = [...depoimentos];
-                                                        copia[index].endereco = text;
-                                                        setDepoimentos(copia);
-                                                    }}
-                                                />
-
-                                                {item.tipoEntrevistado === 'Vítimas sobreviventes' && (
-                                                    <>
-                                                        <PrimarySelect
-                                                            label="Sexo"
-                                                            selected={item.genero}
-                                                            onSelect={(value) => {
-                                                                const copia = [...depoimentos];
-                                                                copia[index].genero = value;
-                                                                setDepoimentos(copia);
-                                                            }}
-                                                            placeholder="Selecione"
-                                                            options={['Masculino', 'Feminino']}
-                                                        />
-
-                                                        <PrimaryInput
-                                                            label="Idade"
-                                                            placeholder="Informe"
-                                                            value={item.idade}
-                                                            onChangeText={(text) => {
-                                                                const copia = [...depoimentos];
-                                                                copia[index].idade = text;
-                                                                setDepoimentos(copia);
-                                                            }}
-                                                        />
-
-                                                        <Text style={styles.textos}>Descrição das lesões</Text>
-                                                        <VoiceInput
-                                                            value={item.descricaoLesoes}
-                                                            onChangeText={(text) => {
-                                                                const copia = [...depoimentos];
-                                                                copia[index].descricaoLesoes = text;
-                                                                setDepoimentos(copia);
-                                                            }}
-                                                        />
-                                                        <FileUpload />
-                                                    </>
-                                                )}
-
-                                                <Text style={styles.textos}>Depoimento/Relato</Text>
-                                                <VoiceInput
-                                                    value={item.depoimentoRelato}
-                                                    onChangeText={(text) => {
-                                                        const copia = [...depoimentos];
-                                                        copia[index].depoimentoRelato = text;
-                                                        setDepoimentos(copia);
-                                                    }}
-                                                />
-                                            </>
-                                        )}
-
-                                        {index > 0 && (
-                                            <RemoveButton
-                                                label="Remover entrevista"
-                                                onPress={() => {
-                                                    setDepoimentos((prev) => prev.filter((_, i) => i !== index));
-                                                }}
-                                            />
-                                        )}
-                                    </View>
+                                    <DepoimentoItem
+                                        key={index}
+                                        item={item}
+                                        index={index}
+                                        onUpdate={(i, novoItem) => {
+                                            const copia = [...depoimentos];
+                                            copia[i] = novoItem;
+                                            setDepoimentos(copia);
+                                        }}
+                                        onRemove={() => {
+                                            setDepoimentos((prev) => prev.filter((_, i) => i !== index));
+                                        }}
+                                    />
                                 ))}
 
                                 <AddButton
@@ -1367,6 +1262,7 @@ export default function ForensicSection() {
                                                 idade: '',
                                                 descricaoLesoes: '',
                                                 depoimentoRelato: '',
+                                                arquivoLesoes: [],
                                             },
                                         ])
                                     }
@@ -1436,7 +1332,7 @@ export default function ForensicSection() {
                                         <PrimarySelect
                                             label="Sexo"
                                             selected={cadaverSexo}
-                                            onSelect={setCadaverSexo}
+                                            onSelect={(value) => setCadaverSexo(value || '')}
                                             placeholder="Selecione"
                                             options={['Masculino', 'Feminino']}
                                         />
@@ -1619,8 +1515,9 @@ export default function ForensicSection() {
                                                         selected={dadosPreliminares[vestigioIndex].naturezaVestigio}
                                                         onSelect={(value) => {
                                                             const copia = [...dadosPreliminares];
-                                                            copia[vestigioIndex].naturezaVestigio = value;
-                                                            if (value !== 'Outros') copia[0].naturezaOutros = '';
+                                                            const safeValue = value || ''; // transforma undefined em string vazia
+                                                            copia[vestigioIndex].naturezaVestigio = safeValue;
+                                                            if (safeValue !== 'Outros') copia[0].naturezaOutros = '';
                                                             setDadosPreliminares(copia);
                                                         }}
                                                         placeholder="Selecione"
@@ -1709,13 +1606,15 @@ export default function ForensicSection() {
                                                         selected={acondicionamento[vestigioIndex].tipoAcondicionamento}
                                                         onSelect={(value) => {
                                                             const copia = [...acondicionamento];
-                                                            copia[vestigioIndex].tipoAcondicionamento = value;
-                                                            if (value !== 'Outros') copia[vestigioIndex].tipoAcondicionamentoOutros = '';
+                                                            const safeValue = value || ''; // evita erro de tipo
+                                                            copia[vestigioIndex].tipoAcondicionamento = safeValue;
+                                                            if (safeValue !== 'Outros') copia[vestigioIndex].tipoAcondicionamentoOutros = '';
                                                             setAcondicionamento(copia);
                                                         }}
                                                         placeholder="Selecione"
                                                         options={['Saco plástico', 'Frasco', 'Caixa térmica', 'Outros']}
                                                     />
+
 
                                                     {acondicionamento[vestigioIndex].tipoAcondicionamento === 'Outros' && (
                                                         <PrimaryInput

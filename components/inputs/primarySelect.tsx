@@ -12,7 +12,6 @@ const [modelo, setModelo] = useState<string | undefined>(undefined);
 
 */
 
-
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, FlatList } from 'react-native';
 import { Feather } from '@expo/vector-icons';
@@ -22,15 +21,25 @@ interface PrimarySelectProps {
   label: string;
   placeholder?: string;
   options: string[];
-  onSelect: (option: string) => void;
+  onSelect: (option: string | undefined) => void;
   selected?: string;
 }
 
-export default function PrimarySelect({ label, placeholder = 'Selecione', options, onSelect, selected }: PrimarySelectProps) {
+export default function PrimarySelect({
+  label,
+  placeholder = 'Selecione',
+  options,
+  onSelect,
+  selected,
+}: PrimarySelectProps) {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleSelect = (option: string) => {
-    onSelect(option);
+    if (option === selected) {
+      onSelect(undefined); // desseleciona se já estiver selecionado
+    } else {
+      onSelect(option); // seleciona normalmente
+    }
     setModalVisible(false);
   };
 
@@ -52,8 +61,18 @@ export default function PrimarySelect({ label, placeholder = 'Selecione', option
               data={options}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.optionItem} onPress={() => handleSelect(item)}>
-                  <Text style={styles.optionText}>{item}</Text>
+                <TouchableOpacity
+                  style={styles.optionItem}
+                  onPress={() => handleSelect(item)}
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      item === selected && { fontWeight: 'bold', color: colors.mainColor },
+                    ]}
+                  >
+                    {item}
+                  </Text>
                 </TouchableOpacity>
               )}
             />
