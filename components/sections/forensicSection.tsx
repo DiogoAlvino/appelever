@@ -272,6 +272,9 @@ export default function ForensicSection() {
         perinecroscopia: 'Perinecroscopia',
     };
 
+    const respondidoMateriais =
+  materiaisSelecionados.length > 0 ||
+  !!materialOutroDescricao?.trim();
 
     return (
         <View style={styles.section}>
@@ -279,8 +282,6 @@ export default function ForensicSection() {
                 title="1. Dados iniciais"
             >
                 <View style={styles.campos}>
-
-                    {/* Perito Responsável */}
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Perito responsável</Text>
 
@@ -454,6 +455,7 @@ export default function ForensicSection() {
 
             <PrimaryList
                 title="2. Materiais, Equipamentos, EPI e EPC"
+                respondido={respondidoMateriais}
             >
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
@@ -1278,12 +1280,11 @@ export default function ForensicSection() {
                                             options={['Masculino', 'Feminino']}
                                         />
 
-                                        <PrimarySelect
+                                         <PrimaryInput
                                             label="Cor da pele"
-                                            selected={cadaverCorPele}
-                                            onSelect={setCadaverCorPele}
-                                            placeholder="Selecione"
-                                            options={['Branco', 'Preto', 'Pardo', 'Amarelo', 'Roxo']}
+                                            placeholder="Informe"
+                                            value={cadaverCorPele}
+                                            onChangeText={setCadaverCorPele}
                                         />
 
                                         <PrimaryInput

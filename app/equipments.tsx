@@ -7,6 +7,7 @@ import SearchInput from '~/components/inputs/searchInput';
 import TabBar from '~/components/layout/tabBar';
 import EquipmentList from '~/components/lists/equipamentList';
 import { useEquipments } from '~/hooks/useEquipments';
+import AlertMessage from '~/components/messages/alertMessage';
 
 export default function Equipments() {
   const { equipments, loading, reload } = useEquipments();
@@ -46,6 +47,10 @@ export default function Equipments() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
           <SearchInput onSearch={reload} />
+          <AlertMessage
+            type="info"
+            message="Selecione apenas um equipamento para realizar a inspeção."
+          />
           <View style={styles.bar}>
             <Text>Total: {equipments.length}</Text>
           </View>
@@ -66,7 +71,7 @@ export default function Equipments() {
       <TabBar
         tabs={[
           { icon: 'home', label: 'Inicio', route: '/' },
-          { icon: 'tool', label: 'Cadastrar equipamentos', route: '/equipmentRegistration' },
+          { icon: 'plus-circle', label: 'Cadastrar', route: '/equipmentRegistration' },
           { icon: 'list', label: 'Inpeções', route: '/inspections' },
         ]}
       />

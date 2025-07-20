@@ -153,7 +153,8 @@ const styles = StyleSheet.create({
     },
     servicesButtons: {
         flexDirection: "row",
-        gap: 8,
+        gap: 10,
+        
     },
 
     servicesTitle: {

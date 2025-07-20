@@ -2,6 +2,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { EquipmentModel } from '~/models/equipmentModel';
 import { InspectionModel } from '~/models/inspectionModel';
+import { auth } from "~/utils/firebase";
 
 export async function generatePDFWithHTML(
   inspection: InspectionModel,
@@ -56,7 +57,7 @@ export async function generatePDFWithHTML(
         body {
           font-family: Arial, sans-serif;
           color: #333;
-          margin: 20px;
+          margin: 45px;
         }
 
         h1, h2 {
@@ -72,10 +73,9 @@ export async function generatePDFWithHTML(
 
         .section {
           border: 1px solid #ccc;
-          border-radius: 8px;
-          padding: 15px;
-          margin-bottom: 20px;
-          page-break-inside: avoid;
+          border-radius: 10px;
+          padding: 20px;
+          margin-bottom: 50px;
         }
 
         .label {
@@ -97,7 +97,7 @@ export async function generatePDFWithHTML(
 
         .footer {
           text-align: right;
-          font-size: 12px;
+          font-size: 14px;
           color: #555;
           margin-top: 40px;
         }
@@ -119,7 +119,7 @@ export async function generatePDFWithHTML(
     .image-item img {
       width: 100%;
       height: auto;
-      max-height: 200px;
+      max-height: 300px;
       object-fit: contain;
       border: 1px solid #ccc;
       border-radius: 6px;
@@ -159,24 +159,25 @@ export async function generatePDFWithHTML(
         <p><span class="label">Nº Paradas:</span> ${equipment?.detalhes_equipamento?.numeroDeParadas}</p>
         <p><span class="label">Casa de Máquinas:</span> ${equipment?.detalhes_equipamento?.casaDeMaquinas ? 'Sim' : 'Não'}</p>
         <p><span class="label">Empresa Conservadora:</span> ${equipment?.empresa_conservadora?.razaoSocial} (${equipment?.empresa_conservadora?.cnpj})</p>
+        
+        ${equipment?.uploads?.filter(u => u.arquivo).length > 0 ? `
+          <p><span class="label">Arquivos: </span></p>
+          <div class="image-grid">
+            ${equipment.uploads.filter(u => u.arquivo).map(file => `
+              <div class="image-item">
+                <img src="${file.arquivo}" />
+                 <p>${file.nome}</p>
+              </div>
+           `).join('')}
+          </div>
+        ` : ''}
       </div>
 
-      ${equipment?.uploads?.filter(u => u.arquivo).length > 0 ? `
-        <h2 style="page-break-before: always;">Anexos do Equipamento</h2>
-        <div class="image-grid">
-          ${equipment.uploads.filter(u => u.arquivo).map(file => `
-            <div class="image-item">
-              <img src="${file.arquivo}" />
-               <p>${file.nome}</p>
-            </div>
-         `).join('')}
-        </div>
-      ` : ''}
 
 
       <div class="section">
         <h2>Responsável pela inspeção</h2>
-        <p><span class="label">Responsável:</span> ${inspection?.usuario}</p>
+        <p><span class="label">Responsável:</span> ${auth.currentUser?.displayName || 'usuário'}</p>
         <p><span class="label">Data:</span> ${new Date(inspection?.dataCriacao).toLocaleDateString('pt-BR')}</p>
       </div>
 
@@ -190,37 +191,34 @@ export async function generatePDFWithHTML(
 
       <div class="section">
         <h2>Itens Verificados</h2>
-        ${Object.entries(inspection.answers).map(([id, q]) => `
-          <div class="item">
-            <p><span class="label">Item:</span> ${id}</p>
-            <p><span class="label">Resposta:</span> ${q.answer?.toUpperCase()}</p>
-            <p><span class="label">Prioridade:</span> ${q.priority}</p>
-            <p><span class="label">Verificação:</span> ${q.verification}</p>
-          </div>
-        `).join('')}
-      </div>
+          ${Object.entries(inspection.answers).map(([id, q]) => {
+            const uploads = Array.isArray(q.uploads)
+              ? q.uploads.filter(file => !!file.arquivo && typeof file.arquivo === 'string')
+              : [];
 
-      ${Object.entries(inspection.answers).flatMap(([id, q]) => {
-      const uploads = Array.isArray(q.uploads)
-        ? q.uploads.filter(file => !!file.arquivo && typeof file.arquivo === 'string')
-        : [];
+        return `
+        <div class="item">
+          <p><span class="label">Item:</span> ${id}</p>
+          <p><span class="label">Resposta:</span> ${q.answer?.toUpperCase()}</p>
+          <p><span class="label">Prioridade:</span> ${q.priority}</p>
+          <p><span class="label">Verificação:</span> ${q.verification}</p>
+          
+          ${uploads.length > 0 ? `
+            <p><span class="label">Arquivos: </span></p>
+            <div class="image-grid">
+              ${uploads.map(file => `
+                <div class="image-item">
+                  <img src="${file.arquivo}" />
+                  <p>${file.nome}</p>
+                </div>
+            ` ).join('')}
+            </div>
+          ` : ''}
+            </div>
+            `;
+              }).join('')}
+        </div>
 
-      if (uploads.length === 0) return [];
-
-      return `
-    <div class="answer-section">
-      <h2 style="page-break-before: always;">Imagens do Item ${id}</h2>
-      <div class="image-grid">
-        ${uploads.map(file => `
-          <div class="image-item">
-            <img src="${file.arquivo}" />
-            <p>${file.nome}</p>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-    }).join('')}
 
 
       <div class="section">
