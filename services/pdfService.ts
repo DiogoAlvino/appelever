@@ -254,35 +254,176 @@ export async function generatePDFWithHTML(
 
 export async function generateForensicPDF(forensic: ForensicModel) {
   try {
+    const dataHoraAtual = new Date().toLocaleString('pt-BR');
+
+    const imagensAnalise = forensic.analisePreliminar?.arquivosReconhecimentoArea || [];
+    const imagensDocumentacao = [
+      ...(forensic.exames?.documentacao?.projetosArquivos || []),
+      ...(forensic.exames?.documentacao?.memorialCalculoArquivos || []),
+      ...(forensic.exames?.documentacao?.licencaAlvaraArquivos || []),
+      ...(forensic.exames?.documentacao?.artArquivos || []),
+      ...(forensic.exames?.documentacao?.planoManutencaoArquivos || []),
+      ...(forensic.exames?.documentacao?.contratoManutencaoArquivos || []),
+      ...(forensic.exames?.documentacao?.registroManutencaoArquivos || []),
+      ...(forensic.exames?.documentacao?.relatorioRiaArquivos || []),
+      ...(forensic.exames?.documentacao?.outroArquivos || []),
+    ];
+
     const html = `
       <html>
-        <body>
-          <h1>Análise Forense</h1>
-          <p><strong>Responsável:</strong> ${forensic.usuario}</p>
-          <p><strong>Data:</strong> ${new Date(forensic.dataCriacao).toLocaleDateString('pt-BR')}</p>
+      <head>
+        <meta charset="UTF-8" />
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #333;
+          }
+          h1, h2 {
+            text-align: center;
+          }
+          .section {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 40px;
+          }
+          .label {
+            font-weight: bold;
+          }
+          .image-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+            justify-content: center;
+          }
+          .image-item {
+            width: calc(50% - 10px);
+            text-align: center;
+            page-break-inside: avoid;
+          }
+          .image-item img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+          }
+          .image-item p {
+            font-size: 12px;
+            margin-top: 4px;
+            color: #555;
+          }
+          .footer {
+            text-align: right;
+            font-size: 14px;
+            margin-top: 40px;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Ficha de Análise Forense</h1>
 
+        <div class="section">
+          <h2>Responsável</h2>
+          <p><span class="label">Usuário:</span> ${forensic.usuario}</p>
+          <p><span class="label">Data:</span> ${new Date(forensic.dataCriacao).toLocaleDateString('pt-BR')}</p>
+        </div>
+
+        <div class="section">
+          <h2>Dados Iniciais</h2>
+          <p><span class="label">Autoridade Policial:</span> ${forensic.dadosIniciais?.autoridadePolicial}</p>
+          <p><span class="label">Nome da Autoridade:</span> ${forensic.dadosIniciais?.autoridadePolicialNome}</p>
+          <p><span class="label">Cargo do Perito:</span> ${forensic.dadosIniciais?.cargoPerito}</p>
+          <p><span class="label">Condição das Vítimas:</span> ${forensic.dadosIniciais?.condicaoVitimas}</p>
+          <p><span class="label">Data/Hora:</span> ${new Date(forensic.dadosIniciais?.dataHora).toLocaleString('pt-BR')}</p>
+          <p><span class="label">Matrícula:</span> ${forensic.dadosIniciais?.matriculaPerito}</p>
+          <p><span class="label">Número de Vítimas:</span> ${forensic.dadosIniciais?.numeroVitimas}</p>
+          <p><span class="label">Responsável:</span> ${forensic.dadosIniciais?.peritoResponsavel}</p>
+          <p><span class="label">Tipo de Ocorrência:</span> ${forensic.dadosIniciais?.tipoOcorrencia}</p>
+          <p><span class="label">Viatura:</span> ${forensic.dadosIniciais?.viatura}</p>
+          <p><span class="label">Endereço:</span> ${forensic.dadosIniciais?.localizacao?.address}</p>
+          <p><span class="label">Latitude:</span> ${forensic.dadosIniciais?.localizacao?.latitude}</p>
+          <p><span class="label">Longitude:</span> ${forensic.dadosIniciais?.localizacao?.longitude}</p>
+        </div>
+
+        <div class="section">
+          <h2>Equipe Pericial</h2>
+          ${forensic.equipePericial?.map(p => `
+            <p><span class="label">Nome:</span> ${p.nome}, <span class="label">Cargo:</span> ${p.cargo}, <span class="label">Matrícula:</span> ${p.matricula}</p>
+          `).join('') || '<p>Nenhum membro registrado.</p>'}
+        </div>
+
+        <div class="section">
           <h2>Análise Preliminar</h2>
-          <p>${forensic.analisePreliminar?.reconhecimentoArea || ''}</p>
-          <p>${forensic.analisePreliminar?.condicoesAmbientais || ''}</p>
-          <p>${forensic.analisePreliminar?.caracteristicasLocal || ''}</p>
+          <p><span class="label">Reconhecimento da área:</span> ${forensic.analisePreliminar?.reconhecimentoArea}</p>
+          <p><span class="label">Condições Ambientais:</span> ${forensic.analisePreliminar?.condicoesAmbientais}</p>
+          <p><span class="label">Características do Local:</span> ${forensic.analisePreliminar?.caracteristicasLocal}</p>
+          ${imagensAnalise.length > 0 ? `
+            <div class="image-grid">
+              ${imagensAnalise.map(f => `
+                <div class="image-item">
+                  <img src="${f.arquivo}" />
+                  <p>${f.nome}</p>
+                </div>
+              `).join('')}
+            </div>` : ''}
+        </div>
 
-          <h2>Risco</h2>
-          <p><strong>Risco Acidente:</strong> ${forensic.risco?.riscoAPR?.riscoAcidente || ''}</p>
-          <p><strong>Gravidade:</strong> ${forensic.risco?.riscoAPR?.gravidade || ''}</p>
-          <p><strong>Probabilidade:</strong> ${forensic.risco?.riscoAPR?.probabilidade || ''}</p>
-        </body>
+        <div class="section">
+          <h2>Riscos</h2>
+          <p><span class="label">Risco Acidente:</span> ${forensic.risco?.riscoAPR?.riscoAcidente}</p>
+          <p><span class="label">Biológico:</span> ${forensic.risco?.riscoAPR?.riscoBiologico ? 'Sim' : 'Não'}</p>
+          <p><span class="label">Físico:</span> ${forensic.risco?.riscoAPR?.riscoFisico}</p>
+          <p><span class="label">Químico:</span> ${forensic.risco?.riscoAPR?.riscoQuimico ? 'Sim' : 'Não'}</p>
+          <p><span class="label">Gravidade:</span> ${forensic.risco?.riscoAPR?.gravidade}</p>
+          <p><span class="label">Probabilidade:</span> ${forensic.risco?.riscoAPR?.probabilidade}</p>
+          <p><span class="label">Medidas Mitigatórias:</span> ${forensic.risco?.riscoAPR?.medidasMitigatoria}</p>
+        </div>
+
+        <div class="section">
+          <h2>Materiais, EPI e EPC</h2>
+          ${Array.isArray(forensic.materiais?.selecionados) && forensic.materiais.selecionados.length > 0
+            ? forensic.materiais.selecionados.map(id => `<p>• ${id}</p>`).join('')
+            : '<p>Nenhum material selecionado.</p>'}
+          ${forensic.materiais?.outroDescricao ? `<p><span class="label">Outro:</span> ${forensic.materiais.outroDescricao}</p>` : ''}
+        </div>
+
+        <div class="section">
+          <h2>Exames - Documentação</h2>
+          <p><span class="label">Projetos:</span> ${forensic.exames?.documentacao?.projetos}</p>
+          <p><span class="label">Memorial de Cálculo:</span> ${forensic.exames?.documentacao?.memorialCalculo}</p>
+          <p><span class="label">Licença/Alvará:</span> ${forensic.exames?.documentacao?.licencaAlvara}</p>
+          <p><span class="label">ART:</span> ${forensic.exames?.documentacao?.art}</p>
+          <p><span class="label">Plano de Manutenção:</span> ${forensic.exames?.documentacao?.planoManutencao}</p>
+          <p><span class="label">Contrato de Manutenção:</span> ${forensic.exames?.documentacao?.contratoManutencao}</p>
+          <p><span class="label">Registro de Manutenção:</span> ${forensic.exames?.documentacao?.registroManutencao}</p>
+          <p><span class="label">Relatório RIA:</span> ${forensic.exames?.documentacao?.relatorioRia}</p>
+          <p><span class="label">Outro:</span> ${forensic.exames?.documentacao?.outro}</p>
+          <p><span class="label">Observações:</span> ${forensic.exames?.observacoesDocumentacao}</p>
+
+          ${imagensDocumentacao.length > 0 ? `
+            <div class="image-grid">
+              ${imagensDocumentacao.map(f => `
+                <div class="image-item">
+                  <img src="${f.arquivo}" />
+                  <p>${f.nome}</p>
+                </div>
+              `).join('')}
+            </div>` : ''}
+        </div>
+
+        <div class="footer">
+          Documento gerado em: ${dataHoraAtual}
+        </div>
+      </body>
       </html>
     `;
 
-    const file = await Print.printToFileAsync({ html });
-
-    if (!file?.uri) {
-      console.error('Erro: URI do PDF não encontrada.');
-      return;
-    }
-
-    await Sharing.shareAsync(file.uri);
+    const { uri } = await Print.printToFileAsync({ html });
+    await Sharing.shareAsync(uri);
   } catch (error) {
-    console.error('Erro ao gerar ou compartilhar o PDF:', error);
+    console.error('Erro ao gerar PDF da análise forense:', error);
   }
 }
