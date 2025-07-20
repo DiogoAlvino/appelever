@@ -1,4 +1,4 @@
-import { FileItem } from "~/types/forensicTypes";
+import { UploadWithMeta } from '~/models/uploadModel';
 
 export type CampoChecklist = {
   id: number;
@@ -6,7 +6,7 @@ export type CampoChecklist = {
   resposta?: 'Sim' | 'Não' | 'NA';
   observacao?: string;
   audio?: string;
-  arquivos?: FileItem[];
+  arquivos?: UploadWithMeta[];
 };
 
 export type VestigioResumo = {
@@ -28,23 +28,23 @@ export type Depoimento = {
 
 export type Documentacao = {
   projetos: string;
-  projetosArquivos: FileItem[];
+  projetosArquivos: UploadWithMeta[];
   memorialCalculo: string;
-  memorialCalculoArquivos: FileItem[];
+  memorialCalculoArquivos: UploadWithMeta[];
   licencaAlvara: string;
-  licencaAlvaraArquivos: FileItem[];
+  licencaAlvaraArquivos: UploadWithMeta[];
   art: string;
-  artArquivos: FileItem[];
+  artArquivos: UploadWithMeta[];
   planoManutencao: string;
-  planoManutencaoArquivos: FileItem[];
+  planoManutencaoArquivos: UploadWithMeta[];
   contratoManutencao: string;
-  contratoManutencaoArquivos: FileItem[];
+  contratoManutencaoArquivos: UploadWithMeta[];
   registroManutencao: string;
-  registroManutencaoArquivos: FileItem[];
+  registroManutencaoArquivos: UploadWithMeta[];
   relatorioRia: string;
-  relatorioRiaArquivos: FileItem[];
+  relatorioRiaArquivos: UploadWithMeta[];
   outro: string;
-  outroArquivos: FileItem[];
+  outroArquivos: UploadWithMeta[];
 };
 
 export type DadosIniciais = {
@@ -94,6 +94,8 @@ export type MembroSimples = {
 };
 
 export type ForensicModel = {
+  id?: string;
+  usuario: string;
   dadosIniciais: DadosIniciais;
   equipePericial: MembroEquipe[];
   materiais: {
@@ -105,7 +107,7 @@ export type ForensicModel = {
     condicoesAmbientais: string;
     caracteristicasLocal: string;
     informacoes: InformacaoFato[];
-    arquivosReconhecimentoArea: FileItem[];
+    arquivosReconhecimentoArea: UploadWithMeta[];
   };
 
   risco: {
@@ -143,11 +145,11 @@ export type ForensicModel = {
     cadaverDescricaoVestes: string;
     cadaverOutro: string;
     analiseDisposicaoCadaver: string;
-    arquivosDisposicaoCadaver: FileItem[];
+    arquivosDisposicaoCadaver: UploadWithMeta[];
     sinaisTanatologicos: string;
-    arquivosTanatologicos: FileItem[];
+    arquivosTanatologicos: UploadWithMeta[];
     descricaoLesoesCadaver: string;
-    arquivosLesoesCadaver: FileItem[];
+    arquivosLesoesCadaver: UploadWithMeta[];
     vestigiosPerinecroscopia: VestigioResumo[];
   };
 };

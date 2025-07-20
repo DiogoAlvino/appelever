@@ -24,8 +24,13 @@ import { saveForensicModular } from '~/services/saveForensic';
 import MainButton from '../buttons/mainButton';
 import { ForensicModel } from '~/models/forensicModel';
 import FeedbackModal from '../modal/feedbackModal';
+import { getAuth } from 'firebase/auth';
 
 export default function ForensicSection() {
+
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
     const {
         // 1. Dados Iniciais
         dadosIniciais, setDadosIniciais,
@@ -155,6 +160,8 @@ export default function ForensicSection() {
 
         try {
             const payload: ForensicModel = {
+                id: '',
+                usuario: currentUser?.email || 'desconhecido',
                 dadosIniciais,
                 equipePericial,
                 materiais: {
