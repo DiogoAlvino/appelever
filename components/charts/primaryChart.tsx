@@ -11,6 +11,7 @@ export default function PrimaryChart() {
 
   const [equipmentCount, setEquipmentCount] = useState(0);
   const [inspectionCount, setInspectionCount] = useState(0);
+  const [forensicCount, setForensicCount] = useState(0);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -27,6 +28,11 @@ export default function PrimaryChart() {
         const inspSnap = await getDocs(inspQuery);
         setInspectionCount(inspSnap.size);
 
+        const forensicRef = collection(db, 'forensic');
+        const forensicQuery = query(forensicRef, where('usuario', '==', user.email));
+        const forensicSnap = await getDocs(forensicQuery);
+        setForensicCount(forensicSnap.size);
+
       } catch (error) {
         console.error('Erro ao buscar contadores:', error);
       }
@@ -38,7 +44,7 @@ export default function PrimaryChart() {
   const data = [
     { name: 'Equipamentos', population: equipmentCount, color: '#2D5BBA', legendFontColor: '#333', legendFontSize: 14 },
     { name: 'Inspeções', population: inspectionCount, color: '#6B91E4', legendFontColor: '#333', legendFontSize: 14 },
-    { name: 'Relatórios', population: 40, color: '#122F52', legendFontColor: '#333', legendFontSize: 14 },
+    { name: 'Análises Forense', population: forensicCount, color: '#122F52', legendFontColor: '#333', legendFontSize: 14 },
   ];
 
   return (
