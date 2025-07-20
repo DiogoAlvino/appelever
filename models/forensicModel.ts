@@ -96,6 +96,7 @@ export type MembroSimples = {
 export type ForensicModel = {
   id?: string;
   usuario: string;
+  dataCriacao: Date;
   dadosIniciais: DadosIniciais;
   equipePericial: MembroEquipe[];
   materiais: {

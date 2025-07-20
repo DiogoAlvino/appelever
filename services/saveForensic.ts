@@ -13,6 +13,7 @@ export async function saveForensicModular(data: ForensicModel) {
       usuario: data.usuario,
       dadosIniciais: data.dadosIniciais,
       equipePericial: data.equipePericial,
+      dataCriacao: data.dataCriacao,
     });
 
     const forensicId = docRef.id;
@@ -22,6 +23,7 @@ export async function saveForensicModular(data: ForensicModel) {
       usuario: data.usuario,
       dadosIniciais: data.dadosIniciais,
       equipePericial: data.equipePericial,
+      dataCriacao: data.dataCriacao,
     });
 
     await setDoc(doc(db, 'forensic_materials', forensicId), data.materiais);

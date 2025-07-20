@@ -162,6 +162,7 @@ export default function ForensicSection() {
         try {
             const payload: ForensicModel = {
                 id: '',
+                dataCriacao: new Date(),
                 usuario: currentUser?.email || 'desconhecido',
                 dadosIniciais,
                 equipePericial,
