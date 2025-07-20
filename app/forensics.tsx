@@ -2,25 +2,25 @@ import { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 
 import SearchInput from '~/components/inputs/searchInput';
-import InspectionList from '~/components/lists/inspectionList';
-import { useInspections } from '~/hooks/useInspections';
+import ForensicList from '~/components/lists/forensicList';
+import { useForensicList } from '~/hooks/useForensicList';
 import FeedbackModal from '~/components/modal/feedbackModal';
 import { useAuth } from '~/hooks/useAuth';
 
 export default function Forensics() {
   const { user } = useAuth();
-  const { inspections, loading, fetchInspections } = useInspections(); //alterar pra useForensic
+  const { forensics, loadingForensics, fetchForensics } = useForensicList();
 
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
   useEffect(() => {
     if (user?.email) {
-      fetchInspections(user.email);
+      fetchForensics(user.email);
     }
   }, [user?.email]);
 
-  if (loading) {
+  if (loadingForensics) {
     return (
       <View style={[styles.container, { justifyContent: 'center', flex: 1 }]}>
         <ActivityIndicator size="large" color="#000" />
@@ -31,13 +31,13 @@ export default function Forensics() {
   return (
     <View style={styles.page}>
       <ScrollView contentContainerStyle={styles.container}>
-        <SearchInput onSearch={() => fetchInspections(user?.email || '')} />
+        <SearchInput onSearch={() => fetchForensics(user?.email || '')} />
         <View style={styles.bar}>
-          <Text>Total: {inspections.length}</Text>
+          <Text>Total: {forensics.length}</Text>
         </View>
 
-        <InspectionList //
-          inspections={inspections}
+        <ForensicList
+          forensics={forensics}
           onError={(msg) => {
             setFeedbackMessage(msg);
             setFeedbackVisible(true);

@@ -25,6 +25,7 @@ import MainButton from '../buttons/mainButton';
 import { ForensicModel } from '~/models/forensicModel';
 import FeedbackModal from '../modal/feedbackModal';
 import { getAuth } from 'firebase/auth';
+import { router } from 'expo-router';
 
 export default function ForensicSection() {
 
@@ -221,7 +222,10 @@ export default function ForensicSection() {
             await saveForensicModular(payload);
             setFeedbackType('success');
             setFeedbackMessage('Análise forense salva com sucesso!');
-            setTimeout(() => setFeedbackVisible(false), 1000);
+            setTimeout(() => {
+                setFeedbackVisible(false);
+                router.push('/forensics');
+            }, 1200);
         } catch (error) {
             console.error(error);
             setFeedbackType('error');
@@ -1672,14 +1676,14 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     modalVestigio: {
-        flexDirection: 'row', 
-        justifyContent: 'space-between', 
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         marginTop: 24,
         backgroundColor: '#fff',
         paddingHorizontal: 16,
         paddingVertical: 5
 
     },
-    campos : {}
+    campos: {}
 
 });
