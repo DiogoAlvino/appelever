@@ -9,9 +9,10 @@ import { useInspectionById } from "~/hooks/useInspectionById";
 import { useEquipmentById } from "~/hooks/useEquipmentById";
 import { db } from '~/utils/firebase';
 import { deleteDoc, doc } from 'firebase/firestore';
-import { colors, fontSize } from '~/theme';
+import { border, colors, fontSize } from '~/theme';
 import { capitalize } from "lodash";
 import { generatePDFWithHTML } from '~/services/pdfService';
+import TabBar from "~/components/layout/tabBar";
 
 export default function InspectionForm() {
   const { inspectionId } = useLocalSearchParams();
@@ -77,6 +78,44 @@ export default function InspectionForm() {
   return (
     <>
       <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+
+
+        <View style={styles.bottomMenu}>
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => {
+              router.push({
+                pathname: '/normativeInspection/[equipmentId]',
+                params: {
+                  equipmentId: inspection.equipmentId,
+                  inspectionId: inspection.id,
+                  mode: 'edit',
+                },
+              });
+            }}
+          >
+            <Feather name="edit" size={20} color="#173A64" />
+            <Text style={styles.menuText}>Editar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuButton} onPress={handleDelete}>
+            <Feather name="trash-2" size={20} color="red" />
+            <Text style={[styles.menuText, { color: 'red' }]}>Excluir</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => {
+              if (inspection && selectedEquipment) {
+                generatePDFWithHTML(inspection, selectedEquipment);
+              }
+            }}
+          >
+            <Feather name="download" size={20} color="#173A64" />
+            <Text style={styles.menuText}>PDF</Text>
+          </TouchableOpacity>
+
+        </View>
 
         <SecondarySection
           icon={<Feather name="tag" size={20} color="#173A64" />}
@@ -242,42 +281,13 @@ export default function InspectionForm() {
 
       </ScrollView>
 
-      <View style={styles.bottomMenu}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => {
-            router.push({
-              pathname: '/normativeInspection/[equipmentId]',
-              params: {
-                equipmentId: inspection.equipmentId,
-                inspectionId: inspection.id,
-                mode: 'edit',
-              },
-            });
-          }}
-        >
-          <Feather name="edit" size={20} color="#173A64" />
-          <Text style={styles.menuText}>Editar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuButton} onPress={handleDelete}>
-          <Feather name="trash-2" size={20} color="red" />
-          <Text style={[styles.menuText, { color: 'red' }]}>Excluir</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => {
-            if (inspection && selectedEquipment) {
-              generatePDFWithHTML(inspection, selectedEquipment);
-            }
-          }}
-        >
-          <Feather name="download" size={20} color="#173A64" />
-          <Text style={styles.menuText}>PDF</Text>
-        </TouchableOpacity>
-
-      </View>
+      <TabBar
+        tabs={[
+          { icon: 'home', label: 'Inicio', route: '/' },
+          { icon: 'plus-circle', label: 'Nova inspeção', route: '/equipments' },
+          { icon: 'list', label: 'Inpeções', route: '/inspections' },
+        ]}
+      />
 
       <FeedbackModal
         visible={feedbackVisible}
@@ -307,17 +317,18 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   bottomMenu: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    shadowColor: 'gray',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 10,
-    paddingVertical: 10,
-  },
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      backgroundColor: '#fff',
+      shadowColor: 'gray',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+      width: "100%",
+      borderRadius: border.radius
+    },
   menuButton: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -325,7 +336,7 @@ const styles = StyleSheet.create({
   },
   menuText: {
     marginTop: 4,
-    fontSize: fontSize.placeholder,
+    fontSize: 10,
   },
   answerItem: {
     width: '100%',

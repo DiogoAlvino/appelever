@@ -48,6 +48,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     borderRadius: 50,
+    borderTopWidth: 1,
+    borderColor: colors.bgGray,
     backgroundColor: '#fff',
     paddingVertical: 8,
     justifyContent: 'space-around',
@@ -57,7 +59,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    marginBottom: 4,
+    marginBottom: 10,
+    marginTop: 5,
   },
   tabItem: {
     alignItems: 'center',

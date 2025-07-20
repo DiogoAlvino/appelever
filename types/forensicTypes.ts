@@ -58,6 +58,11 @@ export type DadosIniciais = {
   numeroVitimas: string;
   condicaoVitimas: string;
   autoridadePolicial: string;
+  localizacao?: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  };
 };
 
 export type MembroEquipe = {

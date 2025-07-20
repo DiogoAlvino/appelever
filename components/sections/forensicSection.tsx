@@ -27,6 +27,8 @@ import FeedbackModal from '../modal/feedbackModal';
 import { getAuth } from 'firebase/auth';
 import { router } from 'expo-router';
 
+import { isDadosIniciaisRespondido, isMateriaisRespondido, isAnalisePreliminarRespondido, isRiscoAPRRespondido, isExamesRespondido } from '~/utils/forensicUtils';
+
 export default function ForensicSection() {
 
     const auth = getAuth();
@@ -115,6 +117,78 @@ export default function ForensicSection() {
     const [feedbackVisible, setFeedbackVisible] = useState(false);
     const [feedbackType, setFeedbackType] = useState<'loading' | 'success' | 'error'>('loading');
     const [feedbackMessage, setFeedbackMessage] = useState('');
+
+    const [vestigioIndex, setVestigioIndex] = useState(0);
+
+
+
+    const respondidoDadosIniciais = isDadosIniciaisRespondido({
+        dadosIniciais,
+        equipePericial,
+    } as any);
+
+    const respondidoMateriais = isMateriaisRespondido({
+        materiais: {
+            selecionados: materiaisSelecionados,
+            outroDescricao: materialOutroDescricao,
+        },
+    } as any);
+
+    const analiseRespondida = isAnalisePreliminarRespondido({
+        analisePreliminar: {
+            reconhecimentoArea,
+            condicoesAmbientais,
+            caracteristicasLocal,
+            informacoes,
+            arquivosReconhecimentoArea,
+        }
+    } as any);
+
+    const riscoRespondido = isRiscoAPRRespondido({
+        risco: {
+            riscoAPR,
+            peritoAuxiliar: [],
+            tecnico: [],
+            outros: []
+        }
+    } as any);
+
+    const examesRespondido = isExamesRespondido({
+        exames: {
+            documentacao,
+            observacoesDocumentacao,
+            vestigiosDocumentacao,
+            maquinaTracao,
+            limitadorVelocidade,
+            cabos,
+            contrapeso,
+            cabine,
+            portas,
+            freiosEmergencia,
+            sistemaControle,
+            sistemaEletrico,
+            sensores,
+            pocoElevador,
+            vestigiosEquipamentos,
+            depoimentos,
+            vestigiosEntrevistas,
+            cadaverSexo,
+            cadaverCorPele,
+            cadaverCabelo,
+            cadaverSinaisIdentificadores,
+            cadaverDescricaoVestes,
+            cadaverOutro,
+            analiseDisposicaoCadaver,
+            arquivosDisposicaoCadaver,
+            sinaisTanatologicos,
+            arquivosTanatologicos,
+            descricaoLesoesCadaver,
+            arquivosLesoesCadaver,
+            vestigiosPerinecroscopia,
+        }
+    } as any);
+
+
 
     const [vestigioTemp, setVestigioTemp] = useState({
         numeroVestigio: '',
@@ -218,6 +292,14 @@ export default function ForensicSection() {
                     arquivosLesoesCadaver,
                     vestigiosPerinecroscopia,
                 },
+                condicaoVitimas: undefined,
+                numeroVitimas: undefined,
+                viatura: undefined,
+                autoridadePolicialNome: undefined,
+                tipoOcorrencia: undefined,
+                matriculaPerito: undefined,
+                cargoPerito: false,
+                peritoResponsavel: undefined
             };
 
             await saveForensicModular(payload);
@@ -235,16 +317,18 @@ export default function ForensicSection() {
         }
     };
 
-    function handleVisualizarVestigio(vestigio: VestigioResumo) {
+    function handleVisualizarVestigio(vestigio: VestigioResumo, index: number) {
         setVestigioSelecionado(vestigio);
         setOrigemVestigio(vestigio.origem);
+        setVestigioIndex(index);
         setModalVestigioVisible(true);
+
     }
 
     const handleAvancarVestigio = () => {
         const resumoVestigio: VestigioResumo = {
-            numeroVestigio: dadosPreliminares[0].numeroVestigio,
-            naturezaVestigio: dadosPreliminares[0].naturezaVestigio,
+            numeroVestigio: dadosPreliminares[vestigioIndex]?.numeroVestigio || '',
+            naturezaVestigio: dadosPreliminares[vestigioIndex]?.naturezaVestigio || '',
             origem: origemVestigio as 'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia',
             dadosCompletos: {
                 dadosPreliminares,
@@ -252,18 +336,23 @@ export default function ForensicSection() {
             },
         };
 
-        if (origemVestigio === 'equipamentos') {
-            setVestigiosEquipamentos(prev => [...prev, resumoVestigio]);
-        } else if (origemVestigio === 'entrevistas') {
-            setVestigiosEntrevistas(prev => [...prev, resumoVestigio]);
-        } else if (origemVestigio === 'documentacao') {
-            setVestigiosDocumentacao(prev => [...prev, resumoVestigio]);
-        } else if (origemVestigio === 'perinecroscopia') {
-            setVestigiosPerinecroscopia(prev => [...prev, resumoVestigio]);
-        }
+
+        const atualizaVestigios = (setFn: React.Dispatch<React.SetStateAction<VestigioResumo[]>>) => {
+            setFn(prev => {
+                const copia = [...prev];
+                copia[vestigioIndex] = resumoVestigio;
+                return copia;
+            });
+        };
+
+        if (origemVestigio === 'equipamentos') atualizaVestigios(setVestigiosEquipamentos);
+        else if (origemVestigio === 'entrevistas') atualizaVestigios(setVestigiosEntrevistas);
+        else if (origemVestigio === 'documentacao') atualizaVestigios(setVestigiosDocumentacao);
+        else if (origemVestigio === 'perinecroscopia') atualizaVestigios(setVestigiosPerinecroscopia);
 
         setModalVestigioVisible(false);
     };
+
 
     const origemLabels: Record<'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia', string> = {
         equipamentos: 'Equipamentos',
@@ -272,14 +361,12 @@ export default function ForensicSection() {
         perinecroscopia: 'Perinecroscopia',
     };
 
-    const respondidoMateriais =
-  materiaisSelecionados.length > 0 ||
-  !!materialOutroDescricao?.trim();
 
     return (
         <View style={styles.section}>
             <PrimaryList
                 title="1. Dados iniciais"
+                respondido={!!respondidoDadosIniciais}
             >
                 <View style={styles.campos}>
                     <View style={styles.campoInterno}>
@@ -410,7 +497,10 @@ export default function ForensicSection() {
                     <View style={styles.campoInternoSecundario}>
                         <Text style={styles.titulos}>Atendimento</Text>
 
-                        <LocationButton />
+                        <LocationButton
+                            value={dadosIniciais.localizacao || null}
+                            onChange={(loc) => setDadosIniciais((prev) => ({...prev, localizacao: loc}))}
+                        />
 
                         <PrimaryInput
                             label="Viatura (placa)"
@@ -455,7 +545,7 @@ export default function ForensicSection() {
 
             <PrimaryList
                 title="2. Materiais, Equipamentos, EPI e EPC"
-                respondido={respondidoMateriais}
+                respondido={!!respondidoMateriais}
             >
                 <View style={styles.campos}>
                     <View style={styles.campoInternoSecundario}>
@@ -472,7 +562,7 @@ export default function ForensicSection() {
             </PrimaryList>
 
 
-            <PrimaryList title="3. Análise preliminar do local">
+            <PrimaryList title="3. Análise preliminar do local" respondido={!!analiseRespondida}>
                 <View style={styles.campos}>
 
                     {/* Reconhecimento da área */}
@@ -539,7 +629,7 @@ export default function ForensicSection() {
             </PrimaryList>
 
 
-            <PrimaryList title="4. Análise preliminar de risco (APR)">
+            <PrimaryList title="4. Análise preliminar de risco (APR)" respondido={!!riscoRespondido}>
                 <View style={styles.campos}>
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Composição da Equipe</Text>
@@ -759,6 +849,7 @@ export default function ForensicSection() {
 
             <PrimaryList
                 title="5. Exames"
+                respondido={!!examesRespondido}
             >
                 <View style={styles.campoInternoSecundario}>
                     <View style={styles.campoInterno}>
@@ -888,7 +979,7 @@ export default function ForensicSection() {
                                     key={index}
                                     index={index}
                                     vestigio={vestigio}
-                                    onVisualizar={() => handleVisualizarVestigio(vestigio)}
+                                    onVisualizar={() => handleVisualizarVestigio(vestigio, index)}
                                     onRemover={() => {
                                         const copia = [...vestigiosDocumentacao];
                                         copia.splice(index, 1);
@@ -900,9 +991,33 @@ export default function ForensicSection() {
                             <AddButton
                                 label="Adicionar vestígio"
                                 onPress={() => {
+                                    const novoIndex = dadosPreliminares.length;
+
+                                    setDadosPreliminares([...dadosPreliminares, {
+                                        numeroVestigio: '',
+                                        unidadeOrigem: '',
+                                        procedimento: '',
+                                        naturezaVestigio: '',
+                                        naturezaOutros: '',
+                                        descricaoDetalhada: '',
+                                        descricaoDetalhadaArquivos: [],
+                                    }]);
+
+                                    setAcondicionamento([...acondicionamento, {
+                                        responsavelColeta: '',
+                                        matricula: '',
+                                        tipoAcondicionamento: '',
+                                        tipoAcondicionamentoOutros: '',
+                                        numeroLacre: '',
+                                        arquivos: [],
+                                        localizacao: undefined,
+                                    }]);
+
+                                    setVestigioIndex(novoIndex);
                                     setOrigemVestigio('documentacao');
                                     setModalVestigioVisible(true);
                                 }}
+
                             />
                         </View>
                     </View>
@@ -1066,7 +1181,7 @@ export default function ForensicSection() {
                                         key={index}
                                         index={index}
                                         vestigio={vestigio}
-                                        onVisualizar={() => handleVisualizarVestigio(vestigio)}
+                                        onVisualizar={() => handleVisualizarVestigio(vestigio, index)}
                                         onRemover={() => {
                                             const copia = [...vestigiosEquipamentos];
                                             copia.splice(index, 1);
@@ -1079,6 +1194,29 @@ export default function ForensicSection() {
                                 <AddButton
                                     label="Adicionar vestígio"
                                     onPress={() => {
+                                        const novoIndex = dadosPreliminares.length;
+
+                                        setDadosPreliminares([...dadosPreliminares, {
+                                            numeroVestigio: '',
+                                            unidadeOrigem: '',
+                                            procedimento: '',
+                                            naturezaVestigio: '',
+                                            naturezaOutros: '',
+                                            descricaoDetalhada: '',
+                                            descricaoDetalhadaArquivos: [],
+                                        }]);
+
+                                        setAcondicionamento([...acondicionamento, {
+                                            responsavelColeta: '',
+                                            matricula: '',
+                                            tipoAcondicionamento: '',
+                                            tipoAcondicionamentoOutros: '',
+                                            numeroLacre: '',
+                                            arquivos: [],
+                                            localizacao: undefined,
+                                        }]);
+
+                                        setVestigioIndex(novoIndex);
                                         setOrigemVestigio('equipamentos');
                                         setModalVestigioVisible(true);
                                     }}
@@ -1239,7 +1377,7 @@ export default function ForensicSection() {
                                         key={index}
                                         index={index}
                                         vestigio={vestigio}
-                                        onVisualizar={() => handleVisualizarVestigio(vestigio)}
+                                        onVisualizar={() => handleVisualizarVestigio(vestigio, index)}
                                         onRemover={() => {
                                             const copia = [...vestigiosEntrevistas];
                                             copia.splice(index, 1);
@@ -1251,6 +1389,29 @@ export default function ForensicSection() {
                                 <AddButton
                                     label="Adicionar vestígio"
                                     onPress={() => {
+                                        const novoIndex = dadosPreliminares.length;
+
+                                        setDadosPreliminares([...dadosPreliminares, {
+                                            numeroVestigio: '',
+                                            unidadeOrigem: '',
+                                            procedimento: '',
+                                            naturezaVestigio: '',
+                                            naturezaOutros: '',
+                                            descricaoDetalhada: '',
+                                            descricaoDetalhadaArquivos: [],
+                                        }]);
+
+                                        setAcondicionamento([...acondicionamento, {
+                                            responsavelColeta: '',
+                                            matricula: '',
+                                            tipoAcondicionamento: '',
+                                            tipoAcondicionamentoOutros: '',
+                                            numeroLacre: '',
+                                            arquivos: [],
+                                            localizacao: undefined,
+                                        }]);
+
+                                        setVestigioIndex(novoIndex);
                                         setOrigemVestigio('entrevistas');
                                         setModalVestigioVisible(true);
                                     }}
@@ -1280,7 +1441,7 @@ export default function ForensicSection() {
                                             options={['Masculino', 'Feminino']}
                                         />
 
-                                         <PrimaryInput
+                                        <PrimaryInput
                                             label="Cor da pele"
                                             placeholder="Informe"
                                             value={cadaverCorPele}
@@ -1350,7 +1511,7 @@ export default function ForensicSection() {
                                                 key={index}
                                                 index={index}
                                                 vestigio={vestigio}
-                                                onVisualizar={() => handleVisualizarVestigio(vestigio)}
+                                                onVisualizar={() => handleVisualizarVestigio(vestigio, index)}
                                                 onRemover={() => {
                                                     const copia = [...vestigiosPerinecroscopia];
                                                     copia.splice(index, 1);
@@ -1362,6 +1523,29 @@ export default function ForensicSection() {
                                         <AddButton
                                             label="Adicionar vestígio"
                                             onPress={() => {
+                                                const novoIndex = dadosPreliminares.length;
+
+                                                setDadosPreliminares([...dadosPreliminares, {
+                                                    numeroVestigio: '',
+                                                    unidadeOrigem: '',
+                                                    procedimento: '',
+                                                    naturezaVestigio: '',
+                                                    naturezaOutros: '',
+                                                    descricaoDetalhada: '',
+                                                    descricaoDetalhadaArquivos: [],
+                                                }]);
+
+                                                setAcondicionamento([...acondicionamento, {
+                                                    responsavelColeta: '',
+                                                    matricula: '',
+                                                    tipoAcondicionamento: '',
+                                                    tipoAcondicionamentoOutros: '',
+                                                    numeroLacre: '',
+                                                    arquivos: [],
+                                                    localizacao: undefined,
+                                                }]);
+
+                                                setVestigioIndex(novoIndex);
                                                 setOrigemVestigio('perinecroscopia');
                                                 setModalVestigioVisible(true);
                                             }}
@@ -1400,10 +1584,10 @@ export default function ForensicSection() {
                                                     <PrimaryInput
                                                         label="Nº do vestígio"
                                                         placeholder="Informe"
-                                                        value={dadosPreliminares[0].numeroVestigio}
+                                                        value={dadosPreliminares[vestigioIndex].numeroVestigio}
                                                         onChangeText={(text) => {
                                                             const copia = [...dadosPreliminares];
-                                                            copia[0].numeroVestigio = text;
+                                                            copia[vestigioIndex].numeroVestigio = text;
                                                             setDadosPreliminares(copia);
                                                         }}
                                                     />
@@ -1411,10 +1595,10 @@ export default function ForensicSection() {
                                                     <PrimaryInput
                                                         label="Unidade de Origem"
                                                         placeholder="Informe"
-                                                        value={dadosPreliminares[0].unidadeOrigem}
+                                                        value={dadosPreliminares[vestigioIndex].unidadeOrigem}
                                                         onChangeText={(text) => {
                                                             const copia = [...dadosPreliminares];
-                                                            copia[0].unidadeOrigem = text;
+                                                            copia[vestigioIndex].unidadeOrigem = text;
                                                             setDadosPreliminares(copia);
                                                         }}
                                                     />
@@ -1422,20 +1606,20 @@ export default function ForensicSection() {
                                                     <PrimaryInput
                                                         label="Nº do Procedimento (IP/TCO/Outros)"
                                                         placeholder="Informe"
-                                                        value={dadosPreliminares[0].procedimento}
+                                                        value={dadosPreliminares[vestigioIndex].procedimento}
                                                         onChangeText={(text) => {
                                                             const copia = [...dadosPreliminares];
-                                                            copia[0].procedimento = text;
+                                                            copia[vestigioIndex].procedimento = text;
                                                             setDadosPreliminares(copia);
                                                         }}
                                                     />
 
                                                     <PrimarySelect
                                                         label="Natureza do Vestígio"
-                                                        selected={dadosPreliminares[0].naturezaVestigio}
+                                                        selected={dadosPreliminares[vestigioIndex].naturezaVestigio}
                                                         onSelect={(value) => {
                                                             const copia = [...dadosPreliminares];
-                                                            copia[0].naturezaVestigio = value;
+                                                            copia[vestigioIndex].naturezaVestigio = value;
                                                             if (value !== 'Outros') copia[0].naturezaOutros = '';
                                                             setDadosPreliminares(copia);
                                                         }}
@@ -1443,14 +1627,14 @@ export default function ForensicSection() {
                                                         options={['Biológico', 'Documental', 'Equipamento', 'Material', 'Mídia de armazenamento', 'Cadáver', 'Outros']}
                                                     />
 
-                                                    {dadosPreliminares[0].naturezaVestigio === 'Outros' && (
+                                                    {dadosPreliminares[vestigioIndex].naturezaVestigio === 'Outros' && (
                                                         <PrimaryInput
                                                             label="Descreva a natureza"
                                                             placeholder="Informe"
-                                                            value={dadosPreliminares[0].naturezaOutros}
+                                                            value={dadosPreliminares[vestigioIndex].naturezaOutros}
                                                             onChangeText={(text) => {
                                                                 const copia = [...dadosPreliminares];
-                                                                copia[0].naturezaOutros = text;
+                                                                copia[vestigioIndex].naturezaOutros = text;
                                                                 setDadosPreliminares(copia);
                                                             }}
                                                         />
@@ -1460,19 +1644,19 @@ export default function ForensicSection() {
                                                     <Text>Quantidades, características, numerações, estado de conservação, possíveis danos, etc</Text>
 
                                                     <VoiceInput
-                                                        value={dadosPreliminares[0].descricaoDetalhada}
+                                                        value={dadosPreliminares[vestigioIndex].descricaoDetalhada}
                                                         onChangeText={(text) => {
                                                             const copia = [...dadosPreliminares];
-                                                            copia[0].descricaoDetalhada = text;
+                                                            copia[vestigioIndex].descricaoDetalhada = text;
                                                             setDadosPreliminares(copia);
                                                         }}
                                                     />
 
                                                     <FileUpload
-                                                        value={dadosPreliminares[0].descricaoDetalhadaArquivos || []}
+                                                        value={dadosPreliminares[vestigioIndex].descricaoDetalhadaArquivos || []}
                                                         onChange={(arquivos) => {
                                                             const copia = [...dadosPreliminares];
-                                                            copia[0].descricaoDetalhadaArquivos = arquivos;
+                                                            copia[vestigioIndex].descricaoDetalhadaArquivos = arquivos;
                                                             setDadosPreliminares(copia);
                                                         }}
                                                     />
@@ -1486,10 +1670,10 @@ export default function ForensicSection() {
                                                     <PrimaryInput
                                                         label="Responsável pela coleta"
                                                         placeholder="Informe"
-                                                        value={acondicionamento[0].responsavelColeta}
+                                                        value={acondicionamento[vestigioIndex].responsavelColeta}
                                                         onChangeText={(text) => {
                                                             const copia = [...acondicionamento];
-                                                            copia[0].responsavelColeta = text;
+                                                            copia[vestigioIndex].responsavelColeta = text;
                                                             setAcondicionamento(copia);
                                                         }}
                                                     />
@@ -1497,37 +1681,50 @@ export default function ForensicSection() {
                                                     <PrimaryInput
                                                         label="Matrícula"
                                                         placeholder="Informe"
-                                                        value={acondicionamento[0].matricula}
+                                                        value={acondicionamento[vestigioIndex].matricula}
                                                         onChangeText={(text) => {
                                                             const copia = [...acondicionamento];
-                                                            copia[0].matricula = text;
+                                                            copia[vestigioIndex].matricula = text;
                                                             setAcondicionamento(copia);
                                                         }}
                                                     />
 
-                                                    <LocationButton />
+                                                    <LocationButton
+                                                        value={acondicionamento[vestigioIndex]?.localizacao || null}
+                                                        onChange={(loc) =>
+                                                            setAcondicionamento((prev) => {
+                                                                const copia = [...prev];
+                                                                copia[vestigioIndex] = {
+                                                                    ...copia[vestigioIndex],
+                                                                    localizacao: loc,
+                                                                };
+                                                                return copia;
+                                                            })
+                                                        }
+                                                    />
+
 
                                                     <PrimarySelect
                                                         label="Tipo de acondicionamento"
-                                                        selected={acondicionamento[0].tipoAcondicionamento}
+                                                        selected={acondicionamento[vestigioIndex].tipoAcondicionamento}
                                                         onSelect={(value) => {
                                                             const copia = [...acondicionamento];
-                                                            copia[0].tipoAcondicionamento = value;
-                                                            if (value !== 'Outros') copia[0].tipoAcondicionamentoOutros = '';
+                                                            copia[vestigioIndex].tipoAcondicionamento = value;
+                                                            if (value !== 'Outros') copia[vestigioIndex].tipoAcondicionamentoOutros = '';
                                                             setAcondicionamento(copia);
                                                         }}
                                                         placeholder="Selecione"
                                                         options={['Saco plástico', 'Frasco', 'Caixa térmica', 'Outros']}
                                                     />
 
-                                                    {acondicionamento[0].tipoAcondicionamento === 'Outros' && (
+                                                    {acondicionamento[vestigioIndex].tipoAcondicionamento === 'Outros' && (
                                                         <PrimaryInput
                                                             label="Descreva o tipo de acondicionamento"
                                                             placeholder="Informe"
-                                                            value={acondicionamento[0].tipoAcondicionamentoOutros}
+                                                            value={acondicionamento[vestigioIndex].tipoAcondicionamentoOutros}
                                                             onChangeText={(text) => {
                                                                 const copia = [...acondicionamento];
-                                                                copia[0].tipoAcondicionamentoOutros = text;
+                                                                copia[vestigioIndex].tipoAcondicionamentoOutros = text;
                                                                 setAcondicionamento(copia);
                                                             }}
                                                         />
@@ -1536,19 +1733,19 @@ export default function ForensicSection() {
                                                     <PrimaryInput
                                                         label="Nº do lacre/ Invólucro de segurança"
                                                         placeholder="Informe"
-                                                        value={acondicionamento[0].numeroLacre}
+                                                        value={acondicionamento[vestigioIndex].numeroLacre}
                                                         onChangeText={(text) => {
                                                             const copia = [...acondicionamento];
-                                                            copia[0].numeroLacre = text;
+                                                            copia[vestigioIndex].numeroLacre = text;
                                                             setAcondicionamento(copia);
                                                         }}
                                                     />
 
                                                     <FileUpload
-                                                        value={acondicionamento[0].arquivos || []}
+                                                        value={acondicionamento[vestigioIndex].arquivos || []}
                                                         onChange={(arquivos) => {
                                                             const copia = [...acondicionamento];
-                                                            copia[0].arquivos = arquivos;
+                                                            copia[vestigioIndex].arquivos = arquivos;
                                                             setAcondicionamento(copia);
                                                         }}
                                                     />

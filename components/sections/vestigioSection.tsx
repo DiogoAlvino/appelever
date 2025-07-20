@@ -16,6 +16,8 @@ export default function ResumoVestigio({
   onVisualizar,
   onRemover,
 }: VestigioResumoProps) {
+  if (!vestigio?.dadosCompletos) return null;
+
   return (
     <View style={styles.etiqueta}>
       <View style={styles.header}>
@@ -31,11 +33,12 @@ export default function ResumoVestigio({
 
       <View style={styles.content}>
         <Text style={styles.texto}>
-          Nº: {vestigio.dadosCompletos?.dadosPreliminares?.[0]?.numeroVestigio ?? '---'}
+          Nº: {vestigio.dadosCompletos?.dadosPreliminares?.[index]?.numeroVestigio ?? '---'}
         </Text>
         <Text style={styles.texto}>
-          Natureza: {vestigio.dadosCompletos?.dadosPreliminares?.[0]?.naturezaVestigio ?? '---'}
+          Natureza: {vestigio.dadosCompletos?.dadosPreliminares?.[index]?.naturezaVestigio ?? '---'}
         </Text>
+
 
         <View style={styles.buttons}>
           <TouchableOpacity onPress={onVisualizar}>

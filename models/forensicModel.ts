@@ -3,7 +3,6 @@ import { UploadWithMeta } from '~/models/uploadModel';
 export type CampoChecklist = {
   id: number;
   titulo: string;
-  resposta?: 'Sim' | 'Não' | 'NA';
   observacao?: string;
   audio?: string;
   arquivos?: UploadWithMeta[];
@@ -58,6 +57,11 @@ export type DadosIniciais = {
   numeroVitimas: string;
   condicaoVitimas: string;
   autoridadePolicial: string;
+  localizacao?: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  };
 };
 
 export type MembroEquipe = {
@@ -97,6 +101,14 @@ export type ForensicModel = {
   id?: string;
   usuario: string;
   dataCriacao: Date;
+  condicaoVitimas: any;
+  numeroVitimas: any;
+  viatura: any;
+  autoridadePolicialNome: any;
+  tipoOcorrencia: any;
+  matriculaPerito: any;
+  cargoPerito: boolean;
+  peritoResponsavel: any;
   dadosIniciais: DadosIniciais;
   equipePericial: MembroEquipe[];
   materiais: {

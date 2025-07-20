@@ -6,8 +6,20 @@ import { border, colors, fontSize } from '~/theme';
 import MainButton from './mainButton';
 
 const OPENCAGE_API_KEY = '25cec5c47001443785b8c9c55021bb44'; // Coloque aqui a chave do OpenCage
+interface Props {
+  value: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  } | null;
+  onChange: (local: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  }) => void;
+}
 
-export default function LocationButton() {
+export default function LocationButton({ value, onChange }: Props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [locationInfo, setLocationInfo] = useState<{ address: string; latitude: number; longitude: number } | null>(null);
   const [search, setSearch] = useState('');
@@ -31,7 +43,7 @@ export default function LocationButton() {
         address = data.results[0].formatted;
       }
 
-      setLocationInfo({
+      onChange({
         address,
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -59,7 +71,7 @@ export default function LocationButton() {
   };
 
   const handleSelectPlace = (item: any) => {
-    setLocationInfo({
+    onChange({
       address: item.formatted,
       latitude: item.geometry.lat,
       longitude: item.geometry.lng,
@@ -99,15 +111,15 @@ export default function LocationButton() {
             )}
           />
 
-<MainButton title='Fechar' type="secondary" onPress={() => setModalVisible(false)} />
+          <MainButton title='Fechar' type="secondary" onPress={() => setModalVisible(false)} />
 
         </View>
       </Modal>
 
-      {locationInfo && (
+      {value && (
         <View style={styles.info}>
-          <Text style={styles.textoInfo}>{locationInfo.address}</Text>
-          <Text style={styles.textoInfo}>Lat: {locationInfo.latitude}, Lng: {locationInfo.longitude}</Text>
+          <Text style={styles.textoInfo}>{value.address}</Text>
+          <Text style={styles.textoInfo}>Lat: {value.latitude}, Lng: {value.longitude}</Text>
         </View>
       )}
     </>

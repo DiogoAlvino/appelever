@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR } from '~/types/forensicTypes';
+import { VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR, DadosIniciais } from '~/types/forensicTypes';
 import { UploadWithMeta} from '~/models/uploadModel';
 
 export const useForensic = () => {
-    const [dadosIniciais, setDadosIniciais] = useState({
+    const [dadosIniciais, setDadosIniciais] = useState<DadosIniciais>({
         peritoResponsavel: '',
         cargoPerito: '',
         matriculaPerito: '',
@@ -14,8 +14,9 @@ export const useForensic = () => {
         numeroVitimas: '',
         condicaoVitimas: '',
         autoridadePolicial: '',
-        reconhecimento: '',
+        localizacao: undefined, // agora reconhecido corretamente
     });
+
 
     const [riscoAPR, setRiscoAPR] = useState<RiscoAPR>({
         peritoResponsavel: '',
@@ -46,7 +47,11 @@ export const useForensic = () => {
         tipoAcondicionamentoOutros: '',
         numeroLacre: '',
         arquivos: [] as UploadWithMeta[],
+        localizacao: undefined as
+            | { address: string; latitude: number; longitude: number }
+            | undefined,
     }]);
+
 
     const [equipePericial, setEquipePericial] = useState([{ nome: '', cargo: '', matricula: '' }]);
     const [informacoes, setInformacoes] = useState([{ descricao: '', observacao: '' }]);

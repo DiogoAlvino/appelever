@@ -3,13 +3,14 @@ import { router, useLocalSearchParams } from "expo-router";
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator, TouchableOpacity, Image } from "react-native";
 
 import SecondarySection from "~/components/sections/secondarySection";
-import { colors, fontSize } from '~/theme';
+import { border, colors, fontSize } from '~/theme';
 import { useEquipmentById } from '~/hooks/useEquipmentById';
 
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '~/utils/firebase';
 import { useState } from "react";
 import FeedbackModal from "~/components/modal/feedbackModal";
+import TabBar from "~/components/layout/tabBar";
 
 export default function EquipmentForm() {
   const { equipmentId } = useLocalSearchParams();
@@ -104,7 +105,35 @@ export default function EquipmentForm() {
 
   return (
     <>
+    
+
       <ScrollView contentContainerStyle={styles.container} style={{ flex: 1 }}>
+
+        <View style={styles.bottomMenu}>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() =>
+            router.push({
+              pathname: '/equipmentRegistration',
+              params: { mode: 'edit', equipmentId: String(equipment.id) },
+            })
+          }
+        >
+          <Feather name="edit" size={20} color="#173A64" />
+          <Text style={styles.menuText}>Editar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.menuButton} onPress={handleDelete}>
+          <Feather name="trash-2" size={20} color="red" />
+          <Text style={[styles.menuText, { color: 'red' }]}>Excluir</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.menuButton} onPress={handleInspection}>
+          <Feather name="navigation" size={20} color="#173A64" />
+          <Text style={styles.menuText}>Inspeção</Text>
+        </TouchableOpacity>
+      </View>
+
         <SecondarySection
           icon={<Feather name="map-pin" size={20} color="#173A64" />}
           title="Local de instalação"
@@ -203,31 +232,15 @@ export default function EquipmentForm() {
 
 
       </ScrollView>
+      <TabBar
+        tabs={[
+          { icon: 'home', label: 'Inicio', route: '/' },
+          { icon: 'plus-circle', label: 'Novo', route: '/equipmentRegistration' },
+          { icon: 'list', label: 'Inpeções', route: '/inspections' },
+        ]}
+      />
 
-      <View style={styles.bottomMenu}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() =>
-            router.push({
-              pathname: '/equipmentRegistration',
-              params: { mode: 'edit', equipmentId: String(equipment.id) },
-            })
-          }
-        >
-          <Feather name="edit" size={20} color="#173A64" />
-          <Text style={styles.menuText}>Editar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuButton} onPress={handleDelete}>
-          <Feather name="trash-2" size={20} color="red" />
-          <Text style={[styles.menuText, { color: 'red' }]}>Excluir</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuButton} onPress={handleInspection}>
-          <Feather name="navigation" size={20} color="#173A64" />
-          <Text style={styles.menuText}>Inspeção</Text>
-        </TouchableOpacity>
-      </View>
+      
 
       <FeedbackModal
         visible={feedbackVisible}
@@ -259,10 +272,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     shadowColor: 'gray',
-    shadowOffset: { width: 0, height: -3 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 10,
+    elevation: 2,
+    width: "100%",
+    borderRadius: border.radius
   },
   menuButton: {
     alignItems: 'center',
@@ -272,7 +287,7 @@ const styles = StyleSheet.create({
   menuText: {
     marginTop: 4,
     color: '#173A64',
-    fontSize: fontSize.placeholder,
+    fontSize: 10,
   },
   imageWrapper: {
     marginRight: 10,
