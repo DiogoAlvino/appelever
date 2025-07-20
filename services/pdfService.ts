@@ -1,5 +1,6 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { materials } from '~/data/materials';
 import { EquipmentModel } from '~/models/equipmentModel';
 import { ForensicModel } from '~/models/forensicModel';
 import { InspectionModel } from '~/models/inspectionModel';
@@ -385,9 +386,12 @@ export async function generateForensicPDF(forensic: ForensicModel) {
         <div class="section">
           <h2>Materiais, EPI e EPC</h2>
           ${Array.isArray(forensic.materiais?.selecionados) && forensic.materiais.selecionados.length > 0
-            ? forensic.materiais.selecionados.map(id => `<p>• ${id}</p>`).join('')
-            : '<p>Nenhum material selecionado.</p>'}
-          ${forensic.materiais?.outroDescricao ? `<p><span class="label">Outro:</span> ${forensic.materiais.outroDescricao}</p>` : ''}
+        ? forensic.materiais.selecionados.map(id => {
+          const item = materials.flatMap(g => g.items).find(i => i.id === id);
+          return `<p>• ${item?.label || 'Material desconhecido'}</p>`;
+        }).join('')
+        : '<p>Nenhum material selecionado.</p>'}
+
         </div>
 
         <div class="section">
@@ -403,15 +407,32 @@ export async function generateForensicPDF(forensic: ForensicModel) {
           <p><span class="label">Outro:</span> ${forensic.exames?.documentacao?.outro}</p>
           <p><span class="label">Observações:</span> ${forensic.exames?.observacoesDocumentacao}</p>
 
-          ${imagensDocumentacao.length > 0 ? `
-            <div class="image-grid">
-              ${imagensDocumentacao.map(f => `
-                <div class="image-item">
-                  <img src="${f.arquivo}" />
-                  <p>${f.nome}</p>
-                </div>
-              `).join('')}
-            </div>` : ''}
+          ${[
+        { titulo: 'Projetos', arquivos: forensic.exames?.documentacao?.projetosArquivos },
+        { titulo: 'Memorial de Cálculo', arquivos: forensic.exames?.documentacao?.memorialCalculoArquivos },
+        { titulo: 'Licença/Alvará', arquivos: forensic.exames?.documentacao?.licencaAlvaraArquivos },
+        { titulo: 'ART', arquivos: forensic.exames?.documentacao?.artArquivos },
+        { titulo: 'Plano de Manutenção', arquivos: forensic.exames?.documentacao?.planoManutencaoArquivos },
+        { titulo: 'Contrato de Manutenção', arquivos: forensic.exames?.documentacao?.contratoManutencaoArquivos },
+        { titulo: 'Registro de Manutenção', arquivos: forensic.exames?.documentacao?.registroManutencaoArquivos },
+        { titulo: 'Relatório RIA', arquivos: forensic.exames?.documentacao?.relatorioRiaArquivos },
+        { titulo: 'Outro', arquivos: forensic.exames?.documentacao?.outroArquivos },
+      ].map(({ titulo, arquivos }) => (
+        arquivos?.length > 0 ? `
+    <div>
+      <p class="label">📎 ${titulo}:</p>
+      <div class="image-grid">
+        ${arquivos.map(f => `
+          <div class="image-item">
+            <img src="${f.arquivo}" />
+            <p>${f.nome}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : ''
+      )).join('')}
+
         </div>
 
         <div class="footer">
