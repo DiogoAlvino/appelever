@@ -26,7 +26,7 @@ export default function ForensicPage() {
       <TabBar
         tabs={[
           { icon: 'home', label: 'Inicio', route: '/' },
-          { icon: 'tool', label: 'Equipamentos', route: '/equipments' },
+          { icon: 'search', label: 'Análises', route: '/forensics' },
           { icon: 'list', label: 'Inpeções', route: '/inspections' },
         ]}
       />

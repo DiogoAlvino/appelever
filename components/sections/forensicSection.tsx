@@ -231,6 +231,35 @@ export default function ForensicSection() {
         };
     };
 
+    function cleanObject<T>(obj: T): T {
+        if (typeof obj !== 'object' || obj === null) return obj;
+
+        const newObj: any = Array.isArray(obj) ? [] : {};
+        Object.entries(obj).forEach(([key, value]) => {
+            if (value === undefined) return;
+
+            if (Array.isArray(value)) {
+                const cleanedArray = value.map(item => cleanObject(item)).filter(item => item !== undefined);
+                newObj[key] = cleanedArray;
+            } else if (typeof value === 'object') {
+                const cleaned = cleanObject(value);
+                if (
+                    (Array.isArray(cleaned) && cleaned.length > 0) ||
+                    (typeof cleaned === 'object' && Object.keys(cleaned).length > 0)
+                ) {
+                    newObj[key] = cleaned;
+                } else if (!Array.isArray(cleaned)) {
+                    newObj[key] = cleaned;
+                }
+            } else {
+                newObj[key] = value;
+            }
+        });
+        return newObj;
+    }
+
+
+
     const handleSave = async () => {
 
         setFeedbackType('loading');
@@ -265,7 +294,6 @@ export default function ForensicSection() {
                     documentacao,
                     observacoesDocumentacao,
                     vestigiosDocumentacao,
-
                     maquinaTracao,
                     limitadorVelocidade,
                     cabos,
@@ -278,10 +306,8 @@ export default function ForensicSection() {
                     sensores,
                     pocoElevador,
                     vestigiosEquipamentos,
-
                     depoimentos,
                     vestigiosEntrevistas,
-
                     cadaverSexo,
                     cadaverCorPele,
                     cadaverCabelo,
@@ -306,7 +332,9 @@ export default function ForensicSection() {
                 peritoResponsavel: undefined
             };
 
-            await saveForensicModular(payload);
+            const cleanedPayload = cleanObject(payload);
+
+            await saveForensicModular(cleanedPayload);
             setFeedbackType('success');
             setFeedbackMessage('Análise forense salva com sucesso!');
             setTimeout(() => {
