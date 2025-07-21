@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    marginBottom: 10,
+    marginBottom: 5,
     marginTop: 5,
   },
   tabItem: {

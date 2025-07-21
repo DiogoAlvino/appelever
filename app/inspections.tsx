@@ -7,6 +7,7 @@ import { useInspections } from '~/hooks/useInspections';
 import FeedbackModal from '~/components/modal/feedbackModal';
 import { useAuth } from '~/hooks/useAuth';
 import TabBar from '~/components/layout/tabBar';
+import { InspectionModel } from '~/models/inspectionModel';
 
 export default function Inspections() {
   const { user } = useAuth();
@@ -14,6 +15,33 @@ export default function Inspections() {
 
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
+
+  const [searchText, setSearchText] = useState('');
+const [filteredInspections, setFilteredInspections] = useState<InspectionModel[]>(inspections);
+
+useEffect(() => {
+  if (!searchText) {
+    setFilteredInspections(inspections);
+    return;
+  }
+
+  const text = searchText.toLowerCase();
+
+  const includesText = (value: any): boolean => {
+    if (typeof value === 'string' || typeof value === 'number') {
+      return String(value).toLowerCase().includes(text);
+    }
+    if (typeof value === 'object' && value !== null) {
+      return Object.values(value).some(includesText);
+    }
+    return false;
+  };
+
+  const filtered = inspections.filter(insp => includesText(insp));
+  setFilteredInspections(filtered);
+}, [searchText, inspections]);
+
+
 
   useEffect(() => {
     if (user?.email) {
@@ -32,13 +60,13 @@ export default function Inspections() {
   return (
     <View style={styles.page}>
       <ScrollView contentContainerStyle={styles.container}>
-        <SearchInput onSearch={() => fetchInspections(user?.email || '')} />
+        <SearchInput onSearch={setSearchText} />
         <View style={styles.bar}>
           <Text>Total: {inspections.length}</Text>
         </View>
 
         <InspectionList
-          inspections={inspections}
+          inspections={filteredInspections}
           onError={(msg) => {
             setFeedbackMessage(msg);
             setFeedbackVisible(true);

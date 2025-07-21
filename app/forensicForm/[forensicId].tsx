@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import { useLayoutEffect } from 'react';
 import HeaderMenu from "~/components/buttons/headerMenu";
+import TabBar from "~/components/layout/tabBar";
 
 
 export default function ForensicForm() {
@@ -92,78 +93,87 @@ export default function ForensicForm() {
                         title="Dados Iniciais"
                         showChevron={false}
                     >
-                        <Text style={styles.text}>Autoridade Policial: {data?.dadosIniciais?.autoridadePolicial}</Text>
-                        <Text style={styles.text}>Nome da Autoridade: {data?.dadosIniciais?.autoridadePolicialNome}</Text>
-                        <Text style={styles.text}>Cargo do Perito: {data?.dadosIniciais?.cargoPerito}</Text>
-                        <Text style={styles.text}>Condição das Vítimas: {data?.dadosIniciais?.condicaoVitimas}</Text>
-                        <Text style={styles.text}>Data/Hora: {formatarData(data?.dadosIniciais?.dataHora)}</Text>
-                        <Text style={styles.text}>Matrícula do Perito: {data?.dadosIniciais?.matriculaPerito}</Text>
-                        <Text style={styles.text}>Número de Vítimas: {data?.dadosIniciais?.numeroVitimas}</Text>
-                        <Text style={styles.text}>Responsável: {data?.dadosIniciais?.peritoResponsavel}</Text>
-                        <Text style={styles.text}>Tipo de Ocorrência: {data?.dadosIniciais?.tipoOcorrencia}</Text>
-                        <Text style={styles.text}>Viatura: {data?.dadosIniciais?.viatura}</Text>
-                        <Text style={styles.text}>Endereço: {data?.dadosIniciais?.localizacao?.address}</Text>
-                        <Text style={styles.text}>Latitude: {data?.dadosIniciais?.localizacao?.latitude}</Text>
-                        <Text style={styles.text}>Longitude: {data?.dadosIniciais?.localizacao?.longitude}</Text>
-                    </SecondarySection>
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>Perito Responsavel</Text>
+                            <Text style={styles.itemText}>{data?.dadosIniciais?.peritoResponsavel}</Text>
+                            <Text style={styles.itemText}>{data?.dadosIniciais?.cargoPerito}</Text>
+                            <Text style={styles.text}>{data?.dadosIniciais?.matriculaPerito}</Text>
 
-                    <SecondarySection
-                        icon={<Feather name="users" size={20} color="#173A64" />}
-                        title="Equipe Pericial"
-                        showChevron={false}
-                    >
-                        {Array.isArray(data?.equipePericial) && data.equipePericial.length > 0 ? (
-                            data.equipePericial.map((membro, index) => (
-                                <View key={index} style={{ marginBottom: 8 }}>
-                                    <Text style={styles.text}>Nome: {membro.nome}</Text>
-                                    <Text style={styles.text}>Matrícula: {membro.matricula}</Text>
-                                    <Text style={styles.text}>Cargo: {membro.cargo}</Text>
-                                </View>
-                            ))
-                        ) : (
-                            <Text style={styles.text}>Nenhum membro da equipe pericial registrado.</Text>
-                        )}
-                    </SecondarySection>
+                        </View>
+                        <View style={styles.campoInterno}>
+                            {Array.isArray(data?.equipePericial) && data.equipePericial.length > 0 ? (
+                                data.equipePericial.map((membro, index) => (
+                                    <View key={index} style={{ gap: 10}}>
+                                        <Text style={styles.itemTitle}>Equipe pericial - Auxiliar {index}</Text>
+                                        <Text style={styles.itemText}>Nome: {membro.nome}</Text>
+                                        <Text style={styles.itemText}>Matrícula: {membro.matricula}</Text>
+                                        <Text style={styles.itemText}>Cargo: {membro.cargo}</Text>
+                                    </View>
+                                ))
+                            ) : (
+                                <Text style={styles.text}>Nenhum membro da equipe pericial registrado.</Text>
+                            )}
+                        </View>
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>Solicitação</Text>
+                            <Text style={styles.text}>Data/Hora: {formatarData(data?.dadosIniciais?.dataHora)}</Text>
+                            <Text style={styles.text}>Tipo de Ocorrência: {data?.dadosIniciais?.tipoOcorrencia}</Text>
+                            <Text style={styles.text}>Nome da Autoridade: {data?.dadosIniciais?.autoridadePolicialNome}</Text>
+                        </View>
+                        <View style={styles.campoInternoSecundario}>
+                            <Text style={styles.itemTitle}>Atendimento</Text>
+                            <Text style={styles.text}>Endereço: {data?.dadosIniciais?.localizacao?.address}</Text>
+                            <Text style={styles.text}>Latitude: {data?.dadosIniciais?.localizacao?.latitude}</Text>
+                            <Text style={styles.text}>Longitude: {data?.dadosIniciais?.localizacao?.longitude}</Text>
+                            <Text style={styles.text}>Viatura: {data?.dadosIniciais?.viatura}</Text>
+                            <Text style={styles.text}>Número de Vítimas: {data?.dadosIniciais?.numeroVitimas}</Text>
+                            <Text style={styles.text}>Condição das Vítimas: {data?.dadosIniciais?.condicaoVitimas}</Text>
+                            <Text style={styles.text}>Autoridade Policial: {data?.dadosIniciais?.autoridadePolicial}</Text>
+                        </View>
 
+
+                            </SecondarySection>
+
+                            <SecondarySection
+                                icon={<Feather name="box" size={20} color="#173A64" />}
+                                title="Materiais, Equipamentos, EPI e EPC"
+                                showChevron={false}
+                            >
+                                {Array.isArray(data?.materiais?.selecionados) && data.materiais.selecionados.length > 0 ? (
+                                    data.materiais.selecionados.map((id, idx) => {
+                                        // Busca o material dentro de qualquer categoria
+                                        const material = materials.flatMap((grupo) => grupo.items).find((item) => item.id === id);
+                                        return (
+                                            <Text key={idx} style={styles.text}>
+                                                • {material?.label || `ID ${id}`}
+                                            </Text>
+                                        );
+                                    })
+                                ) : (
+                                    <Text style={styles.text}>Nenhum material selecionado.</Text>
+                                )}
+
+                                {!!data?.materiais?.outroDescricao && (
+                                    <Text style={styles.text}>
+                                        <Text style={styles.bold}>Outro: </Text>
+                                        {data.materiais.outroDescricao}
+                                    </Text>
+                                )}
+                            </SecondarySection>
 
                     <SecondarySection
                         icon={<Feather name="map" size={20} color="#173A64" />}
-                        title="Análise Preliminar"
+                        title="Análise Preliminar do Local"
                         showChevron={false}
                     >
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Reconhecimento da área: </Text>
-                            {data?.analisePreliminar?.reconhecimentoArea}
-                        </Text>
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Condições Ambientais: </Text>
-                            {data?.analisePreliminar?.condicoesAmbientais}
-                        </Text>
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Características do Local: </Text>
-                            {data?.analisePreliminar?.caracteristicasLocal}
-                        </Text>
-
-                        {Array.isArray(data?.analisePreliminar?.informacoes) &&
-                            data.analisePreliminar.informacoes.map((info, index) => (
-                                <View key={index} style={{ marginTop: 8 }}>
-                                    <Text style={styles.text}>
-                                        <Text style={styles.bold}>Informação: </Text>
-                                        {info.descricao}
-                                    </Text>
-                                    {info.observacao ? (
-                                        <Text style={styles.text}>
-                                            <Text style={styles.bold}>Observação: </Text>
-                                            {info.observacao}
-                                        </Text>
-                                    ) : null}
-                                </View>
-                            ))}
-
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>Reconhecimento da área</Text>
+                            <Text style={styles.itemText}> {data?.analisePreliminar?.reconhecimentoArea}</Text>
+         
                         {Array.isArray(data?.analisePreliminar?.arquivosReconhecimentoArea) &&
                             data.analisePreliminar.arquivosReconhecimentoArea.length > 0 && (
                                 <View style={styles.uploadedList}>
-                                    <Text style={styles.uploadedTitle}>📷 Imagens da área:</Text>
+                                    <Text style={styles.uploadedTitle}>Imagens da área:</Text>
                                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                         {data.analisePreliminar.arquivosReconhecimentoArea.map((file, idx) => (
                                             !!file.uri && typeof file.uri === 'string' && (
@@ -190,6 +200,33 @@ export default function ForensicForm() {
                                     </ScrollView>
                                 </View>
                             )}
+                        </View>
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>Condições Ambientais </Text>
+                            <Text style={styles.itemText}>{data?.analisePreliminar?.condicoesAmbientais}</Text>
+                        </View>
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>Características do Local </Text>
+                            <Text style={styles.itemText}>{data?.analisePreliminar?.caracteristicasLocal}</Text>
+                        </View>
+                        <View style={styles.campoInternoSecundario}>
+                            {Array.isArray(data?.analisePreliminar?.informacoes) &&
+                                data.analisePreliminar.informacoes.map((info, index) => (
+                                    <View key={index} style={{ marginTop: 8 }}>
+                                        <View style={styles.campoInternoSecundario}>
+                                            <Text style={styles.itemTitle}>Informação do fato {index}</Text>
+                                            <Text style={styles.itemText}>{info.descricao}</Text>
+                                        </View>
+                                        {info.observacao ? (
+                                            <View style={styles.campoInternoSecundario}>
+                                                <Text style={styles.itemTitle}>Observação: </Text>
+                                                <Text style={styles.itemText}>{info.observacao}</Text>
+                                            </View>
+                                        ) : null}
+                                    </View>
+                                ))}
+                        </View>
+                       
                     </SecondarySection>
 
 
@@ -198,93 +235,59 @@ export default function ForensicForm() {
                         title="Risco"
                         showChevron={false}
                     >
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Risco Acidente: </Text>{data?.risco?.riscoAPR?.riscoAcidente}
-                        </Text>
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Risco Biológico: </Text>{data?.risco?.riscoAPR?.riscoBiologico ? 'Sim' : 'Não'}
-                        </Text>
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Risco Físico: </Text>{data?.risco?.riscoAPR?.riscoFisico}
-                        </Text>
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Risco Químico: </Text>{data?.risco?.riscoAPR?.riscoQuimico ? 'Sim' : 'Não'}
-                        </Text>
-
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Gravidade: </Text>{data?.risco?.riscoAPR?.gravidade}
-                        </Text>
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Probabilidade: </Text>{data?.risco?.riscoAPR?.probabilidade}
-                        </Text>
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Medidas Mitigatórias: </Text>{data?.risco?.riscoAPR?.medidasMitigatoria}
-                        </Text>
-
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Perito Responsável: </Text>{data?.risco?.riscoAPR?.peritoResponsavel}
-                        </Text>
-                        <Text style={styles.text}>
-                            <Text style={styles.bold}>Matrícula do Perito: </Text>{data?.risco?.riscoAPR?.peritoMatricula}
-                        </Text>
-
-                        {/* Técnicos */}
-                        {Array.isArray(data?.risco?.tecnico) && data.risco.tecnico.length > 0 && (
-                            <View style={{ marginTop: 8 }}>
-                                <Text style={styles.bold}>Técnicos:</Text>
-                                {data.risco.tecnico.map((t, idx) => (
-                                    <Text key={idx} style={styles.text}>• {t.nome} ({t.matricula})</Text>
-                                ))}
-                            </View>
-                        )}
-
-                        {/* Peritos Auxiliares */}
-                        {Array.isArray(data?.risco?.peritoAuxiliar) && data.risco.peritoAuxiliar.length > 0 && (
-                            <View style={{ marginTop: 8 }}>
-                                <Text style={styles.bold}>Peritos Auxiliares:</Text>
-                                {data.risco.peritoAuxiliar.map((p, idx) => (
-                                    <Text key={idx} style={styles.text}>• {p.nome} ({p.matricula})</Text>
-                                ))}
-                            </View>
-                        )}
-
-                        {/* Outros */}
-                        {Array.isArray(data?.risco?.outros) && data.risco.outros.length > 0 && (
-                            <View style={{ marginTop: 8 }}>
-                                <Text style={styles.bold}>Outros envolvidos:</Text>
-                                {data.risco.outros.map((o, idx) => (
-                                    <Text key={idx} style={styles.text}>• {o.nome} ({o.matricula})</Text>
-                                ))}
-                            </View>
-                        )}
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>Composição da equipe</Text>
+                            <Text style={styles.itemText}>Perito responsavel: {data?.risco?.riscoAPR?.peritoResponsavel}</Text>
+                            <Text style={styles.itemText}>Matrícula: {data?.risco?.riscoAPR?.peritoMatricula}</Text>
+                        </View>
+                        <View style={styles.campoInterno}>
+                            {Array.isArray(data?.risco?.peritoAuxiliar) && data.risco.peritoAuxiliar.length > 0 && (
+                                <View style={{ gap: 8 }}>
+                                    <Text style={styles.itemTitle}>Peritos Auxiliares:</Text>
+                                    {data.risco.peritoAuxiliar.map((p, idx) => (
+                                        <Text key={idx} style={styles.text}>• {p.nome} ({p.matricula})</Text>
+                                    ))}
+                                </View>
+                            )}
+                        </View>
+                        <View style={styles.campoInterno}>
+                            {Array.isArray(data?.risco?.tecnico) && data.risco.tecnico.length > 0 && (
+                                <View style={{ gap: 8 }}>
+                                    <Text style={styles.itemTitle}>Técnicos:</Text>
+                                    {data.risco.tecnico.map((t, idx) => (
+                                        <Text key={idx} style={styles.itemText}>• {t.nome} ({t.matricula})</Text>
+                                    ))}
+                                </View>
+                            )}
+                        </View>
+                        <View style={styles.campoInterno}>
+                            {Array.isArray(data?.risco?.outros) && data.risco.outros.length > 0 && (
+                                <View style={{ gap: 8 }}>
+                                    <Text style={styles.itemTitle}>Outros envolvidos:</Text>
+                                    {data.risco.outros.map((o, idx) => (
+                                        <Text key={idx} style={styles.itemText}>• {o.nome} ({o.matricula})</Text>
+                                    ))}
+                                </View>
+                            )}
+                        </View>
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>Identificação dos riscos</Text>
+                            <Text style={styles.itemText}>Risco Acidente: {data?.risco?.riscoAPR?.riscoAcidente}</Text>
+                            <Text style={styles.itemText}>Risco Físico: {data?.risco?.riscoAPR?.riscoFisico}</Text>
+                            <Text style={styles.itemText}>Risco Biológico: {data?.risco?.riscoAPR?.riscoBiologico ? 'Sim' : 'Não'}</Text>
+                            <Text style={styles.itemText}>Risco Químico: {data?.risco?.riscoAPR?.riscoQuimico ? 'Sim' : 'Não'}</Text>
+                        </View>
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>Avaliação dos riscos</Text>
+                            <Text style={styles.itemText}>Gravidade: {data?.risco?.riscoAPR?.gravidade}</Text>
+                            <Text style={styles.itemText}>Probabilidade: {data?.risco?.riscoAPR?.probabilidade}</Text>
+                        </View>
+                        <View style={styles.campoInternoSecundario}>
+                            <Text style={styles.itemTitle}>Medidas mitigatórias</Text>
+                            <Text style={styles.itemText}>{data?.risco?.riscoAPR?.medidasMitigatoria}</Text>
+                        </View>
                     </SecondarySection>
 
-                    <SecondarySection
-                        icon={<Feather name="box" size={20} color="#173A64" />}
-                        title="Materiais, Equipamentos, EPI e EPC"
-                        showChevron={false}
-                    >
-                        {Array.isArray(data?.materiais?.selecionados) && data.materiais.selecionados.length > 0 ? (
-                            data.materiais.selecionados.map((id, idx) => {
-                                // Busca o material dentro de qualquer categoria
-                                const material = materials.flatMap((grupo) => grupo.items).find((item) => item.id === id);
-                                return (
-                                    <Text key={idx} style={styles.text}>
-                                        • {material?.label || `ID ${id}`}
-                                    </Text>
-                                );
-                            })
-                        ) : (
-                            <Text style={styles.text}>Nenhum material selecionado.</Text>
-                        )}
-
-                        {!!data?.materiais?.outroDescricao && (
-                            <Text style={styles.text}>
-                                <Text style={styles.bold}>Outro: </Text>
-                                {data.materiais.outroDescricao}
-                            </Text>
-                        )}
-                    </SecondarySection>
 
                     <SecondarySection
                         icon={<Feather name="file-text" size={20} color="#173A64" />}
@@ -292,76 +295,94 @@ export default function ForensicForm() {
                         showChevron={false}
                     >
                         {/* Documentação */}
-                        <Text style={styles.bold}>📁 Documentação:</Text>
-                        <Text style={styles.text}>Projetos: {data?.exames?.documentacao?.projetos}</Text>
-                        <Text style={styles.text}>Memorial de Cálculo: {data?.exames?.documentacao?.memorialCalculo}</Text>
-                        <Text style={styles.text}>Licença/Alvará: {data?.exames?.documentacao?.licencaAlvara}</Text>
-                        <Text style={styles.text}>ART: {data?.exames?.documentacao?.art}</Text>
-                        <Text style={styles.text}>Plano de Manutenção: {data?.exames?.documentacao?.planoManutencao}</Text>
-                        <Text style={styles.text}>Contrato de Manutenção: {data?.exames?.documentacao?.contratoManutencao}</Text>
-                        <Text style={styles.text}>Registro de Manutenção: {data?.exames?.documentacao?.registroManutencao}</Text>
-                        <Text style={styles.text}>Relatório RIA: {data?.exames?.documentacao?.relatorioRia}</Text>
-                        <Text style={styles.text}>Outro: {data?.exames?.documentacao?.outro}</Text>
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>5.1. Documentação</Text>
+                            <Text style={styles.itemText}>Projetos: {data?.exames?.documentacao?.projetos}</Text>
+                            <Text style={styles.itemText}>Memorial de Cálculo: {data?.exames?.documentacao?.memorialCalculo}</Text>
+                            <Text style={styles.itemText}>Licença/Alvará: {data?.exames?.documentacao?.licencaAlvara}</Text>
+                            <Text style={styles.itemText}>ART: {data?.exames?.documentacao?.art}</Text>
+                            <Text style={styles.itemText}>Plano de Manutenção: {data?.exames?.documentacao?.planoManutencao}</Text>
+                            <Text style={styles.itemText}>Contrato de Manutenção: {data?.exames?.documentacao?.contratoManutencao}</Text>
+                            <Text style={styles.itemText}>Registro de Manutenção: {data?.exames?.documentacao?.registroManutencao}</Text>
+                            <Text style={styles.itemText}>Relatório RIA: {data?.exames?.documentacao?.relatorioRia}</Text>
+                            <Text style={styles.itemText}>Outro: {data?.exames?.documentacao?.outro}</Text>
 
-                        {/* Observações */}
-                        <Text style={styles.text}>Observações: {data?.exames?.observacoesDocumentacao}</Text>
+                            {/* Observações */}
+                            <Text style={styles.text}>Observações: {data?.exames?.observacoesDocumentacao}</Text>
 
-                        {/* Exibe todos os arquivos agrupados */}
-                        {[
-                            { title: 'Projetos', arquivos: data?.exames?.documentacao?.projetosArquivos },
-                            { title: 'Memorial de Cálculo', arquivos: data?.exames?.documentacao?.memorialCalculoArquivos },
-                            { title: 'Licença/Alvará', arquivos: data?.exames?.documentacao?.licencaAlvaraArquivos },
-                            { title: 'ART', arquivos: data?.exames?.documentacao?.artArquivos },
-                            { title: 'Plano de Manutenção', arquivos: data?.exames?.documentacao?.planoManutencaoArquivos },
-                            { title: 'Contrato de Manutenção', arquivos: data?.exames?.documentacao?.contratoManutencaoArquivos },
-                            { title: 'Registro de Manutenção', arquivos: data?.exames?.documentacao?.registroManutencaoArquivos },
-                            { title: 'Relatório RIA', arquivos: data?.exames?.documentacao?.relatorioRiaArquivos },
-                            { title: 'Outro', arquivos: data?.exames?.documentacao?.outroArquivos },
-                        ].map(({ title, arquivos }, idx) =>
-                            Array.isArray(arquivos) && arquivos.length > 0 ? (
-                                <View key={idx} style={styles.uploadedList}>
-                                    <Text style={styles.uploadedTitle}>📎 {title}:</Text>
-                                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                        {arquivos.map((file, fIdx) => (
-                                            !!file.uri && (
-                                                <TouchableOpacity
-                                                    key={`${file.nome}-${fIdx}`}
-                                                    style={styles.thumbnailWrapper}
-                                                    onPress={() =>
-                                                        router.push({
-                                                            pathname: '/previewImage',
-                                                            params: { uri: file.uri },
-                                                        })
-                                                    }
-                                                >
-                                                    <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
-                                                    <View style={styles.imageContainer}>
-                                                        <Image
-                                                            source={{ uri: file.arquivo }}
-                                                            style={styles.thumbnail}
-                                                        />
-                                                    </View>
-                                                </TouchableOpacity>
-                                            )
-                                        ))}
-                                    </ScrollView>
-                                </View>
-                            ) : null
-                        )}
-                    </SecondarySection>
+                            {/* Exibe todos os arquivos agrupados */}
+                            {[
+                                { title: 'Projetos', arquivos: data?.exames?.documentacao?.projetosArquivos },
+                                { title: 'Memorial de Cálculo', arquivos: data?.exames?.documentacao?.memorialCalculoArquivos },
+                                { title: 'Licença/Alvará', arquivos: data?.exames?.documentacao?.licencaAlvaraArquivos },
+                                { title: 'ART', arquivos: data?.exames?.documentacao?.artArquivos },
+                                { title: 'Plano de Manutenção', arquivos: data?.exames?.documentacao?.planoManutencaoArquivos },
+                                { title: 'Contrato de Manutenção', arquivos: data?.exames?.documentacao?.contratoManutencaoArquivos },
+                                { title: 'Registro de Manutenção', arquivos: data?.exames?.documentacao?.registroManutencaoArquivos },
+                                { title: 'Relatório RIA', arquivos: data?.exames?.documentacao?.relatorioRiaArquivos },
+                                { title: 'Outro', arquivos: data?.exames?.documentacao?.outroArquivos },
+                            ].map(({ title, arquivos }, idx) =>
+                                Array.isArray(arquivos) && arquivos.length > 0 ? (
+                                    <View key={idx} style={styles.uploadedList}>
+                                        <Text style={styles.itemText}>{title}:</Text>
+                                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                            {arquivos.map((file, fIdx) => (
+                                                !!file.uri && (
+                                                    <TouchableOpacity
+                                                        key={`${file.nome}-${fIdx}`}
+                                                        style={styles.thumbnailWrapper}
+                                                        onPress={() =>
+                                                            router.push({
+                                                                pathname: '/previewImage',
+                                                                params: { uri: file.uri },
+                                                            })
+                                                        }
+                                                    >
+                                                        <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
+                                                        <View style={styles.imageContainer}>
+                                                            <Image
+                                                                source={{ uri: file.arquivo }}
+                                                                style={styles.thumbnail}
+                                                            />
+                                                        </View>
+                                                    </TouchableOpacity>
+                                                )
+                                            ))}
+                                        </ScrollView>
+                                    </View>
+                                ) : null
+                            )}
 
+                        </View>
 
-                    <SecondarySection
-                        icon={<Feather name="activity" size={20} color="#173A64" />}
-                        title="Perinecroscopia"
-                        showChevron={false}
-                    >
-                        <Text style={styles.text}>Sexo: {data?.exames?.cadaverSexo}</Text>
-                        <Text style={styles.text}>Cor da Pele: {data?.exames?.cadaverCorPele}</Text>
-                        <Text style={styles.text}>Cabelo: {data?.exames?.cadaverCabelo}</Text>
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>5.2. Equiapmentos</Text>
+                        </View>
+
+                        <View style={styles.campoInterno}>
+                            <Text style={styles.itemTitle}>5.3. Entrevistas</Text>
+                        </View>
+
+                        <View style={styles.campoInternoSecundario}>
+                            <Text style={styles.itemTitle}>5.4. Perinecroscopia</Text>
+                            <Text style={styles.itemText}>Sexo: {data?.exames?.cadaverSexo}</Text>
+                            <Text style={styles.itemText}>Cor da Pele: {data?.exames?.cadaverCorPele}</Text>
+                            <Text style={styles.itemText}>Cabelo: {data?.exames?.cadaverCabelo}</Text>
+                            <Text style={styles.itemText}>Sinais identificadores: {data?.exames?.cadaverSinaisIdentificadores}</Text>
+                            <Text style={styles.itemText}>Descrição das vestes e pertences pessoais: {data?.exames?.cadaverDescricaoVestes}</Text>
+                            <Text style={styles.itemText}>Outro: {data?.exames?.cadaverOutro}</Text>
+                        </View>
                     </SecondarySection>
                 </ScrollView>
             )}
+
+            <TabBar
+                tabs={[
+                    { icon: 'home', label: 'Inicio', route: '/' },
+                    { icon: 'plus-circle', label: 'Nova análise', route: '/forensicPage' },
+                    { icon: 'list', label: 'Inpeções', route: '/inspections' },
+                ]}
+            />
 
 
             <FeedbackModal
@@ -386,6 +407,17 @@ const styles = StyleSheet.create({
         color: colors.primaryDark,
         width: '100%',
     },
+    itemTitle: {
+    fontSize: fontSize.label,
+    fontWeight: '500',
+    color: colors.primaryDark,
+  },
+  itemText: {
+    fontSize: fontSize.placeholder,
+    color: colors.primaryDark,
+    lineHeight: 20,
+    marginBottom: 4,
+  },
     menuButton: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -429,6 +461,18 @@ const styles = StyleSheet.create({
         marginBottom: 4,
         maxWidth: 80,
         textAlign: 'center',
+    },
+    campoInterno: {
+        gap: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: "#D0CECE",
+        borderStyle: "dashed",
+        paddingBottom: 20,
+        width: "100%",
+    },
+    campoInternoSecundario: {
+        gap: 10,
+        width: "100%",
     },
 
 });

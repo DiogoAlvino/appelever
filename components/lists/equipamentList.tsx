@@ -4,6 +4,7 @@ import { Text, View, StyleSheet } from 'react-native';
 import SecondarySection from '../sections/secondarySection';
 import { colors } from '~/theme/colors';
 import { router } from 'expo-router';
+import { EquipmentModel } from '~/models/equipmentModel';
 
 interface EquipmentItem {
   id: string;
@@ -13,7 +14,7 @@ interface EquipmentItem {
 }
 
 interface EquipmentListProps {
-  equipments: EquipmentItem[];
+  equipments: EquipmentModel[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 }
@@ -32,18 +33,24 @@ export default function EquipmentList({ equipments, selectedId, onSelect }: Equi
         return (
           <SecondarySection
             key={equip.id}
-            title={equip.name}
-            onPress={() => handleViewEquipment(equip.id)}
+            title={equip.detalhes_equipamento?.identificacaoEquipamento || 'Sem nome'}
+            onPress={() => handleViewEquipment(equip.id!)}
             showCheckbox
             checked={isSelected}
-            onCheckChange={() => !isDisabled && onSelect(equip.id)}
+            onCheckChange={() => !isDisabled && onSelect(equip.id!)}
             disabled={isDisabled}
-            backgroundColor={isDisabled ? '#f1f1f1' : colors.primaryLight}>
-            <Text style={{ color: isDisabled ? '#888' : colors.primaryDark }}>{equip.modelo}</Text>
-            <Text style={{ color: isDisabled ? '#888' : colors.primaryDark }}>{equip.address}</Text>
+            backgroundColor={isDisabled ? '#f1f1f1' : colors.primaryLight}
+          >
+            <Text style={{ color: isDisabled ? '#888' : colors.primaryDark }}>
+              {equip.detalhes_equipamento?.modelo || 'Sem modelo'}
+            </Text>
+            <Text style={{ color: isDisabled ? '#888' : colors.primaryDark }}>
+              {equip.local ? `${equip.local.logradouro}, ${equip.local.numero} - ${equip.local.bairro}` : 'Sem endereço'}
+            </Text>
           </SecondarySection>
         );
       })}
+
     </View>
   );
 }

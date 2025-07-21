@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View, Text, ActivityIndicator, RefreshControl } from 'react-native';
 
 import MainButton from '~/components/buttons/mainButton';
@@ -8,10 +8,44 @@ import TabBar from '~/components/layout/tabBar';
 import EquipmentList from '~/components/lists/equipamentList';
 import { useEquipments } from '~/hooks/useEquipments';
 import AlertMessage from '~/components/messages/alertMessage';
+import { EquipmentDetailsModel } from '~/models/equipmentDetailsModel';
+import { EquipmentModel } from '~/models/equipmentModel';
 
 export default function Equipments() {
   const { equipments, loading, reload } = useEquipments();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState('');
+  const [filteredEquipments, setFilteredEquipments] = useState(equipments);
+
+  useEffect(() => {
+  if (!searchText) {
+    setFilteredEquipments(equipments);
+    return;
+  }
+
+  const text = searchText.toLowerCase();
+
+  const filtered = equipments.filter((equip: EquipmentModel) => {
+  return (
+    equip.id?.toLowerCase().includes(text) ||
+    equip.responsavel?.nome?.toLowerCase().includes(text) ||
+    equip.responsavel?.funcao?.toLowerCase().includes(text) ||
+    equip.local?.logradouro?.toLowerCase().includes(text) ||
+    equip.local?.bairro?.toLowerCase().includes(text) ||
+    equip.detalhes_equipamento?.modelo?.toLowerCase().includes(text) ||
+    equip.detalhes_equipamento?.fabricante?.toLowerCase().includes(text) ||
+    equip.detalhes_equipamento?.cnpj?.toLowerCase().includes(text) ||
+    equip.empresa_conservadora?.razaoSocial?.toLowerCase().includes(text) ||
+    equip.empresa_conservadora?.cnpj?.toLowerCase().includes(text)
+  );
+});
+
+  setFilteredEquipments(filtered);
+}, [searchText, equipments]);
+
+
+
+
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -46,7 +80,7 @@ export default function Equipments() {
         <ScrollView contentContainerStyle={styles.container} refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
-          <SearchInput onSearch={reload} />
+          <SearchInput onSearch={setSearchText} />
           <AlertMessage
             type="info"
             message="Selecione apenas um equipamento para realizar a inspeção."
@@ -55,7 +89,7 @@ export default function Equipments() {
             <Text>Total: {equipments.length}</Text>
           </View>
           <EquipmentList
-            equipments={equipments}
+            equipments={filteredEquipments}
             selectedId={selectedId}
             onSelect={(id) => setSelectedId((prev) => (prev === id ? null : id))}
           />

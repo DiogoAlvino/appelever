@@ -6,6 +6,7 @@ import ForensicList from '~/components/lists/forensicList';
 import { useForensicList } from '~/hooks/useForensicList';
 import FeedbackModal from '~/components/modal/feedbackModal';
 import { useAuth } from '~/hooks/useAuth';
+import TabBar from '~/components/layout/tabBar';
 
 export default function Forensics() {
   const { user } = useAuth();
@@ -13,6 +14,32 @@ export default function Forensics() {
 
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
+
+  const [searchText, setSearchText] = useState('');
+  const [filteredForensics, setFilteredForensics] = useState(forensics);
+
+  useEffect(() => {
+  if (!searchText) {
+    setFilteredForensics(forensics);
+    return;
+  }
+
+  const text = searchText.toLowerCase();
+
+  const includesText = (value: any): boolean => {
+    if (typeof value === 'string' || typeof value === 'number') {
+      return String(value).toLowerCase().includes(text);
+    }
+    if (typeof value === 'object' && value !== null) {
+      return Object.values(value).some(includesText);
+    }
+    return false;
+  };
+
+  const filtered = forensics.filter(f => includesText(f));
+  setFilteredForensics(filtered);
+}, [searchText, forensics]);
+
 
   useEffect(() => {
     if (user?.email) {
@@ -31,13 +58,13 @@ export default function Forensics() {
   return (
     <View style={styles.page}>
       <ScrollView contentContainerStyle={styles.container}>
-        <SearchInput onSearch={() => fetchForensics(user?.email || '')} />
+        <SearchInput onSearch={setSearchText} />
         <View style={styles.bar}>
           <Text>Total: {forensics.length}</Text>
         </View>
 
         <ForensicList
-          forensics={forensics}
+          forensics={filteredForensics}
           onError={(msg) => {
             setFeedbackMessage(msg);
             setFeedbackVisible(true);
@@ -46,6 +73,14 @@ export default function Forensics() {
           onSelect={() => {}}
         />
       </ScrollView>
+
+      <TabBar
+        tabs={[
+          { icon: 'home', label: 'Inicio', route: '/' },
+          { icon: 'plus-circle', label: 'Nova análise', route: '/forensicPage' },
+          { icon: 'list', label: 'Inpeções', route: '/inspections' },
+        ]}
+      />
 
       <FeedbackModal
         visible={feedbackVisible}
