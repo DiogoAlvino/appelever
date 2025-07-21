@@ -82,12 +82,12 @@ export type InformacaoFato = {
 };
 
 export type RiscoAPR = {
-  peritoResponsavel: string;
-  peritoMatricula: string;
-  riscoAcidente: string;
-  riscoFisico: string;
-  riscoQuimico: boolean;
-  riscoBiologico: boolean;
+  peritoResponsavel?: string;
+  peritoMatricula?: string;
+  riscoAcidente?: string;
+  riscoFisico?: string;
+  riscoQuimico?: boolean;
+  riscoBiologico?: boolean;
   gravidade?: string;
   probabilidade?: string;
   medidasMitigatoria: string;
