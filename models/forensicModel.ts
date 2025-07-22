@@ -37,8 +37,8 @@ export type VestigioResumo = {
   naturezaVestigio?: string;
   origem: 'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia';
   dadosCompletos: {
-    dadosPreliminares: DadosPreliminares[];
-    acondicionamento: Acondicionamento[];
+    dadosPreliminares: DadosPreliminares;
+    acondicionamento: Acondicionamento;
   };
 };
 export type Depoimento = {

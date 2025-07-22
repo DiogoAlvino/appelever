@@ -33,10 +33,10 @@ export default function ResumoVestigio({
 
       <View style={styles.content}>
         <Text style={styles.texto}>
-          Nº: {vestigio.dadosCompletos?.dadosPreliminares?.[index]?.numeroVestigio ?? '---'}
+          Nº: {vestigio.dadosCompletos?.dadosPreliminares?.numeroVestigio ?? '---'}
         </Text>
         <Text style={styles.texto}>
-          Natureza: {vestigio.dadosCompletos?.dadosPreliminares?.[index]?.naturezaVestigio ?? '---'}
+          Natureza: {vestigio.dadosCompletos?.dadosPreliminares?.naturezaVestigio ?? '---'}
         </Text>
 
 
