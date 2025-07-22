@@ -12,7 +12,7 @@ import MaterialList from '../lists/materialList';
 import CheckBox from '../inputs/CheckBox';
 import { useForensic } from '~/hooks/useForensic';
 import { inspecaoCampos } from '~/data/inspecaoCampos';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import FormDrawer from '../modal/formDrawer';
 
 import CroquiModal from '../croqui';
@@ -31,6 +31,7 @@ import { VestigioResumo } from '~/models/forensicModel';
 import { DadosPreliminares, Acondicionamento } from '~/models/forensicModel';
 
 import { isDadosIniciaisRespondido, isMateriaisRespondido, isAnalisePreliminarRespondido, isRiscoAPRRespondido, isExamesRespondido } from '~/utils/forensicUtils';
+import { Perinecroscopia } from '~/types/forensicTypes';
 
 export default function ForensicSection() {
 
@@ -64,18 +65,7 @@ export default function ForensicSection() {
         depoimentos, setDepoimentos,
 
         // 5.4 Perinecroscopia
-        cadaverSexo, setCadaverSexo,
-        cadaverCorPele, setCadaverCorPele,
-        cadaverCabelo, setCadaverCabelo,
-        cadaverSinaisIdentificadores, setCadaverSinaisIdentificadores,
-        cadaverDescricaoVestes, setCadaverDescricaoVestes,
-        cadaverOutro, setCadaverOutro,
-        analiseDisposicaoCadaver, setAnaliseDisposicaoCadaver,
-        sinaisTanatologicos, setSinaisTanatologicos,
-        descricaoLesoesCadaver, setDescricaoLesoesCadaver,
-        arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver,
-        arquivosTanatologicos, setArquivosTanatologicos,
-        arquivosLesoesCadaver, setArquivosLesoesCadaver,
+        perinecroscopia, setPerinecroscopia,
 
         // Vestígios
         dadosPreliminares, setDadosPreliminares,
@@ -85,21 +75,7 @@ export default function ForensicSection() {
         adicionarCampo, atualizarCampo, removerCampo,
         clearFieldError, errors, setErrors,
 
-        maquinaTracao, setMaquinaTracao,
-        limitadorVelocidade, setLimitadorVelocidade,
-
-        cabos, setCabos,
-        contrapeso, setContrapeso,
-
-        cabine, setCabine,
-        portas, setPortas,
-
-        freiosEmergencia, setFreiosEmergencia,
-
-        sistemaControle, setSistemaControle,
-        sistemaEletrico, setSistemaEletrico,
-        sensores, setSensores,
-        pocoElevador, setPocoElevador,
+        equipamentosExame, setEquipamentosExame,
         arquivosReconhecimentoArea, setArquivosReconhecimentoArea,
     } = useForensic();
 
@@ -159,38 +135,20 @@ export default function ForensicSection() {
             documentacao,
             observacoesDocumentacao,
             vestigiosDocumentacao,
-            maquinaTracao,
-            limitadorVelocidade,
-            cabos,
-            contrapeso,
-            cabine,
-            portas,
-            freiosEmergencia,
-            sistemaControle,
-            sistemaEletrico,
-            sensores,
-            pocoElevador,
+            equipamentosExame,
             vestigiosEquipamentos,
             depoimentos,
             vestigiosEntrevistas,
-            cadaverSexo,
-            cadaverCorPele,
-            cadaverCabelo,
-            cadaverSinaisIdentificadores,
-            cadaverDescricaoVestes,
-            cadaverOutro,
-            analiseDisposicaoCadaver,
-            arquivosDisposicaoCadaver,
-            sinaisTanatologicos,
-            arquivosTanatologicos,
-            descricaoLesoesCadaver,
-            arquivosLesoesCadaver,
+            perinecroscopia,
             vestigiosPerinecroscopia,
         }
     } as any);
 
+
     function cleanObject<T>(obj: T): T {
         if (typeof obj !== 'object' || obj === null) return obj;
+
+        if (obj instanceof Date) return obj;
 
         const newObj: any = Array.isArray(obj) ? [] : {};
         Object.entries(obj).forEach(([key, value]) => {
@@ -252,32 +210,11 @@ export default function ForensicSection() {
                     documentacao,
                     observacoesDocumentacao,
                     vestigiosDocumentacao,
-                    maquinaTracao,
-                    limitadorVelocidade,
-                    cabos,
-                    contrapeso,
-                    cabine,
-                    portas,
-                    freiosEmergencia,
-                    sistemaControle,
-                    sistemaEletrico,
-                    sensores,
-                    pocoElevador,
+                    equipamentosExame,
                     vestigiosEquipamentos,
                     depoimentos,
                     vestigiosEntrevistas,
-                    cadaverSexo,
-                    cadaverCorPele,
-                    cadaverCabelo,
-                    cadaverSinaisIdentificadores,
-                    cadaverDescricaoVestes,
-                    cadaverOutro,
-                    analiseDisposicaoCadaver,
-                    arquivosDisposicaoCadaver,
-                    sinaisTanatologicos,
-                    arquivosTanatologicos,
-                    descricaoLesoesCadaver,
-                    arquivosLesoesCadaver,
+                    perinecroscopia,
                     vestigiosPerinecroscopia,
                 },
                 condicaoVitimas: undefined,
@@ -359,6 +296,10 @@ export default function ForensicSection() {
         perinecroscopia: 'Perinecroscopia',
     };
 
+
+    function atualizarObjeto(setPerinecroscopia: Dispatch<SetStateAction<Perinecroscopia>>, arg1: string, arg2: string): void {
+        throw new Error('Function not implemented.');
+    }
 
     return (
         <View style={styles.section}>
@@ -1049,8 +990,8 @@ export default function ForensicSection() {
                                                         title="Máquina de tração"
                                                         buttonLabel="Máquina de tração"
                                                         campos={inspecaoCampos.maquinaTracao}
-                                                        valor={maquinaTracao}
-                                                        onChange={setMaquinaTracao}
+                                                        valor={equipamentosExame.maquinaTracao}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, maquinaTracao: novo }))}
                                                     />
                                                 </View>
                                                 <View style={styles.nivel2}>
@@ -1058,8 +999,8 @@ export default function ForensicSection() {
                                                         title="Limitador de Velocidade"
                                                         buttonLabel="Limitador de Velocidade"
                                                         campos={inspecaoCampos.limitadorVelocidade}
-                                                        valor={limitadorVelocidade}
-                                                        onChange={setLimitadorVelocidade}
+                                                        valor={equipamentosExame.limitadorVelocidade}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, limitadorVelocidade: novo }))}
                                                     />
                                                 </View>
                                             </View>
@@ -1075,8 +1016,8 @@ export default function ForensicSection() {
                                                         title="Cabos"
                                                         buttonLabel="Cabos"
                                                         campos={inspecaoCampos.cabos}
-                                                        valor={cabos}
-                                                        onChange={setCabos}
+                                                        valor={equipamentosExame.cabos}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, cabos: novo }))}
                                                     />
                                                 </View>
                                                 <View style={styles.nivel2}>
@@ -1084,8 +1025,8 @@ export default function ForensicSection() {
                                                         title="Contrapeso"
                                                         buttonLabel="Contrapeso"
                                                         campos={inspecaoCampos.contrapeso}
-                                                        valor={contrapeso}
-                                                        onChange={setContrapeso}
+                                                        valor={equipamentosExame.contrapeso}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, contrapeso: novo }))}
                                                     />
                                                 </View>
                                             </View>
@@ -1101,8 +1042,8 @@ export default function ForensicSection() {
                                                         title="Cabine"
                                                         buttonLabel="Cabine"
                                                         campos={inspecaoCampos.cabine}
-                                                        valor={cabine}
-                                                        onChange={setCabine}
+                                                        valor={equipamentosExame.cabine}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, cabine: novo }))}
                                                     />
                                                 </View>
 
@@ -1111,8 +1052,8 @@ export default function ForensicSection() {
                                                         title="Portas"
                                                         buttonLabel="Portas"
                                                         campos={inspecaoCampos.portas}
-                                                        valor={portas}
-                                                        onChange={setPortas}
+                                                        valor={equipamentosExame.portas}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, portas: novo }))}
                                                     />
                                                 </View>
                                             </View>
@@ -1128,8 +1069,8 @@ export default function ForensicSection() {
                                                         title="Freios de Emergência"
                                                         buttonLabel="Freios de Emergência"
                                                         campos={inspecaoCampos.freiosEmergencia}
-                                                        valor={freiosEmergencia}
-                                                        onChange={setFreiosEmergencia}
+                                                        valor={equipamentosExame.freiosEmergencia}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, freiosEmergencia: novo }))}
                                                     />
                                                 </View>
                                             </View>
@@ -1146,8 +1087,8 @@ export default function ForensicSection() {
                                                         title="Sistema de Controle"
                                                         buttonLabel="Sistema de Controle"
                                                         campos={inspecaoCampos.sistemaControle}
-                                                        valor={sistemaControle}
-                                                        onChange={setSistemaControle}
+                                                        valor={equipamentosExame.sistemaControle}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, sistemaControle: novo }))}
                                                     />
                                                 </View>
 
@@ -1156,8 +1097,8 @@ export default function ForensicSection() {
                                                         title="Sistema Elétrico"
                                                         buttonLabel="Sistema Elétrico"
                                                         campos={inspecaoCampos.sistemaEletrico}
-                                                        valor={sistemaEletrico}
-                                                        onChange={setSistemaEletrico}
+                                                        valor={equipamentosExame.sistemaEletrico}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, sistemaEletrico: novo }))}
                                                     />
                                                 </View>
 
@@ -1166,8 +1107,8 @@ export default function ForensicSection() {
                                                         title="Sensores"
                                                         buttonLabel="Sensores"
                                                         campos={inspecaoCampos.sensores}
-                                                        valor={sensores}
-                                                        onChange={setSensores}
+                                                        valor={equipamentosExame.sensores}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, sensores: novo }))}
                                                     />
                                                 </View>
 
@@ -1176,8 +1117,8 @@ export default function ForensicSection() {
                                                         title="Poço do Elevador"
                                                         buttonLabel="Poço do Elevador"
                                                         campos={inspecaoCampos.pocoElevador}
-                                                        valor={pocoElevador}
-                                                        onChange={setPocoElevador}
+                                                        valor={equipamentosExame.pocoElevador}
+                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, pocoElevador: novo }))}
                                                     />
                                                 </View>
 
@@ -1367,75 +1308,76 @@ export default function ForensicSection() {
 
                                         <PrimarySelect
                                             label="Sexo"
-                                            selected={cadaverSexo}
-                                            onSelect={(value) => setCadaverSexo(value || '')}
+                                            selected={perinecroscopia.cadaverSexo}
+                                            onSelect={(value) => atualizarObjeto(setPerinecroscopia, 'cadaverSexo', value || '')}
                                             placeholder="Selecione"
                                             options={['Masculino', 'Feminino']}
                                         />
 
+
+
                                         <PrimaryInput
                                             label="Cor da pele"
-                                            placeholder="Informe"
-                                            value={cadaverCorPele}
-                                            onChangeText={setCadaverCorPele}
+                                            value={perinecroscopia.cadaverCorPele}
+                                            onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'cadaverCorPele', text)}
                                         />
 
                                         <PrimaryInput
                                             label="Características do Cabelo"
                                             placeholder="Informe"
-                                            value={cadaverCabelo}
-                                            onChangeText={setCadaverCabelo}
+                                            value={perinecroscopia.cadaverCabelo}
+                                            onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'cadaverCabelo', text)}
                                         />
 
                                         <PrimaryInput
                                             label="Sinais identificadores (tatuagem)"
                                             placeholder="Informe"
-                                            value={cadaverSinaisIdentificadores}
-                                            onChangeText={setCadaverSinaisIdentificadores}
+                                            value={perinecroscopia.cadaverSinaisIdentificadores}
+                                            onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'cadaverSinaisIdentificadores', text)}
                                         />
 
                                         <PrimaryInput
                                             label="Descrição das vestes e pertences pessoais"
                                             placeholder="Informe"
-                                            value={cadaverDescricaoVestes}
-                                            onChangeText={setCadaverDescricaoVestes}
+                                            value={perinecroscopia.cadaverDescricaoVestes}
+                                            onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'cadaverDescricaoVestes', text)}
                                         />
 
                                         <PrimaryInput
                                             label="Outro"
                                             placeholder="Informe"
-                                            value={cadaverOutro}
-                                            onChangeText={setCadaverOutro}
+                                            value={perinecroscopia.cadaverOutro}
+                                            onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'cadaverOutro', text)}
                                         />
 
                                         <Text style={styles.titulos}>Análise da disposição do Cadáver</Text>
                                         <FileUpload
-                                            value={arquivosDisposicaoCadaver}
-                                            onChange={setArquivosDisposicaoCadaver}
+                                            value={perinecroscopia.arquivosDisposicaoCadaver}
+                                            onChange={(arquivos) => setPerinecroscopia({ ...perinecroscopia, arquivosDisposicaoCadaver: arquivos })}
                                         />
                                         <VoiceInput
-                                            value={analiseDisposicaoCadaver}
-                                            onChangeText={setAnaliseDisposicaoCadaver}
+                                            value={perinecroscopia.analiseDisposicaoCadaver}
+                                            onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'analiseDisposicaoCadaver', text)}
                                         />
 
                                         <Text style={styles.titulos}>Descrição dos sinais tanatológicos</Text>
                                         <FileUpload
-                                            value={arquivosTanatologicos}
-                                            onChange={setArquivosTanatologicos}
+                                            value={perinecroscopia.arquivosTanatologicos}
+                                            onChange={(arquivos) => setPerinecroscopia({ ...perinecroscopia, arquivosTanatologicos: arquivos })}
                                         />
                                         <VoiceInput
-                                            value={sinaisTanatologicos}
-                                            onChangeText={setSinaisTanatologicos}
+                                            value={perinecroscopia.sinaisTanatologicos}
+                                            onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'sinaisTanatologicos', text)}
                                         />
 
                                         <Text style={styles.titulos}>Descrição das lesões</Text>
                                         <FileUpload
-                                            value={arquivosLesoesCadaver}
-                                            onChange={setArquivosLesoesCadaver}
+                                            value={perinecroscopia.arquivosLesoesCadaver}
+                                            onChange={(arquivos) => setPerinecroscopia({ ...perinecroscopia, arquivosLesoesCadaver: arquivos })}
                                         />
                                         <VoiceInput
-                                            value={descricaoLesoesCadaver}
-                                            onChangeText={setDescricaoLesoesCadaver}
+                                            value={perinecroscopia.descricaoLesoesCadaver}
+                                            onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'descricaoLesoesCadaver', text)}
                                         />
 
                                         {vestigiosPerinecroscopia.map((vestigio, index) => (

@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useLayoutEffect } from 'react';
 import HeaderMenu from "~/components/buttons/headerMenu";
 import TabBar from "~/components/layout/tabBar";
+import { auth } from "~/utils/firebase";
 
 
 export default function ForensicForm() {
@@ -80,7 +81,7 @@ export default function ForensicForm() {
                         title="Responsável"
                         showChevron={false}
                     >
-                        <Text style={styles.text}>{data?.usuario}</Text>
+                        <Text style={styles.text}>{auth.currentUser?.displayName || 'usuário'}</Text>
                         <Text style={styles.text}>
                             Data: {formatarData(data?.dataCriacao)}
                         </Text>
@@ -88,22 +89,20 @@ export default function ForensicForm() {
 
                     </SecondarySection>
 
-                    <SecondarySection
-                        icon={<Feather name="info" size={20} color="#173A64" />}
-                        title="Dados Iniciais"
-                        showChevron={false}
-                    >
-                        {(!data?.dadosIniciais ||
-                            Object.values(data.dadosIniciais).every(value => {
-                                if (typeof value === 'string') return value.trim() === '';
-                                if (typeof value === 'object' && value !== null) {
-                                    return Object.values(value).every(v => v === '' || v === undefined || v === null);
-                                }
-                                return value === undefined || value === null;
-                            })) ? (
-                            <Text style={styles.text}>Nenhum registro de dados iniciais.</Text>
-                        ) : (
-                            <>
+                    {data?.dadosIniciais &&
+                        !Object.values(data.dadosIniciais).every(value => {
+                            if (typeof value === 'string') return value.trim() === '';
+                            if (typeof value === 'object' && value !== null) {
+                                return Object.values(value).every(v => v === '' || v === undefined || v === null);
+                            }
+                            return value === undefined || value === null;
+                        }) && (
+                            <SecondarySection
+                                icon={<Feather name="info" size={20} color="#173A64" />}
+                                title="Dados Iniciais"
+                                showChevron={false}
+                            >
+
                                 <View style={styles.campoInterno}>
                                     {(!data?.dadosIniciais?.peritoResponsavel &&
                                         !data?.dadosIniciais?.cargoPerito &&
@@ -190,264 +189,296 @@ export default function ForensicForm() {
                                         </>
                                     )}
                                 </View>
+                            </SecondarySection>
 
-                            </>
+
                         )}
-                    </SecondarySection>
 
 
-                    <SecondarySection
-                        icon={<Feather name="box" size={20} color="#173A64" />}
-                        title="Materiais, Equipamentos, EPI e EPC"
-                        showChevron={false}
-                    >
-                        {Array.isArray(data?.materiais?.selecionados) && data.materiais.selecionados.length > 0 ? (
-                            data.materiais.selecionados.map((id, idx) => {
-                                // Busca o material dentro de qualquer categoria
-                                const material = materials.flatMap((grupo) => grupo.items).find((item) => item.id === id);
-                                return (
-                                    <Text key={idx} style={styles.text}>
-                                        • {material?.label || `ID ${id}`}
+                    {((Array.isArray(data?.materiais?.selecionados) && data.materiais.selecionados.length > 0) ||
+                        !!data?.materiais?.outroDescricao) && (
+                            <SecondarySection
+                                icon={<Feather name="box" size={20} color="#173A64" />}
+                                title="Materiais, Equipamentos, EPI e EPC"
+                                showChevron={false}
+                            >
+                                {data.materiais.selecionados.map((id, idx) => {
+                                    const material = materials.flatMap((grupo) => grupo.items).find((item) => item.id === id);
+                                    return (
+                                        <Text key={idx} style={styles.text}>
+                                            • {material?.label || `ID ${id}`}
+                                        </Text>
+                                    );
+                                })}
+
+                                {!!data.materiais.outroDescricao && (
+                                    <Text style={styles.text}>
+                                        <Text style={styles.bold}>Outro: </Text>
+                                        {data.materiais.outroDescricao}
                                     </Text>
-                                );
-                            })
-                        ) : (
-                            <Text style={styles.text}>Nenhum material selecionado.</Text>
-                        )}
-
-                        {!!data?.materiais?.outroDescricao && (
-                            <Text style={styles.text}>
-                                <Text style={styles.bold}>Outro: </Text>
-                                {data.materiais.outroDescricao}
-                            </Text>
-                        )}
-                    </SecondarySection>
-
-                    <SecondarySection
-                        icon={<Feather name="map" size={20} color="#173A64" />}
-                        title="Análise Preliminar do Local"
-                        showChevron={false}
-                    >
-                        {(!data?.analisePreliminar ||
-                            (
-                                (data.analisePreliminar.reconhecimentoArea?.trim?.() === '' || !data.analisePreliminar.reconhecimentoArea) &&
-                                (data.analisePreliminar.condicoesAmbientais?.trim?.() === '' || !data.analisePreliminar.condicoesAmbientais) &&
-                                (data.analisePreliminar.caracteristicasLocal?.trim?.() === '' || !data.analisePreliminar.caracteristicasLocal) &&
-                                (!Array.isArray(data.analisePreliminar.informacoes) || data.analisePreliminar.informacoes.length === 0 || data.analisePreliminar.informacoes.every(info =>
-                                    (!info.descricao || info.descricao.trim() === '') &&
-                                    (!info.observacao || info.observacao.trim() === '')
-                                )) &&
-                                (!Array.isArray(data.analisePreliminar.arquivosReconhecimentoArea) || data.analisePreliminar.arquivosReconhecimentoArea.length === 0)
-                            )
-                        ) ? (
-                            <Text style={styles.text}>Nenhum registro de análise preliminar do local.</Text>
-                        ) : (
-                            <>
-                                <View style={styles.campoInterno}>
-                                    <Text style={styles.itemTitle}>Reconhecimento da área</Text>
-                                    <Text style={styles.itemText}>{data?.analisePreliminar?.reconhecimentoArea}</Text>
-
-                                    {Array.isArray(data?.analisePreliminar?.arquivosReconhecimentoArea) &&
-                                        data.analisePreliminar.arquivosReconhecimentoArea.length > 0 && (
-                                            <View style={styles.uploadedList}>
-                                                <Text style={styles.uploadedTitle}>Imagens da área:</Text>
-                                                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                                    {data.analisePreliminar.arquivosReconhecimentoArea.map((file, idx) => (
-                                                        !!file.uri && typeof file.uri === 'string' && (
-                                                            <TouchableOpacity
-                                                                key={`${file.nome}-${idx}`}
-                                                                style={styles.thumbnailWrapper}
-                                                                onPress={() =>
-                                                                    router.push({
-                                                                        pathname: '/previewImage',
-                                                                        params: { uri: file.uri },
-                                                                    })
-                                                                }
-                                                            >
-                                                                <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
-                                                                <View style={styles.imageContainer}>
-                                                                    <Image
-                                                                        source={{ uri: file.arquivo }}
-                                                                        style={styles.thumbnail}
-                                                                    />
-                                                                </View>
-                                                            </TouchableOpacity>
-                                                        )
-                                                    ))}
-                                                </ScrollView>
-                                            </View>
-                                        )}
-                                </View>
-
-                                <View style={styles.campoInterno}>
-                                    <Text style={styles.itemTitle}>Condições Ambientais</Text>
-                                    <Text style={styles.itemText}>{data?.analisePreliminar?.condicoesAmbientais}</Text>
-                                </View>
-
-                                <View style={styles.campoInterno}>
-                                    <Text style={styles.itemTitle}>Características do Local</Text>
-                                    <Text style={styles.itemText}>{data?.analisePreliminar?.caracteristicasLocal}</Text>
-                                </View>
-
-                                <View style={styles.campoInternoSecundario}>
-                                    {Array.isArray(data?.analisePreliminar?.informacoes) &&
-                                        data.analisePreliminar.informacoes.map((info, index) => (
-                                            <View key={index} style={{ marginTop: 8 }}>
-                                                <View style={styles.campoInternoSecundario}>
-                                                    <Text style={styles.itemTitle}>Informação do fato {index}</Text>
-                                                    <Text style={styles.itemText}>{info.descricao}</Text>
-                                                </View>
-                                                {info.observacao ? (
-                                                    <View style={styles.campoInternoSecundario}>
-                                                        <Text style={styles.itemTitle}>Observação:</Text>
-                                                        <Text style={styles.itemText}>{info.observacao}</Text>
-                                                    </View>
-                                                ) : null}
-                                            </View>
-                                        ))}
-                                </View>
-                            </>
-                        )}
-                    </SecondarySection>
-
-
-                    <SecondarySection
-                        icon={<Feather name="alert-circle" size={20} color="#173A64" />}
-                        title="Análise preliminar de risco (APR)"
-                        showChevron={false}
-                    >
-                        {(!data?.risco ||
-                            (
-                                (!data.risco.riscoAPR?.peritoResponsavel || data.risco.riscoAPR.peritoResponsavel.trim() === '') &&
-                                (!data.risco.riscoAPR?.peritoMatricula || data.risco.riscoAPR.peritoMatricula.trim() === '') &&
-                                (!data.risco.riscoAPR?.riscoAcidente || data.risco.riscoAPR.riscoAcidente.trim() === '') &&
-                                (!data.risco.riscoAPR?.riscoFisico || data.risco.riscoAPR.riscoFisico.trim() === '') &&
-                                !data.risco.riscoAPR?.riscoBiologico &&
-                                !data.risco.riscoAPR?.riscoQuimico &&
-                                (!data.risco.riscoAPR?.gravidade || data.risco.riscoAPR.gravidade.trim() === '') &&
-                                (!data.risco.riscoAPR?.probabilidade || data.risco.riscoAPR.probabilidade.trim() === '') &&
-                                (!data.risco.riscoAPR?.medidasMitigatoria || data.risco.riscoAPR.medidasMitigatoria.trim() === '') &&
-                                (!Array.isArray(data.risco.peritoAuxiliar) || data.risco.peritoAuxiliar.length === 0) &&
-                                (!Array.isArray(data.risco.tecnico) || data.risco.tecnico.length === 0) &&
-                                (!Array.isArray(data.risco.outros) || data.risco.outros.length === 0)
-                            )
-                        ) ? (
-                            <Text style={styles.text}>Nenhum registro de risco.</Text>
-                        ) : (
-                            <>
-                                <View style={styles.campoInterno}>
-                                    <Text style={styles.itemTitle}>Composição da equipe</Text>
-                                    {(!data?.risco?.riscoAPR?.peritoResponsavel && !data?.risco?.riscoAPR?.peritoMatricula) ? (
-                                        <Text style={styles.text}>Nenhum dado de perito responsável registrado.</Text>
-                                    ) : (
-                                        <>
-                                            {data?.risco?.riscoAPR?.peritoResponsavel && (
-                                                <Text style={styles.itemText}>Perito responsável: {data.risco.riscoAPR.peritoResponsavel}</Text>
-                                            )}
-                                            {data?.risco?.riscoAPR?.peritoMatricula && (
-                                                <Text style={styles.itemText}>Matrícula: {data.risco.riscoAPR.peritoMatricula}</Text>
-                                            )}
-                                        </>
-                                    )}
-                                </View>
-
-                                {Array.isArray(data?.risco?.peritoAuxiliar) && data.risco.peritoAuxiliar.length > 0 ? (
-                                    <View style={styles.campoInterno}>
-                                        <Text style={styles.itemTitle}>Peritos Auxiliares:</Text>
-                                        {data.risco.peritoAuxiliar.map((p, idx) => {
-                                            const isEmpty = !p.nome && !p.matricula;
-                                            return (
-                                                <Text key={idx} style={styles.text}>
-                                                    {isEmpty ? 'Dados não registrados' : `• ${p.nome} (${p.matricula})`}
-                                                </Text>
-                                            );
-                                        })}
-                                    </View>
-                                ) : null}
-
-                                {Array.isArray(data?.risco?.tecnico) && data.risco.tecnico.length > 0 ? (
-                                    <View style={styles.campoInterno}>
-                                        <Text style={styles.itemTitle}>Técnicos:</Text>
-                                        {data.risco.tecnico.map((t, idx) => {
-                                            const isEmpty = !t.nome && !t.matricula;
-                                            return (
-                                                <Text key={idx} style={styles.text}>
-                                                    {isEmpty ? 'Dados não registrados' : `• ${t.nome} (${t.matricula})`}
-                                                </Text>
-                                            );
-                                        })}
-                                    </View>
-                                ) : null}
-
-                                {Array.isArray(data?.risco?.outros) && data.risco.outros.length > 0 ? (
-                                    <View style={styles.campoInterno}>
-                                        <Text style={styles.itemTitle}>Outros envolvidos:</Text>
-                                        {data.risco.outros.map((o, idx) => {
-                                            const isEmpty = !o.nome && !o.matricula;
-                                            return (
-                                                <Text key={idx} style={styles.text}>
-                                                    {isEmpty ? 'Dados não registrados' : `• ${o.nome} (${o.matricula})`}
-                                                </Text>
-                                            );
-                                        })}
-                                    </View>
-                                ) : null}
-
-                                <View style={styles.campoInterno}>
-                                    <Text style={styles.itemTitle}>Identificação dos riscos</Text>
-
-                                    {data?.risco?.riscoAPR?.riscoAcidente && (
-                                        <Text style={styles.itemText}>Risco Acidente: {data.risco.riscoAPR.riscoAcidente}</Text>
-                                    )}
-                                    {data?.risco?.riscoAPR?.riscoFisico && (
-                                        <Text style={styles.itemText}>Risco Físico: {data.risco.riscoAPR.riscoFisico}</Text>
-                                    )}
-
-                                    {data?.risco?.riscoAPR?.riscoBiologico !== undefined && data?.risco?.riscoAPR?.riscoBiologico !== null && (
-                                        <Text style={styles.itemText}>Risco Biológico: {data.risco.riscoAPR.riscoBiologico ? 'Sim' : 'Não'}</Text>
-                                    )}
-                                    {data?.risco?.riscoAPR?.riscoQuimico !== undefined && data?.risco?.riscoAPR?.riscoQuimico !== null && (
-                                        <Text style={styles.itemText}>Risco Químico: {data.risco.riscoAPR.riscoQuimico ? 'Sim' : 'Não'}</Text>
-                                    )}
-
-                                    {/* Se tudo estiver vazio, exibe a mensagem */}
-                                    {(!
-                                        data?.risco?.riscoAPR?.riscoAcidente &&
-                                        !data?.risco?.riscoAPR?.riscoFisico &&
-                                        data?.risco?.riscoAPR?.riscoBiologico === undefined &&
-                                        data?.risco?.riscoAPR?.riscoQuimico === undefined
-                                    ) && (
-                                            <Text style={styles.text}>Nenhum risco identificado.</Text>
-                                        )}
-                                </View>
-
-
-                                {(!data?.risco?.riscoAPR?.gravidade && !data?.risco?.riscoAPR?.probabilidade) ? (
-                                    <View style={styles.campoInterno}>
-                                        <Text style={styles.itemTitle}>Avaliação dos riscos</Text>
-                                        <Text style={styles.text}>Nenhuma avaliação registrada.</Text>
-                                    </View>
-                                ) : (
-                                    <View style={styles.campoInterno}>
-                                        <Text style={styles.itemTitle}>Avaliação dos riscos</Text>
-                                        {data.risco.riscoAPR.gravidade && (
-                                            <Text style={styles.itemText}>Gravidade: {data.risco.riscoAPR.gravidade}</Text>
-                                        )}
-                                        {data.risco.riscoAPR.probabilidade && (
-                                            <Text style={styles.itemText}>Probabilidade: {data.risco.riscoAPR.probabilidade}</Text>
-                                        )}
-                                    </View>
                                 )}
-
-                                {data?.risco?.riscoAPR?.medidasMitigatoria ? (
-                                    <View style={styles.campoInternoSecundario}>
-                                        <Text style={styles.itemTitle}>Medidas mitigatórias</Text>
-                                        <Text style={styles.itemText}>{data.risco.riscoAPR.medidasMitigatoria}</Text>
-                                    </View>
-                                ) : null}
-                            </>
+                            </SecondarySection>
                         )}
-                    </SecondarySection>
+
+
+                    {data?.analisePreliminar &&
+                        (
+                            (data.analisePreliminar.reconhecimentoArea?.trim?.() || '') !== '' ||
+                            (data.analisePreliminar.condicoesAmbientais?.trim?.() || '') !== '' ||
+                            (data.analisePreliminar.caracteristicasLocal?.trim?.() || '') !== '' ||
+                            (Array.isArray(data.analisePreliminar.informacoes) &&
+                                data.analisePreliminar.informacoes.some(info =>
+                                    (info.descricao && info.descricao.trim() !== '') ||
+                                    (info.observacao && info.observacao.trim() !== '')
+                                )
+                            ) ||
+                            (Array.isArray(data.analisePreliminar.arquivosReconhecimentoArea) &&
+                                data.analisePreliminar.arquivosReconhecimentoArea.length > 0)
+                        ) && (
+                            <SecondarySection
+                                icon={<Feather name="map" size={20} color="#173A64" />}
+                                title="Análise Preliminar do Local"
+                                showChevron={false}
+                            >
+                                {(!data?.analisePreliminar ||
+                                    (
+                                        (data.analisePreliminar.reconhecimentoArea?.trim?.() === '' || !data.analisePreliminar.reconhecimentoArea) &&
+                                        (data.analisePreliminar.condicoesAmbientais?.trim?.() === '' || !data.analisePreliminar.condicoesAmbientais) &&
+                                        (data.analisePreliminar.caracteristicasLocal?.trim?.() === '' || !data.analisePreliminar.caracteristicasLocal) &&
+                                        (!Array.isArray(data.analisePreliminar.informacoes) || data.analisePreliminar.informacoes.length === 0 || data.analisePreliminar.informacoes.every(info =>
+                                            (!info.descricao || info.descricao.trim() === '') &&
+                                            (!info.observacao || info.observacao.trim() === '')
+                                        )) &&
+                                        (!Array.isArray(data.analisePreliminar.arquivosReconhecimentoArea) || data.analisePreliminar.arquivosReconhecimentoArea.length === 0)
+                                    )
+                                ) ? (
+                                    <Text style={styles.text}>Nenhum registro de análise preliminar do local.</Text>
+                                ) : (
+                                    <>
+                                        <View style={styles.campoInterno}>
+                                            <Text style={styles.itemTitle}>Reconhecimento da área</Text>
+                                            <Text style={styles.itemText}>{data?.analisePreliminar?.reconhecimentoArea}</Text>
+
+                                            {Array.isArray(data?.analisePreliminar?.arquivosReconhecimentoArea) &&
+                                                data.analisePreliminar.arquivosReconhecimentoArea.length > 0 && (
+                                                    <View style={styles.uploadedList}>
+                                                        <Text style={styles.uploadedTitle}>Imagens da área:</Text>
+                                                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                                            {data.analisePreliminar.arquivosReconhecimentoArea.map((file, idx) => (
+                                                                !!file.uri && typeof file.uri === 'string' && (
+                                                                    <TouchableOpacity
+                                                                        key={`${file.nome}-${idx}`}
+                                                                        style={styles.thumbnailWrapper}
+                                                                        onPress={() =>
+                                                                            router.push({
+                                                                                pathname: '/previewImage',
+                                                                                params: { uri: file.uri },
+                                                                            })
+                                                                        }
+                                                                    >
+                                                                        <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
+                                                                        <View style={styles.imageContainer}>
+                                                                            <Image
+                                                                                source={{ uri: file.arquivo }}
+                                                                                style={styles.thumbnail}
+                                                                            />
+                                                                        </View>
+                                                                    </TouchableOpacity>
+                                                                )
+                                                            ))}
+                                                        </ScrollView>
+                                                    </View>
+                                                )}
+                                        </View>
+
+                                        <View style={styles.campoInterno}>
+                                            <Text style={styles.itemTitle}>Condições Ambientais</Text>
+                                            <Text style={styles.itemText}>{data?.analisePreliminar?.condicoesAmbientais}</Text>
+                                        </View>
+
+                                        <View style={styles.campoInterno}>
+                                            <Text style={styles.itemTitle}>Características do Local</Text>
+                                            <Text style={styles.itemText}>{data?.analisePreliminar?.caracteristicasLocal}</Text>
+                                        </View>
+
+                                        <View style={styles.campoInternoSecundario}>
+                                            {Array.isArray(data?.analisePreliminar?.informacoes) &&
+                                                data.analisePreliminar.informacoes.map((info, index) => (
+                                                    <View key={index} style={{ marginTop: 8 }}>
+                                                        <View style={styles.campoInternoSecundario}>
+                                                            <Text style={styles.itemTitle}>Informação do fato {index}</Text>
+                                                            <Text style={styles.itemText}>{info.descricao}</Text>
+                                                        </View>
+                                                        {info.observacao ? (
+                                                            <View style={styles.campoInternoSecundario}>
+                                                                <Text style={styles.itemTitle}>Observação:</Text>
+                                                                <Text style={styles.itemText}>{info.observacao}</Text>
+                                                            </View>
+                                                        ) : null}
+                                                    </View>
+                                                ))}
+                                        </View>
+                                    </>
+                                )}
+                            </SecondarySection>
+
+                        )}
+
+                    {data?.risco && (
+                        // Verificação se algum campo da APR foi preenchido
+                        data.risco.riscoAPR?.peritoResponsavel?.trim() ||
+                        data.risco.riscoAPR?.peritoMatricula?.trim() ||
+                        data.risco.riscoAPR?.riscoAcidente?.trim() ||
+                        data.risco.riscoAPR?.riscoFisico?.trim() ||
+                        data.risco.riscoAPR?.riscoBiologico === true ||
+                        data.risco.riscoAPR?.riscoQuimico === true ||
+                        data.risco.riscoAPR?.gravidade?.trim() ||
+                        data.risco.riscoAPR?.probabilidade?.trim() ||
+                        data.risco.riscoAPR?.medidasMitigatoria?.trim() ||
+                        (Array.isArray(data.risco.peritoAuxiliar) && data.risco.peritoAuxiliar.some(p => p.nome || p.matricula)) ||
+                        (Array.isArray(data.risco.tecnico) && data.risco.tecnico.some(t => t.nome || t.matricula)) ||
+                        (Array.isArray(data.risco.outros) && data.risco.outros.some(o => o.nome || o.matricula))
+                    ) && (
+                            <SecondarySection
+                                icon={<Feather name="alert-circle" size={20} color="#173A64" />}
+                                title="Análise preliminar de risco (APR)"
+                                showChevron={false}
+                            >
+                                {(!data?.risco ||
+                                    (
+                                        (!data.risco.riscoAPR?.peritoResponsavel || data.risco.riscoAPR.peritoResponsavel.trim() === '') &&
+                                        (!data.risco.riscoAPR?.peritoMatricula || data.risco.riscoAPR.peritoMatricula.trim() === '') &&
+                                        (!data.risco.riscoAPR?.riscoAcidente || data.risco.riscoAPR.riscoAcidente.trim() === '') &&
+                                        (!data.risco.riscoAPR?.riscoFisico || data.risco.riscoAPR.riscoFisico.trim() === '') &&
+                                        data.risco.riscoAPR?.riscoBiologico === true ||
+                                        data.risco.riscoAPR?.riscoQuimico === true
+                                        &&
+                                        (!data.risco.riscoAPR?.gravidade || data.risco.riscoAPR.gravidade.trim() === '') &&
+                                        (!data.risco.riscoAPR?.probabilidade || data.risco.riscoAPR.probabilidade.trim() === '') &&
+                                        (!data.risco.riscoAPR?.medidasMitigatoria || data.risco.riscoAPR.medidasMitigatoria.trim() === '') &&
+                                        (!Array.isArray(data.risco.peritoAuxiliar) || data.risco.peritoAuxiliar.length === 0) &&
+                                        (!Array.isArray(data.risco.tecnico) || data.risco.tecnico.length === 0) &&
+                                        (!Array.isArray(data.risco.outros) || data.risco.outros.length === 0)
+                                    )
+                                ) ? (
+                                    <Text style={styles.text}>Nenhum registro de risco.</Text>
+                                ) : (
+                                    <>
+                                        <View style={styles.campoInterno}>
+                                            <Text style={styles.itemTitle}>Composição da equipe</Text>
+                                            {(!data?.risco?.riscoAPR?.peritoResponsavel && !data?.risco?.riscoAPR?.peritoMatricula) ? (
+                                                <Text style={styles.text}>Nenhum dado de perito responsável registrado.</Text>
+                                            ) : (
+                                                <>
+                                                    {data?.risco?.riscoAPR?.peritoResponsavel && (
+                                                        <Text style={styles.itemText}>Perito responsável: {data.risco.riscoAPR.peritoResponsavel}</Text>
+                                                    )}
+                                                    {data?.risco?.riscoAPR?.peritoMatricula && (
+                                                        <Text style={styles.itemText}>Matrícula: {data.risco.riscoAPR.peritoMatricula}</Text>
+                                                    )}
+                                                </>
+                                            )}
+                                        </View>
+
+                                        {Array.isArray(data?.risco?.peritoAuxiliar) && data.risco.peritoAuxiliar.length > 0 ? (
+                                            <View style={styles.campoInterno}>
+                                                <Text style={styles.itemTitle}>Peritos Auxiliares:</Text>
+                                                {data.risco.peritoAuxiliar.map((p, idx) => {
+                                                    const isEmpty = !p.nome && !p.matricula;
+                                                    return (
+                                                        <Text key={idx} style={styles.text}>
+                                                            {isEmpty ? 'Dados não registrados' : `• ${p.nome} (${p.matricula})`}
+                                                        </Text>
+                                                    );
+                                                })}
+                                            </View>
+                                        ) : null}
+
+                                        {Array.isArray(data?.risco?.tecnico) && data.risco.tecnico.length > 0 ? (
+                                            <View style={styles.campoInterno}>
+                                                <Text style={styles.itemTitle}>Técnicos:</Text>
+                                                {data.risco.tecnico.map((t, idx) => {
+                                                    const isEmpty = !t.nome && !t.matricula;
+                                                    return (
+                                                        <Text key={idx} style={styles.text}>
+                                                            {isEmpty ? 'Dados não registrados' : `• ${t.nome} (${t.matricula})`}
+                                                        </Text>
+                                                    );
+                                                })}
+                                            </View>
+                                        ) : null}
+
+                                        {Array.isArray(data?.risco?.outros) && data.risco.outros.length > 0 ? (
+                                            <View style={styles.campoInterno}>
+                                                <Text style={styles.itemTitle}>Outros envolvidos:</Text>
+                                                {data.risco.outros.map((o, idx) => {
+                                                    const isEmpty = !o.nome && !o.matricula;
+                                                    return (
+                                                        <Text key={idx} style={styles.text}>
+                                                            {isEmpty ? 'Dados não registrados' : `• ${o.nome} (${o.matricula})`}
+                                                        </Text>
+                                                    );
+                                                })}
+                                            </View>
+                                        ) : null}
+
+                                        <View style={styles.campoInterno}>
+                                            <Text style={styles.itemTitle}>Identificação dos riscos</Text>
+
+                                            {data?.risco?.riscoAPR?.riscoAcidente && (
+                                                <Text style={styles.itemText}>Risco Acidente: {data.risco.riscoAPR.riscoAcidente}</Text>
+                                            )}
+                                            {data?.risco?.riscoAPR?.riscoFisico && (
+                                                <Text style={styles.itemText}>Risco Físico: {data.risco.riscoAPR.riscoFisico}</Text>
+                                            )}
+
+                                            {data?.risco?.riscoAPR?.riscoBiologico !== undefined && data?.risco?.riscoAPR?.riscoBiologico !== null && (
+                                                <Text style={styles.itemText}>Risco Biológico: {data.risco.riscoAPR.riscoBiologico ? 'Sim' : 'Não'}</Text>
+                                            )}
+                                            {data?.risco?.riscoAPR?.riscoQuimico !== undefined && data?.risco?.riscoAPR?.riscoQuimico !== null && (
+                                                <Text style={styles.itemText}>Risco Químico: {data.risco.riscoAPR.riscoQuimico ? 'Sim' : 'Não'}</Text>
+                                            )}
+
+                                            {/* Se tudo estiver vazio, exibe a mensagem */}
+                                            {(!
+                                                data?.risco?.riscoAPR?.riscoAcidente &&
+                                                !data?.risco?.riscoAPR?.riscoFisico &&
+                                                data?.risco?.riscoAPR?.riscoBiologico === undefined &&
+                                                data?.risco?.riscoAPR?.riscoQuimico === undefined
+                                            ) && (
+                                                    <Text style={styles.text}>Nenhum risco identificado.</Text>
+                                                )}
+                                        </View>
+
+
+                                        {(!data?.risco?.riscoAPR?.gravidade && !data?.risco?.riscoAPR?.probabilidade) ? (
+                                            <View style={styles.campoInterno}>
+                                                <Text style={styles.itemTitle}>Avaliação dos riscos</Text>
+                                                <Text style={styles.text}>Nenhuma avaliação registrada.</Text>
+                                            </View>
+                                        ) : (
+                                            <View style={styles.campoInterno}>
+                                                <Text style={styles.itemTitle}>Avaliação dos riscos</Text>
+                                                {data.risco.riscoAPR.gravidade && (
+                                                    <Text style={styles.itemText}>Gravidade: {data.risco.riscoAPR.gravidade}</Text>
+                                                )}
+                                                {data.risco.riscoAPR.probabilidade && (
+                                                    <Text style={styles.itemText}>Probabilidade: {data.risco.riscoAPR.probabilidade}</Text>
+                                                )}
+                                            </View>
+                                        )}
+
+                                        {data?.risco?.riscoAPR?.medidasMitigatoria ? (
+                                            <View style={styles.campoInternoSecundario}>
+                                                <Text style={styles.itemTitle}>Medidas mitigatórias</Text>
+                                                <Text style={styles.itemText}>{data.risco.riscoAPR.medidasMitigatoria}</Text>
+                                            </View>
+                                        ) : null}
+                                    </>
+                                )}
+                            </SecondarySection>
+
+                        )}
 
 
 
@@ -462,12 +493,12 @@ export default function ForensicForm() {
                                     typeof v === 'string' ? v.trim() === '' : Array.isArray(v) ? v.length === 0 : !v
                                 ) &&
                                 (!data.exames.observacoesDocumentacao || data.exames.observacoesDocumentacao.trim() === '') &&
-                                (!data.exames.cadaverSexo &&
-                                    !data.exames.cadaverCorPele &&
-                                    !data.exames.cadaverCabelo &&
-                                    !data.exames.cadaverSinaisIdentificadores &&
-                                    !data.exames.cadaverDescricaoVestes &&
-                                    !data.exames.cadaverOutro)
+                                (!data.exames.perinecroscopia?.cadaverSexo &&
+                                    !data.exames.perinecroscopia?.cadaverCorPele &&
+                                    !data.exames.perinecroscopia?.cadaverCabelo &&
+                                    !data.exames.perinecroscopia?.cadaverSinaisIdentificadores &&
+                                    !data.exames.perinecroscopia?.cadaverDescricaoVestes &&
+                                    !data.exames.perinecroscopia?.cadaverOutro)
                             )
                         ) ? (
                             <Text style={styles.text}>Nenhum registro de exames.</Text>
@@ -551,37 +582,53 @@ export default function ForensicForm() {
                                 </View>
 
                                 {(
-                                    data?.exames?.cadaverSexo ||
-                                    data?.exames?.cadaverCorPele ||
-                                    data?.exames?.cadaverCabelo ||
-                                    data?.exames?.cadaverSinaisIdentificadores ||
-                                    data?.exames?.cadaverDescricaoVestes ||
-                                    data?.exames?.cadaverOutro
+                                    data?.exames?.perinecroscopia?.cadaverSexo ||
+                                    data?.exames?.perinecroscopia?.cadaverCorPele ||
+                                    data?.exames?.perinecroscopia?.cadaverCabelo ||
+                                    data?.exames?.perinecroscopia?.cadaverSinaisIdentificadores ||
+                                    data?.exames?.perinecroscopia?.cadaverDescricaoVestes ||
+                                    data?.exames?.perinecroscopia?.cadaverOutro
                                 ) ? (
                                     <View style={styles.campoInternoSecundario}>
                                         <Text style={styles.itemTitle}>5.4. Perinecroscopia</Text>
-                                        {data?.exames?.cadaverSexo ? (
-                                            <Text style={styles.itemText}>Sexo: {data.exames.cadaverSexo}</Text>
-                                        ) : null}
-                                        {data?.exames?.cadaverCorPele ? (
-                                            <Text style={styles.itemText}>Cor da Pele: {data.exames.cadaverCorPele}</Text>
-                                        ) : null}
-                                        {data?.exames?.cadaverCabelo ? (
-                                            <Text style={styles.itemText}>Cabelo: {data.exames.cadaverCabelo}</Text>
-                                        ) : null}
-                                        {data?.exames?.cadaverSinaisIdentificadores ? (
-                                            <Text style={styles.itemText}>Sinais identificadores: {data.exames.cadaverSinaisIdentificadores}</Text>
-                                        ) : null}
-                                        {data?.exames?.cadaverDescricaoVestes ? (
-                                            <Text style={styles.itemText}>Descrição das vestes e pertences pessoais: {data.exames.cadaverDescricaoVestes}</Text>
-                                        ) : null}
-                                        {data?.exames?.cadaverOutro ? (
-                                            <Text style={styles.itemText}>Outro: {data.exames.cadaverOutro}</Text>
-                                        ) : null}
+
+                                        {data.exames.perinecroscopia.cadaverSexo && (
+                                            <Text style={styles.itemText}>Sexo: {data.exames.perinecroscopia.cadaverSexo}</Text>
+                                        )}
+                                        {data.exames.perinecroscopia.cadaverCorPele && (
+                                            <Text style={styles.itemText}>Cor da Pele: {data.exames.perinecroscopia.cadaverCorPele}</Text>
+                                        )}
+                                        {data.exames.perinecroscopia.cadaverCabelo && (
+                                            <Text style={styles.itemText}>Cabelo: {data.exames.perinecroscopia.cadaverCabelo}</Text>
+                                        )}
+                                        {data.exames.perinecroscopia.cadaverSinaisIdentificadores && (
+                                            <Text style={styles.itemText}>Sinais identificadores: {data.exames.perinecroscopia.cadaverSinaisIdentificadores}</Text>
+                                        )}
+                                        {data.exames.perinecroscopia.cadaverDescricaoVestes && (
+                                            <Text style={styles.itemText}>Descrição das vestes e pertences pessoais: {data.exames.perinecroscopia.cadaverDescricaoVestes}</Text>
+                                        )}
+                                        {data.exames.perinecroscopia.cadaverOutro && (
+                                            <Text style={styles.itemText}>Outro: {data.exames.perinecroscopia.cadaverOutro}</Text>
+                                        )}
+
+                                        {Array.isArray(data.exames.vestigiosPerinecroscopia) &&
+                                            data.exames.vestigiosPerinecroscopia.length > 0 && (
+                                                <>
+                                                    <Text style={[styles.itemTitle, { marginTop: 8 }]}>Vestígios (Perinecroscopia)</Text>
+                                                    {data.exames.vestigiosPerinecroscopia.map((vestigio, idx) => (
+                                                        <View key={idx} style={{ marginBottom: 6 }}>
+                                                            <Text style={styles.itemText}>
+                                                                • Nº {vestigio.numeroVestigio} - {vestigio.naturezaVestigio}
+                                                            </Text>
+                                                        </View>
+                                                    ))}
+                                                </>
+                                            )}
                                     </View>
                                 ) : (
                                     <Text style={styles.text}>Nenhum dado de perinecroscopia registrado.</Text>
                                 )}
+
 
                             </>
                         )}

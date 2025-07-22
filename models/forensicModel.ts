@@ -51,6 +51,7 @@ export type Depoimento = {
   descricaoLesoes: string;
   depoimentoRelato: string;
   arquivoLesoes: UploadWithMeta[];
+  dataHoraEntrevista?: Date;
 };
 
 export type Documentacao = {
@@ -73,6 +74,36 @@ export type Documentacao = {
   outro: string;
   outroArquivos: UploadWithMeta[];
 };
+
+export type EquipamentosExame = {
+  maquinaTracao: CampoChecklist[];
+  limitadorVelocidade: CampoChecklist[];
+  cabos: CampoChecklist[];
+  contrapeso: CampoChecklist[];
+  cabine: CampoChecklist[];
+  portas: CampoChecklist[];
+  freiosEmergencia: CampoChecklist[];
+  sistemaControle: CampoChecklist[];
+  sistemaEletrico: CampoChecklist[];
+  sensores: CampoChecklist[];
+  pocoElevador: CampoChecklist[];
+}
+
+export type Perinecroscopia = {
+  cadaverSexo?: string;
+  cadaverCorPele: string;
+  cadaverCabelo: string;
+  cadaverSinaisIdentificadores: string;
+  cadaverDescricaoVestes: string;
+  cadaverOutro: string;
+  analiseDisposicaoCadaver: string;
+  arquivosDisposicaoCadaver: UploadWithMeta[];
+  sinaisTanatologicos: string;
+  arquivosTanatologicos: UploadWithMeta[];
+  descricaoLesoesCadaver: string;
+  arquivosLesoesCadaver: UploadWithMeta[];
+}
+
 
 export type DadosIniciais = {
   peritoResponsavel: string;
@@ -159,38 +190,18 @@ export type ForensicModel = {
   };
 
   exames: {
-    documentacao: Documentacao;
-    observacoesDocumentacao: string;
-    vestigiosDocumentacao: VestigioResumo[];
-
-    maquinaTracao: CampoChecklist[];
-    limitadorVelocidade: CampoChecklist[];
-    cabos: CampoChecklist[];
-    contrapeso: CampoChecklist[];
-    cabine: CampoChecklist[];
-    portas: CampoChecklist[];
-    freiosEmergencia: CampoChecklist[];
-    sistemaControle: CampoChecklist[];
-    sistemaEletrico: CampoChecklist[];
-    sensores: CampoChecklist[];
-    pocoElevador: CampoChecklist[];
-    vestigiosEquipamentos: VestigioResumo[];
-
-    depoimentos: Depoimento[];
-    vestigiosEntrevistas: VestigioResumo[];
-
-    cadaverSexo?: string;
-    cadaverCorPele: string;
-    cadaverCabelo: string;
-    cadaverSinaisIdentificadores: string;
-    cadaverDescricaoVestes: string;
-    cadaverOutro: string;
-    analiseDisposicaoCadaver: string;
-    arquivosDisposicaoCadaver: UploadWithMeta[];
-    sinaisTanatologicos: string;
-    arquivosTanatologicos: UploadWithMeta[];
-    descricaoLesoesCadaver: string;
-    arquivosLesoesCadaver: UploadWithMeta[];
-    vestigiosPerinecroscopia: VestigioResumo[];
-  };
+      documentacao: Documentacao;
+      observacoesDocumentacao: string;
+      vestigiosDocumentacao: VestigioResumo[];
+  
+      equipamentosExame: EquipamentosExame;
+      vestigiosEquipamentos: VestigioResumo[];
+      
+  
+      depoimentos: Depoimento[];
+      vestigiosEntrevistas: VestigioResumo[];
+  
+      perinecroscopia: Perinecroscopia;
+      vestigiosPerinecroscopia: VestigioResumo[];
+    };
 };

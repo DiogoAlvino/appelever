@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR, DadosIniciais } from '~/types/forensicTypes';
+import { VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR, DadosIniciais, Perinecroscopia } from '~/types/forensicTypes';
 import { UploadWithMeta } from '~/models/uploadModel';
 
 export const useForensic = () => {
@@ -96,37 +96,45 @@ export const useForensic = () => {
     const [observacoesDocumentacao, setObservacoesDocumentacao] = useState('');
     const [vestigiosDocumentacao, setVestigiosDocumentacao] = useState<VestigioResumo[]>([]);
 
-    const [maquinaTracao, setMaquinaTracao] = useState<CampoChecklist[]>([]);
-    const [limitadorVelocidade, setLimitadorVelocidade] = useState<CampoChecklist[]>([]);
-    const [cabos, setCabos] = useState<CampoChecklist[]>([]);
-    const [contrapeso, setContrapeso] = useState<CampoChecklist[]>([]);
-    const [cabine, setCabine] = useState<CampoChecklist[]>([]);
-    const [portas, setPortas] = useState<CampoChecklist[]>([]);
-    const [freiosEmergencia, setFreiosEmergencia] = useState<CampoChecklist[]>([]);
-    const [sistemaControle, setSistemaControle] = useState<CampoChecklist[]>([]);
-    const [sistemaEletrico, setSistemaEletrico] = useState<CampoChecklist[]>([]);
-    const [sensores, setSensores] = useState<CampoChecklist[]>([]);
-    const [pocoElevador, setPocoElevador] = useState<CampoChecklist[]>([]);
+  
+    const [equipamentosExame, setEquipamentosExame] = useState({
+        maquinaTracao: [] as CampoChecklist[],
+        limitadorVelocidade: [] as CampoChecklist[],
+        cabos: [] as CampoChecklist[],
+        contrapeso: [] as CampoChecklist[],
+        cabine: [] as CampoChecklist[],
+        portas: [] as CampoChecklist[],
+        freiosEmergencia: [] as CampoChecklist[],
+        sistemaControle: [] as CampoChecklist[],
+        sistemaEletrico: [] as CampoChecklist[],
+        sensores: [] as CampoChecklist[],
+        pocoElevador: [] as CampoChecklist[],
+    });
+
     const [vestigiosEquipamentos, setVestigiosEquipamentos] = useState<VestigioResumo[]>([]);
 
     const [depoimentos, setDepoimentos] = useState<Depoimento[]>([{
         tipoEntrevistado: '', genero: '', nomeEntrevistado: '', identificacao: '', endereco: '', idade: '',
         descricaoLesoes: '', depoimentoRelato: '', arquivoLesoes: [],
+        dataHoraEntrevista: undefined, // << NOVO
     }]);
     const [vestigiosEntrevistas, setVestigiosEntrevistas] = useState<VestigioResumo[]>([]);
 
-    const [cadaverSexo, setCadaverSexo] = useState('');
-    const [cadaverCorPele, setCadaverCorPele] = useState('');
-    const [cadaverCabelo, setCadaverCabelo] = useState('');
-    const [cadaverSinaisIdentificadores, setCadaverSinaisIdentificadores] = useState('');
-    const [cadaverDescricaoVestes, setCadaverDescricaoVestes] = useState('');
-    const [cadaverOutro, setCadaverOutro] = useState('');
-    const [analiseDisposicaoCadaver, setAnaliseDisposicaoCadaver] = useState('');
-    const [arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver] = useState<UploadWithMeta[]>([]);
-    const [sinaisTanatologicos, setSinaisTanatologicos] = useState('');
-    const [arquivosTanatologicos, setArquivosTanatologicos] = useState<UploadWithMeta[]>([]);
-    const [descricaoLesoesCadaver, setDescricaoLesoesCadaver] = useState('');
-    const [arquivosLesoesCadaver, setArquivosLesoesCadaver] = useState<UploadWithMeta[]>([]);
+    const [perinecroscopia, setPerinecroscopia] = useState<Perinecroscopia>({
+        cadaverSexo: '',
+        cadaverCorPele: '',
+        cadaverCabelo: '',
+        cadaverSinaisIdentificadores: '',
+        cadaverDescricaoVestes: '',
+        cadaverOutro: '',
+        analiseDisposicaoCadaver: '',
+        arquivosDisposicaoCadaver: [],
+        sinaisTanatologicos: '',
+        arquivosTanatologicos: [],
+        descricaoLesoesCadaver: '',
+        arquivosLesoesCadaver: [],
+    });
+
     const [vestigiosPerinecroscopia, setVestigiosPerinecroscopia] = useState<VestigioResumo[]>([]);
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -142,6 +150,18 @@ export const useForensic = () => {
             return copia;
         });
     };
+
+    const atualizarObjeto = <T, K extends keyof T>(
+        setter: React.Dispatch<React.SetStateAction<T>>,
+        campo: K,
+        valor: T[K]
+    ) => {
+        setter((prev) => ({
+            ...prev,
+            [campo]: valor,
+        }));
+    };
+
 
     const removerCampo = <T,>(setter: React.Dispatch<React.SetStateAction<T[]>>, indexToRemove: number) => {
         setter(prev => prev.filter((_, index) => index !== indexToRemove));
@@ -168,32 +188,11 @@ export const useForensic = () => {
         documentacao, setDocumentacao,
         observacoesDocumentacao, setObservacoesDocumentacao,
         vestigiosDocumentacao, setVestigiosDocumentacao,
-        maquinaTracao, setMaquinaTracao,
-        limitadorVelocidade, setLimitadorVelocidade,
-        cabos, setCabos,
-        contrapeso, setContrapeso,
-        cabine, setCabine,
-        portas, setPortas,
-        freiosEmergencia, setFreiosEmergencia,
-        sistemaControle, setSistemaControle,
-        sistemaEletrico, setSistemaEletrico,
-        sensores, setSensores,
-        pocoElevador, setPocoElevador,
+        equipamentosExame, setEquipamentosExame,
         vestigiosEquipamentos, setVestigiosEquipamentos,
         depoimentos, setDepoimentos,
         vestigiosEntrevistas, setVestigiosEntrevistas,
-        cadaverSexo, setCadaverSexo,
-        cadaverCorPele, setCadaverCorPele,
-        cadaverCabelo, setCadaverCabelo,
-        cadaverSinaisIdentificadores, setCadaverSinaisIdentificadores,
-        cadaverDescricaoVestes, setCadaverDescricaoVestes,
-        cadaverOutro, setCadaverOutro,
-        analiseDisposicaoCadaver, setAnaliseDisposicaoCadaver,
-        arquivosDisposicaoCadaver, setArquivosDisposicaoCadaver,
-        sinaisTanatologicos, setSinaisTanatologicos,
-        arquivosTanatologicos, setArquivosTanatologicos,
-        descricaoLesoesCadaver, setDescricaoLesoesCadaver,
-        arquivosLesoesCadaver, setArquivosLesoesCadaver,
+        perinecroscopia, setPerinecroscopia,
         vestigiosPerinecroscopia, setVestigiosPerinecroscopia,
         materialOutroDescricao, setMaterialOutroDescricao,
         informacoes, setInformacoes,

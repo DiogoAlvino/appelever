@@ -8,7 +8,7 @@ import SecondarySection from "~/components/sections/secondarySection";
 import FeedbackModal from "~/components/modal/feedbackModal";
 import { useInspectionById } from "~/hooks/useInspectionById";
 import { useEquipmentById } from "~/hooks/useEquipmentById";
-import { db } from '~/utils/firebase';
+import { auth, db } from '~/utils/firebase';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { border, colors, fontSize } from '~/theme';
 import { capitalize } from "lodash";
@@ -138,7 +138,7 @@ export default function InspectionForm() {
         >
           <View style={styles.sectionContent}>
             <View style={styles.inspection}>
-              <Text style={styles.itemText}>{inspection.usuario}</Text>
+              <Text style={styles.itemText}>{auth.currentUser?.displayName || 'usuário'}</Text>
               <Text style={styles.itemText}>
                 Data: {new Date(inspection.dataCriacao).toLocaleDateString('pt-BR')}
               </Text>

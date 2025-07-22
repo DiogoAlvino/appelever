@@ -8,6 +8,7 @@ import FileUpload from "../inputs/fileUpload";
 import RemoveButton from "../buttons/removeButton";
 import { colors, fontSize } from "~/theme";
 import { UploadWithMeta } from "~/models/uploadModel";
+import DataHoraButton from "../buttons/dataHoraButton";
 
 interface DepoimentoItemProps {
     item: Depoimento;
@@ -48,6 +49,11 @@ export function DepoimentoItem({ item, index, onUpdate, onRemove }: DepoimentoIt
                     <PrimaryInput label="Nome" value={item.nomeEntrevistado} placeholder="Informe" onChangeText={(t) => atualizarCampo('nomeEntrevistado', t)} />
                     <PrimaryInput label="Identificação" value={item.identificacao} placeholder="Informe"  onChangeText={(t) => atualizarCampo('identificacao', t)} />
                     <PrimaryInput label="Endereço" value={item.endereco} placeholder="Informe"  onChangeText={(t) => atualizarCampo('endereco', t)} />
+                    
+                    <DataHoraButton
+                        value={item.dataHoraEntrevista ?? null}
+                        onChange={(data) => onUpdate(index, { ...item, dataHoraEntrevista: data })}
+                    />
 
                     <PrimarySelect
                         label="Sexo"

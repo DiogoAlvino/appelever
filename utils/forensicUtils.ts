@@ -1,71 +1,71 @@
 import { ForensicModel } from "~/models/forensicModel";
 
 export function isDadosIniciaisRespondido(dados: ForensicModel): boolean {
-    const { dadosIniciais, equipePericial } = dados;
+  const { dadosIniciais, equipePericial } = dados;
 
-    return (
-        dadosIniciais.peritoResponsavel?.trim() !== '' ||
-        dadosIniciais.cargoPerito?.trim() !== '' ||
-        dadosIniciais.matriculaPerito?.trim() !== '' ||
-        dadosIniciais.tipoOcorrencia?.trim() !== '' ||
-        dadosIniciais.autoridadePolicialNome?.trim() !== '' ||
-        dadosIniciais.viatura?.trim() !== '' ||
-        dadosIniciais.numeroVitimas?.trim() !== '' ||
-        dadosIniciais.condicaoVitimas?.trim() !== '' ||
-        dadosIniciais.autoridadePolicial?.trim() !== '' ||
-        !!dadosIniciais.localizacao?.address?.trim() ||
-        equipePericial.some(
-            (membro) =>
-                membro.nome?.trim() !== '' ||
-                membro.cargo?.trim() !== '' ||
-                membro.matricula?.trim() !== ''
-        )
-    );
+  return (
+    dadosIniciais.peritoResponsavel?.trim() !== '' ||
+    dadosIniciais.cargoPerito?.trim() !== '' ||
+    dadosIniciais.matriculaPerito?.trim() !== '' ||
+    dadosIniciais.tipoOcorrencia?.trim() !== '' ||
+    dadosIniciais.autoridadePolicialNome?.trim() !== '' ||
+    dadosIniciais.viatura?.trim() !== '' ||
+    dadosIniciais.numeroVitimas?.trim() !== '' ||
+    dadosIniciais.condicaoVitimas?.trim() !== '' ||
+    dadosIniciais.autoridadePolicial?.trim() !== '' ||
+    !!dadosIniciais.localizacao?.address?.trim() ||
+    equipePericial.some(
+      (membro) =>
+        membro.nome?.trim() !== '' ||
+        membro.cargo?.trim() !== '' ||
+        membro.matricula?.trim() !== ''
+    )
+  );
 }
 
 export function isMateriaisRespondido(dados: ForensicModel): boolean {
-    const { materiais } = dados;
+  const { materiais } = dados;
 
-    return (
-        materiais.selecionados.length > 0 ||
-        materiais.outroDescricao?.trim() !== ''
-    );
+  return (
+    materiais.selecionados.length > 0 ||
+    materiais.outroDescricao?.trim() !== ''
+  );
 }
 
 export function isAnalisePreliminarRespondido(dados: ForensicModel): boolean {
-    const { analisePreliminar } = dados;
+  const { analisePreliminar } = dados;
 
-    const {
-        reconhecimentoArea,
-        condicoesAmbientais,
-        caracteristicasLocal,
-        informacoes,
-        arquivosReconhecimentoArea
-    } = analisePreliminar;
+  const {
+    reconhecimentoArea,
+    condicoesAmbientais,
+    caracteristicasLocal,
+    informacoes,
+    arquivosReconhecimentoArea
+  } = analisePreliminar;
 
-    return (
-        reconhecimentoArea.trim() !== '' ||
-        condicoesAmbientais.trim() !== '' ||
-        caracteristicasLocal.trim() !== '' ||
-        arquivosReconhecimentoArea.length > 0 ||
-        informacoes.some(info => info.descricao.trim() !== '' || info.observacao.trim() !== '')
-    );
+  return (
+    reconhecimentoArea.trim() !== '' ||
+    condicoesAmbientais.trim() !== '' ||
+    caracteristicasLocal.trim() !== '' ||
+    arquivosReconhecimentoArea.length > 0 ||
+    informacoes.some(info => info.descricao.trim() !== '' || info.observacao.trim() !== '')
+  );
 }
 
 export function isRiscoAPRRespondido(dados: ForensicModel): boolean {
-    const risco = dados.risco?.riscoAPR;
+  const risco = dados.risco?.riscoAPR;
 
-    return (
-        risco?.peritoResponsavel?.trim() !== '' ||
-        risco?.peritoMatricula?.trim() !== '' ||
-        risco?.riscoAcidente?.trim() !== '' ||
-        risco?.riscoFisico?.trim() !== '' ||
-        risco?.riscoQuimico === true ||
-        risco?.riscoBiologico === true ||
-        risco?.gravidade?.trim() !== '' ||
-        risco?.probabilidade?.trim() !== '' ||
-        risco?.medidasMitigatoria?.trim() !== ''
-    );
+  return (
+    risco?.peritoResponsavel?.trim() !== '' ||
+    risco?.peritoMatricula?.trim() !== '' ||
+    risco?.riscoAcidente?.trim() !== '' ||
+    risco?.riscoFisico?.trim() !== '' ||
+    risco?.riscoQuimico === true ||
+    risco?.riscoBiologico === true ||
+    risco?.gravidade?.trim() !== '' ||
+    risco?.probabilidade?.trim() !== '' ||
+    risco?.medidasMitigatoria?.trim() !== ''
+  );
 }
 
 export function isExamesRespondido(dados: ForensicModel): boolean {
@@ -73,21 +73,22 @@ export function isExamesRespondido(dados: ForensicModel): boolean {
   const documentacao = exames.documentacao;
 
   const camposChecklist = [
-    exames.maquinaTracao,
-    exames.limitadorVelocidade,
-    exames.cabos,
-    exames.contrapeso,
-    exames.cabine,
-    exames.portas,
-    exames.freiosEmergencia,
-    exames.sistemaControle,
-    exames.sistemaEletrico,
-    exames.sensores,
-    exames.pocoElevador,
+    exames.equipamentosExame.maquinaTracao,
+    exames.equipamentosExame.limitadorVelocidade,
+    exames.equipamentosExame.cabos,
+    exames.equipamentosExame.contrapeso,
+    exames.equipamentosExame.cabine,
+    exames.equipamentosExame.portas,
+    exames.equipamentosExame.freiosEmergencia,
+    exames.equipamentosExame.sistemaControle,
+    exames.equipamentosExame.sistemaEletrico,
+    exames.equipamentosExame.sensores,
+    exames.equipamentosExame.pocoElevador,
   ];
 
+
   const algumChecklistRespondido = camposChecklist.some((lista) =>
-    lista.some(
+    lista?.some(
       (campo) =>
         (campo.observacao && campo.observacao.trim() !== '') ||
         (campo.arquivos && campo.arquivos.length > 0)
@@ -114,6 +115,33 @@ export function isExamesRespondido(dados: ForensicModel): boolean {
     documentacao.outro?.trim() !== '' ||
     documentacao.outroArquivos.length > 0;
 
+  const algumDepoimentoPreenchido = exames.depoimentos.some((dep) =>
+    dep.tipoEntrevistado?.trim() !== '' ||
+    dep.genero?.trim() !== '' ||
+    dep.nomeEntrevistado?.trim() !== '' ||
+    dep.identificacao?.trim() !== '' ||
+    dep.endereco?.trim() !== '' ||
+    dep.idade?.trim() !== '' ||
+    dep.descricaoLesoes?.trim() !== '' ||
+    dep.depoimentoRelato?.trim() !== '' ||
+    dep.arquivoLesoes.length > 0
+  );
+
+  const p = exames.perinecroscopia;
+  const algumaPerinecroscopiaPreenchida =
+    p.cadaverSexo?.trim() !== '' ||
+    p.cadaverCorPele?.trim() !== '' ||
+    p.cadaverCabelo?.trim() !== '' ||
+    p.cadaverSinaisIdentificadores?.trim() !== '' ||
+    p.cadaverDescricaoVestes?.trim() !== '' ||
+    p.cadaverOutro?.trim() !== '' ||
+    p.analiseDisposicaoCadaver?.trim() !== '' ||
+    p.sinaisTanatologicos?.trim() !== '' ||
+    p.descricaoLesoesCadaver?.trim() !== '' ||
+    p.arquivosDisposicaoCadaver.length > 0 ||
+    p.arquivosTanatologicos.length > 0 ||
+    p.arquivosLesoesCadaver.length > 0;
+
   return (
     algumDocumentoPreenchido ||
     exames.observacoesDocumentacao?.trim() !== '' ||
@@ -122,31 +150,7 @@ export function isExamesRespondido(dados: ForensicModel): boolean {
     exames.vestigiosEntrevistas.length > 0 ||
     exames.vestigiosPerinecroscopia.length > 0 ||
     algumChecklistRespondido ||
-    exames.depoimentos.some((dep) =>
-      dep.tipoEntrevistado?.trim() !== '' ||
-      dep.genero?.trim() !== '' ||
-      dep.nomeEntrevistado?.trim() !== '' ||
-      dep.identificacao?.trim() !== '' ||
-      dep.endereco?.trim() !== '' ||
-      dep.idade?.trim() !== '' ||
-      dep.descricaoLesoes?.trim() !== '' ||
-      dep.depoimentoRelato?.trim() !== '' ||
-      dep.arquivoLesoes.length > 0
-    ) ||
-    exames.cadaverSexo?.trim() !== '' ||
-    exames.cadaverCorPele?.trim() !== '' ||
-    exames.cadaverCabelo?.trim() !== '' ||
-    exames.cadaverSinaisIdentificadores?.trim() !== '' ||
-    exames.cadaverDescricaoVestes?.trim() !== '' ||
-    exames.cadaverOutro?.trim() !== '' ||
-    exames.analiseDisposicaoCadaver?.trim() !== '' ||
-    exames.sinaisTanatologicos?.trim() !== '' ||
-    exames.descricaoLesoesCadaver?.trim() !== '' ||
-    exames.arquivosDisposicaoCadaver.length > 0 ||
-    exames.arquivosTanatologicos.length > 0 ||
-    exames.arquivosLesoesCadaver.length > 0
+    algumDepoimentoPreenchido ||
+    algumaPerinecroscopiaPreenchida
   );
 }
-
-
-
