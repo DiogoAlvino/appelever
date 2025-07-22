@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR, DadosIniciais } from '~/types/forensicTypes';
-import { UploadWithMeta} from '~/models/uploadModel';
+import { UploadWithMeta } from '~/models/uploadModel';
 
 export const useForensic = () => {
     const [dadosIniciais, setDadosIniciais] = useState<DadosIniciais>({
@@ -14,9 +14,8 @@ export const useForensic = () => {
         numeroVitimas: '',
         condicaoVitimas: '',
         autoridadePolicial: '',
-        localizacao: undefined, // agora reconhecido corretamente
+        localizacao: undefined,
     });
-
 
     const [riscoAPR, setRiscoAPR] = useState<RiscoAPR>({
         peritoResponsavel: '',
@@ -30,7 +29,25 @@ export const useForensic = () => {
         medidasMitigatoria: '',
     });
 
-    const [dadosPreliminares, setDadosPreliminares] = useState([{
+    const [dadosPreliminares, setDadosPreliminares] = useState<{
+        [origem: string]: typeof initialDadosPreliminares;
+    }>({
+        equipamentos: [],
+        documentacao: [],
+        entrevistas: [],
+        perinecroscopia: [],
+    });
+
+    const [acondicionamento, setAcondicionamento] = useState<{
+        [origem: string]: typeof initialAcondicionamento;
+    }>({
+        equipamentos: [],
+        documentacao: [],
+        entrevistas: [],
+        perinecroscopia: [],
+    });
+
+    const initialDadosPreliminares = [{
         numeroVestigio: '',
         unidadeOrigem: '',
         procedimento: '',
@@ -38,20 +55,17 @@ export const useForensic = () => {
         naturezaOutros: '',
         descricaoDetalhada: '',
         descricaoDetalhadaArquivos: [] as UploadWithMeta[],
-    }]);
+    }];
 
-    const [acondicionamento, setAcondicionamento] = useState([{
+    const initialAcondicionamento = [{
         responsavelColeta: '',
         matricula: '',
         tipoAcondicionamento: '',
         tipoAcondicionamentoOutros: '',
         numeroLacre: '',
         arquivos: [] as UploadWithMeta[],
-        localizacao: undefined as
-            | { address: string; latitude: number; longitude: number }
-            | undefined,
-    }]);
-
+        localizacao: undefined as { address: string; latitude: number; longitude: number } | undefined,
+    }];
 
     const [equipePericial, setEquipePericial] = useState([{ nome: '', cargo: '', matricula: '' }]);
     const [informacoes, setInformacoes] = useState([{ descricao: '', observacao: '' }]);
@@ -68,24 +82,15 @@ export const useForensic = () => {
     const [arquivosReconhecimentoArea, setArquivosReconhecimentoArea] = useState<UploadWithMeta[]>([]);
 
     const [documentacao, setDocumentacao] = useState<Documentacao>({
-        projetos: '',
-        projetosArquivos: [],
-        memorialCalculo: '',
-        memorialCalculoArquivos: [],
-        licencaAlvara: '',
-        licencaAlvaraArquivos: [],
-        art: '',
-        artArquivos: [],
-        planoManutencao: '',
-        planoManutencaoArquivos: [],
-        contratoManutencao: '',
-        contratoManutencaoArquivos: [],
-        registroManutencao: '',
-        registroManutencaoArquivos: [],
-        relatorioRia: '',
-        relatorioRiaArquivos: [],
-        outro: '',
-        outroArquivos: [],
+        projetos: '', projetosArquivos: [],
+        memorialCalculo: '', memorialCalculoArquivos: [],
+        licencaAlvara: '', licencaAlvaraArquivos: [],
+        art: '', artArquivos: [],
+        planoManutencao: '', planoManutencaoArquivos: [],
+        contratoManutencao: '', contratoManutencaoArquivos: [],
+        registroManutencao: '', registroManutencaoArquivos: [],
+        relatorioRia: '', relatorioRiaArquivos: [],
+        outro: '', outroArquivos: [],
     });
 
     const [observacoesDocumentacao, setObservacoesDocumentacao] = useState('');
@@ -104,19 +109,10 @@ export const useForensic = () => {
     const [pocoElevador, setPocoElevador] = useState<CampoChecklist[]>([]);
     const [vestigiosEquipamentos, setVestigiosEquipamentos] = useState<VestigioResumo[]>([]);
 
-    const [depoimentos, setDepoimentos] = useState<Depoimento[]>([
-        {
-            tipoEntrevistado: '',
-            genero: '',
-            nomeEntrevistado: '',
-            identificacao: '',
-            endereco: '',
-            idade: '',
-            descricaoLesoes: '',
-            depoimentoRelato: '',
-            arquivoLesoes: [],
-        },
-    ]);
+    const [depoimentos, setDepoimentos] = useState<Depoimento[]>([{
+        tipoEntrevistado: '', genero: '', nomeEntrevistado: '', identificacao: '', endereco: '', idade: '',
+        descricaoLesoes: '', depoimentoRelato: '', arquivoLesoes: [],
+    }]);
     const [vestigiosEntrevistas, setVestigiosEntrevistas] = useState<VestigioResumo[]>([]);
 
     const [cadaverSexo, setCadaverSexo] = useState('');
@@ -139,12 +135,7 @@ export const useForensic = () => {
         setter(prev => [...prev, novoItem]);
     };
 
-    const atualizarCampo = <T,>(
-        setter: React.Dispatch<React.SetStateAction<T[]>>,
-        index: number,
-        campo: keyof T,
-        valor: T[keyof T]
-    ) => {
+    const atualizarCampo = <T,>(setter: React.Dispatch<React.SetStateAction<T[]>>, index: number, campo: keyof T, valor: T[keyof T]) => {
         setter(prev => {
             const copia = [...prev];
             copia[index] = { ...copia[index], [campo]: valor };
@@ -210,6 +201,6 @@ export const useForensic = () => {
         errors, setErrors, clearFieldError,
         riscoAPR, setRiscoAPR,
         dadosPreliminares, setDadosPreliminares,
-        acondicionamento, setAcondicionamento
+        acondicionamento, setAcondicionamento,
     };
 };

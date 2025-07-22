@@ -8,12 +8,39 @@ export type CampoChecklist = {
   arquivos?: UploadWithMeta[];
 };
 
+export type DadosPreliminares = {
+  numeroVestigio: string;
+  unidadeOrigem: string;
+  procedimento: string;
+  naturezaVestigio: string;
+  naturezaOutros: string;
+  descricaoDetalhada: string;
+  descricaoDetalhadaArquivos: UploadWithMeta[];
+};
+
+export type Acondicionamento = {
+  responsavelColeta: string;
+  matricula: string;
+  tipoAcondicionamento: string;
+  tipoAcondicionamentoOutros: string;
+  numeroLacre: string;
+  arquivos: UploadWithMeta[];
+  localizacao?: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  };
+};
+
 export type VestigioResumo = {
   numeroVestigio: string;
   naturezaVestigio?: string;
   origem: 'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia';
+  dadosCompletos: {
+    dadosPreliminares: DadosPreliminares[];
+    acondicionamento: Acondicionamento[];
+  };
 };
-
 export type Depoimento = {
   tipoEntrevistado?: string;
   genero?: string;
