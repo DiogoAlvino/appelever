@@ -13,25 +13,38 @@ import { ForensicModel } from '~/models/forensicModel';
 
 export async function saveForensicModular(data: ForensicModel) {
   try {
-    const docRef = await addDoc(collection(db, 'forensic'), {
-      usuario: data.usuario,
-      dadosIniciais: data.dadosIniciais,
-      equipePericial: data.equipePericial,
-      dataCriacao: data.dataCriacao,
-    });
+    let forensicId = data.id;
 
-    const forensicId = docRef.id;
+    if (forensicId) {
+      await setDoc(doc(db, 'forensic', forensicId), {
+        id: forensicId,
+        usuario: data.usuario,
+        dadosIniciais: data.dadosIniciais,
+        equipePericial: data.equipePericial,
+        dataCriacao: data.dataCriacao,
+      });
+    } else {
+      const docRef = await addDoc(collection(db, 'forensic'), {
+        usuario: data.usuario,
+        dadosIniciais: data.dadosIniciais,
+        equipePericial: data.equipePericial,
+        dataCriacao: data.dataCriacao,
+      });
+      forensicId = docRef.id;
 
-    await setDoc(docRef, {
-      id: forensicId,
-      usuario: data.usuario,
-      dadosIniciais: data.dadosIniciais,
-      equipePericial: data.equipePericial,
-      dataCriacao: data.dataCriacao,
-    });
+      await setDoc(docRef, {
+        id: forensicId,
+        usuario: data.usuario,
+        dadosIniciais: data.dadosIniciais,
+        equipePericial: data.equipePericial,
+        dataCriacao: data.dataCriacao,
+      });
+    }
 
+    // Materiais
     await setDoc(doc(db, 'forensic_materials', forensicId), data.materiais);
 
+    // Análise
     await setDoc(doc(db, 'forensic_analysis', forensicId), {
       reconhecimentoArea: data.analisePreliminar.reconhecimentoArea,
       condicoesAmbientais: data.analisePreliminar.condicoesAmbientais,
@@ -40,7 +53,7 @@ export async function saveForensicModular(data: ForensicModel) {
       arquivosReconhecimentoArea: data.analisePreliminar.arquivosReconhecimentoArea,
     });
 
-    // 5. Riscos
+    // Riscos
     await setDoc(doc(db, 'forensic_risk', forensicId), {
       riscoAPR: data.risco.riscoAPR,
       peritoAuxiliar: data.risco.peritoAuxiliar,
@@ -48,7 +61,7 @@ export async function saveForensicModular(data: ForensicModel) {
       outros: data.risco.outros,
     });
 
-    // 6. Exames
+    // Exames
     await setDoc(doc(db, 'forensic_exams', forensicId), {
       documentacao: data.exames.documentacao,
       observacoesDocumentacao: data.exames.observacoesDocumentacao,
@@ -68,10 +81,10 @@ export async function saveForensicModular(data: ForensicModel) {
       },
 
       depoimentos: data.exames.depoimentos,
-
       perinecroscopia: data.exames.perinecroscopia,
     });
 
+    // Vestígios — para edição, idealmente deveríamos limpar os antigos primeiro
     const vestigiosTotais = [
       ...(data.exames.vestigiosDocumentacao || []),
       ...(data.exames.vestigiosEquipamentos || []),
@@ -79,13 +92,22 @@ export async function saveForensicModular(data: ForensicModel) {
       ...(data.exames.vestigiosPerinecroscopia || []),
     ];
 
-    const vestigioPromises = vestigiosTotais.map((vestigio) => {
-      return addDoc(collection(db, 'forensic_vestigios'), {
+    // (Opcional) Deletar vestígios antigos antes de adicionar os novos
+    if (data.id) {
+      const vestigiosRef = collection(db, 'forensic_vestigios');
+      const q = query(vestigiosRef, where('forensicId', '==', forensicId));
+      const snapshot = await getDocs(q);
+      const deletes = snapshot.docs.map((docSnap) => deleteDoc(docSnap.ref));
+      await Promise.all(deletes);
+    }
+
+    // Adiciona os vestígios novos
+    const vestigioPromises = vestigiosTotais.map((vestigio) =>
+      addDoc(collection(db, 'forensic_vestigios'), {
         forensicId,
         ...vestigio,
-      });
-    });
-
+      })
+    );
     await Promise.all(vestigioPromises);
 
     return forensicId;

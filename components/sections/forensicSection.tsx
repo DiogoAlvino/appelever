@@ -1,7 +1,7 @@
 import PrimaryList from '~/components/lists/primaryList';
 import PrimaryInput from '../inputs/primaryInput';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { colors, fontSize} from '~/theme';
+import { colors, fontSize } from '~/theme';
 import RemoveButton from '../buttons/removeButton';
 import AddButton from '../buttons/addButton';
 import LocationButton from '../buttons/locationButton';
@@ -31,11 +31,23 @@ import { VestigioResumo } from '~/models/forensicModel';
 
 import { isDadosIniciaisRespondido, isMateriaisRespondido, isAnalisePreliminarRespondido, isRiscoAPRRespondido, isExamesRespondido } from '~/utils/forensicUtils';
 import { Perinecroscopia } from '~/types/forensicTypes';
+import { useLocalSearchParams } from 'expo-router';
+import { getDoc, doc, collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '~/utils/firebase';
+import { useEffect } from 'react';
+
 
 export default function ForensicSection() {
 
     const auth = getAuth();
     const currentUser = auth.currentUser;
+
+    const { mode, forensicId } = useLocalSearchParams<{
+        mode?: string;
+        forensicId?: string;
+    }>();
+
+    const modoEdicao = !!forensicId;
 
     const {
         // 1. Dados Iniciais
@@ -76,6 +88,82 @@ export default function ForensicSection() {
         equipamentosExame, setEquipamentosExame,
         arquivosReconhecimentoArea, setArquivosReconhecimentoArea,
     } = useForensic();
+
+    useEffect(() => {
+        async function carregarDadosForense(forensicId: string) {
+            try {
+                // 1. Dados principais
+                const forensicSnap = await getDoc(doc(db, 'forensic', forensicId));
+                if (forensicSnap.exists()) {
+                    const dados = forensicSnap.data();
+                    setDadosIniciais(dados.dadosIniciais || {});
+                    setEquipePericial(dados.equipePericial || []);
+                }
+
+                // 2. Materiais
+                const materialsSnap = await getDoc(doc(db, 'forensic_materials', forensicId));
+                if (materialsSnap.exists()) {
+                    const materiais = materialsSnap.data();
+                    setMateriaisSelecionados(materiais.selecionados || []);
+                    setMaterialOutroDescricao(materiais.outroDescricao || '');
+                }
+
+                // 3. Análise preliminar
+                const analiseSnap = await getDoc(doc(db, 'forensic_analysis', forensicId));
+                if (analiseSnap.exists()) {
+                    const analise = analiseSnap.data();
+                    setReconhecimentoArea(analise.reconhecimentoArea || '');
+                    setCondicoesAmbientais(analise.condicoesAmbientais || '');
+                    setCaracteristicasLocal(analise.caracteristicasLocal || '');
+                    setInformacoes(analise.informacoes || '');
+                    setArquivosReconhecimentoArea(analise.arquivosReconhecimentoArea || []);
+                }
+
+                // 4. Risco APR
+                const riscoSnap = await getDoc(doc(db, 'forensic_risk', forensicId));
+                if (riscoSnap.exists()) {
+                    const risco = riscoSnap.data();
+                    setRiscoAPR(risco.riscoAPR || {});
+                    setPeritoAuxiliar(risco.peritoAuxiliar || []);
+                    setTecnico(risco.tecnico || []);
+                    setOutros(risco.outros || []);
+                }
+
+                // 5. Exames
+                const examesSnap = await getDoc(doc(db, 'forensic_exams', forensicId));
+                if (examesSnap.exists()) {
+                    const exames = examesSnap.data();
+                    const docu = exames.documentacao || {};
+                    setDocumentacao({
+                        ...docu,
+                        dataHora: docu.dataHora?.toDate?.() || null, // Corrige Timestamp
+                    });
+                    setObservacoesDocumentacao(exames.observacoesDocumentacao || '');
+                    setEquipamentosExame(exames.equipamentosExame || {});
+                    setDepoimentos(exames.depoimentos || []);
+                    setPerinecroscopia(exames.perinecroscopia || {});
+                }
+
+                // 6. Vestígios
+                const vestigiosRef = collection(db, 'forensic_vestigios');
+                const q = query(vestigiosRef, where('forensicId', '==', forensicId));
+                const snapshot = await getDocs(q);
+                const vestigios = snapshot.docs.map(doc => doc.data() as VestigioResumo);
+
+                setVestigiosDocumentacao(vestigios.filter(v => v.origem === 'documentacao'));
+                setVestigiosEquipamentos(vestigios.filter(v => v.origem === 'equipamentos'));
+                setVestigiosEntrevistas(vestigios.filter(v => v.origem === 'entrevistas'));
+                setVestigiosPerinecroscopia(vestigios.filter(v => v.origem === 'perinecroscopia'));
+
+            } catch (err) {
+                console.error('Erro ao carregar dados da análise forense:', err);
+            }
+        }
+
+        if (modoEdicao && forensicId) {
+            carregarDadosForense(forensicId);
+        }
+    }, [modoEdicao, forensicId]);
 
     const [modalVestigioVisible, setModalVestigioVisible] = useState(false);
     const [origemVestigio, setOrigemVestigio] = useState<'equipamentos' | 'documentacao' | 'entrevistas' | 'perinecroscopia' | null>(null);
@@ -232,7 +320,11 @@ export default function ForensicSection() {
 
             const cleanedPayload = cleanObject(payload);
 
-            await saveForensicModular(cleanedPayload);
+            if (mode === 'edit' && forensicId) {
+                await saveForensicModular({ ...cleanedPayload, id: forensicId });
+            } else {
+                await saveForensicModular(cleanedPayload);
+            }
             setFeedbackType('success');
             setFeedbackMessage('Análise forense salva com sucesso!');
             setTimeout(() => {
@@ -298,6 +390,33 @@ export default function ForensicSection() {
     function atualizarObjeto(setPerinecroscopia: Dispatch<SetStateAction<Perinecroscopia>>, arg1: string, arg2: string): void {
         throw new Error('Function not implemented.');
     }
+
+    useEffect(() => {
+        async function fetchData() {
+            if (mode === 'edit' && forensicId) {
+                try {
+                    const docRef = doc(db, 'forensic', forensicId);
+                    const snapshot = await getDoc(docRef);
+
+                    if (snapshot.exists()) {
+                        const data = snapshot.data();
+
+                        setDadosIniciais(data.dadosIniciais || {});
+                        setEquipePericial(data.equipePericial || []);
+                        setPeritoAuxiliar(data.peritoAuxiliar || []);
+                        setTecnico(data.tecnico || []);
+                        setOutros(data.outros || []);
+                        // Adicione os demais estados conforme estrutura
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar análise para edição:', error);
+                }
+            }
+        }
+
+        fetchData();
+    }, [mode, forensicId]);
+
 
     return (
         <View style={styles.section}>
