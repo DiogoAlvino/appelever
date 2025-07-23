@@ -21,6 +21,7 @@ import { deleteForensicById } from '~/services/forensicService';
 export default function ForensicForm() {
     const { forensicId } = useLocalSearchParams();
     const { forensic: data, loading } = useForensicById(String(forensicId));
+    console.log(data)
 
     const navigation = useNavigation();
 
@@ -93,6 +94,9 @@ export default function ForensicForm() {
         }
         return 'Data inválida';
     }
+
+    console.log('analisePreliminar', data?.analisePreliminar);
+
 
 
     return (
@@ -252,106 +256,104 @@ export default function ForensicForm() {
                         )}
 
 
-                    {data?.analisePreliminar &&
-                        (
-                            (data.analisePreliminar.reconhecimentoArea?.trim?.() || '') !== '' ||
-                            (data.analisePreliminar.condicoesAmbientais?.trim?.() || '') !== '' ||
-                            (data.analisePreliminar.caracteristicasLocal?.trim?.() || '') !== '' ||
-                            (Array.isArray(data.analisePreliminar.informacoes) &&
-                                data.analisePreliminar.informacoes.some(info =>
-                                    (info.descricao && info.descricao.trim() !== '') ||
-                                    (info.observacao && info.observacao.trim() !== '')
-                                )
-                            ) ||
-                            (Array.isArray(data.analisePreliminar.arquivosReconhecimentoArea) &&
-                                data.analisePreliminar.arquivosReconhecimentoArea.length > 0)
-                        ) && (
+
+                    {data?.analisePreliminar && (
+                        
                             <SecondarySection
                                 icon={<Feather name="map" size={20} color="#173A64" />}
                                 title="Análise Preliminar do Local"
                                 showChevron={false}
+                                
                             >
-                                {(!data?.analisePreliminar ||
-                                    (
-                                        (data.analisePreliminar.reconhecimentoArea?.trim?.() === '' || !data.analisePreliminar.reconhecimentoArea) &&
-                                        (data.analisePreliminar.condicoesAmbientais?.trim?.() === '' || !data.analisePreliminar.condicoesAmbientais) &&
-                                        (data.analisePreliminar.caracteristicasLocal?.trim?.() === '' || !data.analisePreliminar.caracteristicasLocal) &&
-                                        (!Array.isArray(data.analisePreliminar.informacoes) || data.analisePreliminar.informacoes.length === 0 || data.analisePreliminar.informacoes.every(info =>
-                                            (!info.descricao || info.descricao.trim() === '') &&
-                                            (!info.observacao || info.observacao.trim() === '')
-                                        )) &&
-                                        (!Array.isArray(data.analisePreliminar.arquivosReconhecimentoArea) || data.analisePreliminar.arquivosReconhecimentoArea.length === 0)
-                                    )
-                                ) ? (
-                                    <Text style={styles.text}>Nenhum registro de análise preliminar do local.</Text>
-                                ) : (
-                                    <>
-                                        <View style={styles.campoInterno}>
-                                            <Text style={styles.itemTitle}>Reconhecimento da área</Text>
-                                            <Text style={styles.itemText}>{data?.analisePreliminar?.reconhecimentoArea}</Text>
 
-                                            {Array.isArray(data?.analisePreliminar?.arquivosReconhecimentoArea) &&
-                                                data.analisePreliminar.arquivosReconhecimentoArea.length > 0 && (
-                                                    <View style={styles.uploadedList}>
-                                                        <Text style={styles.uploadedTitle}>Imagens da área:</Text>
-                                                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                                            {data.analisePreliminar.arquivosReconhecimentoArea.map((file, idx) => (
-                                                                !!file.uri && typeof file.uri === 'string' && (
-                                                                    <TouchableOpacity
-                                                                        key={`${file.nome}-${idx}`}
-                                                                        style={styles.thumbnailWrapper}
-                                                                        onPress={() =>
-                                                                            router.push({
-                                                                                pathname: '/previewImage',
-                                                                                params: { uri: file.uri },
-                                                                            })
-                                                                        }
-                                                                    >
-                                                                        <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
-                                                                        <View style={styles.imageContainer}>
-                                                                            <Image
-                                                                                source={{ uri: file.arquivo }}
-                                                                                style={styles.thumbnail}
-                                                                            />
-                                                                        </View>
-                                                                    </TouchableOpacity>
-                                                                )
-                                                            ))}
-                                                        </ScrollView>
-                                                    </View>
-                                                )}
+                                <View style={styles.campoInterno}>
+                                    <Text style={styles.itemTitle}>Reconhecimento da área</Text>
+                                    <Text style={styles.itemText}>{data.analisePreliminar.reconhecimentoArea}</Text>
+                                </View>
+
+
+                                {Array.isArray(data.analisePreliminar.arquivosReconhecimentoArea) &&
+                                    data.analisePreliminar.arquivosReconhecimentoArea.length > 0 && (
+                                        <View style={styles.uploadedList}>
+                                            <Text style={styles.uploadedTitle}>Imagens da área:</Text>
+                                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                                {data.analisePreliminar.arquivosReconhecimentoArea.map((file, idx) => (
+                                                    !!file.uri && typeof file.uri === 'string' && (
+                                                        <TouchableOpacity
+                                                            key={`${file.nome}-${idx}`}
+                                                            style={styles.thumbnailWrapper}
+                                                            onPress={() =>
+                                                                router.push({
+                                                                    pathname: '/previewImage',
+                                                                    params: { uri: file.uri },
+                                                                })
+                                                            }
+                                                        >
+                                                            <Text numberOfLines={1} style={styles.imageLabel}>{file.nome}</Text>
+                                                            <View style={styles.imageContainer}>
+                                                                <Image
+                                                                    source={{ uri: file.arquivo }}
+                                                                    style={styles.thumbnail}
+                                                                />
+                                                            </View>
+                                                        </TouchableOpacity>
+                                                    )
+                                                ))}
+                                            </ScrollView>
                                         </View>
+                                    )}
 
-                                        <View style={styles.campoInterno}>
-                                            <Text style={styles.itemTitle}>Condições Ambientais</Text>
-                                            <Text style={styles.itemText}>{data?.analisePreliminar?.condicoesAmbientais}</Text>
-                                        </View>
 
-                                        <View style={styles.campoInterno}>
-                                            <Text style={styles.itemTitle}>Características do Local</Text>
-                                            <Text style={styles.itemText}>{data?.analisePreliminar?.caracteristicasLocal}</Text>
-                                        </View>
+                                <View style={styles.campoInterno}>
+                                    <Text style={styles.itemTitle}>Condições Ambientais</Text>
+                                    <Text style={styles.itemText}>{data.analisePreliminar.condicoesAmbientais}</Text>
+                                </View>
 
+                                <View style={styles.campoInterno}>
+                                    <Text style={styles.itemTitle}>Características do Local</Text>
+                                    <Text style={styles.itemText}>{data.analisePreliminar.caracteristicasLocal}</Text>
+                                </View>
+
+                                <View style={styles.campoInterno}>
+                                    <Text style={styles.itemTitle}>Localização aproximada</Text>
+                                    <Text style={styles.itemText}>{data.analisePreliminar.localizacao?.address}</Text>
+                                    <Text style={styles.itemText}>Lat: {data.analisePreliminar.localizacao?.latitude}</Text>
+                                    <Text style={styles.itemText}>Lng: {data.analisePreliminar.localizacao?.longitude}</Text>
+                                </View>
+
+
+                                {Array.isArray(data.analisePreliminar.informacoes) &&
+                                    data.analisePreliminar.informacoes.some(info =>
+                                        (info.descricao && info.descricao.trim() !== '') ||
+                                        (info.observacao && info.observacao.trim() !== '')
+                                    ) && (
                                         <View style={styles.campoInternoSecundario}>
-                                            {Array.isArray(data?.analisePreliminar?.informacoes) &&
-                                                data.analisePreliminar.informacoes.map((info, index) => (
+                                            {data.analisePreliminar.informacoes.map((info, index) => {
+                                                const hasDescricao = info.descricao?.trim() !== '';
+                                                const hasObs = info.observacao?.trim() !== '';
+                                                if (!hasDescricao && !hasObs) return null;
+
+                                                return (
                                                     <View key={index} style={{ marginTop: 8 }}>
-                                                        <View style={styles.campoInternoSecundario}>
-                                                            <Text style={styles.itemTitle}>Informação do fato {index}</Text>
-                                                            <Text style={styles.itemText}>{info.descricao}</Text>
-                                                        </View>
-                                                        {info.observacao ? (
+                                                        {hasDescricao && (
+                                                            <View style={styles.campoInternoSecundario}>
+                                                                <Text style={styles.itemTitle}>Informação do fato {index + 1}</Text>
+                                                                <Text style={styles.itemText}>{info.descricao}</Text>
+                                                            </View>
+                                                        )}
+                                                        {hasObs && (
                                                             <View style={styles.campoInternoSecundario}>
                                                                 <Text style={styles.itemTitle}>Observação:</Text>
                                                                 <Text style={styles.itemText}>{info.observacao}</Text>
                                                             </View>
-                                                        ) : null}
+                                                        )}
                                                     </View>
-                                                ))}
+                                                );
+                                            })}
                                         </View>
-                                    </>
-                                )}
+                                    )}
                             </SecondarySection>
+
 
                         )}
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR, DadosIniciais, Perinecroscopia } from '~/types/forensicTypes';
+import { VestigioResumo, CampoChecklist, Depoimento, Documentacao, RiscoAPR, DadosIniciais, Perinecroscopia, AnalisePreliminar } from '~/types/forensicTypes';
 import { UploadWithMeta } from '~/models/uploadModel';
 
 export const useForensic = () => {
@@ -76,10 +76,14 @@ export const useForensic = () => {
 
     const [materialOutroDescricao, setMaterialOutroDescricao] = useState('');
 
-    const [reconhecimentoArea, setReconhecimentoArea] = useState('');
-    const [condicoesAmbientais, setCondicoesAmbientais] = useState('');
-    const [caracteristicasLocal, setCaracteristicasLocal] = useState('');
-    const [arquivosReconhecimentoArea, setArquivosReconhecimentoArea] = useState<UploadWithMeta[]>([]);
+    const [analisePreliminar, setAnalisePreliminar] = useState<AnalisePreliminar>({
+        reconhecimentoArea: '',
+        condicoesAmbientais: '',
+        caracteristicasLocal: '',
+        informacoes: [{ descricao: '', observacao: '' }],
+        arquivosReconhecimentoArea: [],
+        localizacao: undefined as { address: string; latitude: number; longitude: number } | undefined,
+    });
 
     const [documentacao, setDocumentacao] = useState<Documentacao>({
         projetos: '', projetosArquivos: [],
@@ -96,7 +100,7 @@ export const useForensic = () => {
     const [observacoesDocumentacao, setObservacoesDocumentacao] = useState('');
     const [vestigiosDocumentacao, setVestigiosDocumentacao] = useState<VestigioResumo[]>([]);
 
-  
+
     const [equipamentosExame, setEquipamentosExame] = useState({
         maquinaTracao: [] as CampoChecklist[],
         limitadorVelocidade: [] as CampoChecklist[],
@@ -109,6 +113,15 @@ export const useForensic = () => {
         sistemaEletrico: [] as CampoChecklist[],
         sensores: [] as CampoChecklist[],
         pocoElevador: [] as CampoChecklist[],
+        dataHoraCabos: undefined,
+        dataHoraContrapeso: undefined,
+        dataHoraCabine: undefined,
+        dataHoraPortas: undefined,
+        dataHoraFreios: undefined,
+        dataHoraSistemaControle: undefined,
+        dataHoraSistemaEletrico: undefined,
+        dataHoraSensores: undefined,
+        dataHoraPocoElevador: undefined,
     });
 
     const [vestigiosEquipamentos, setVestigiosEquipamentos] = useState<VestigioResumo[]>([]);
@@ -133,6 +146,7 @@ export const useForensic = () => {
         arquivosTanatologicos: [],
         descricaoLesoesCadaver: '',
         arquivosLesoesCadaver: [],
+        dataHora: undefined,
     });
 
     const [vestigiosPerinecroscopia, setVestigiosPerinecroscopia] = useState<VestigioResumo[]>([]);
@@ -181,10 +195,7 @@ export const useForensic = () => {
         peritoAuxiliar, setPeritoAuxiliar,
         tecnico, setTecnico,
         outros, setOutros,
-        reconhecimentoArea, setReconhecimentoArea,
-        condicoesAmbientais, setCondicoesAmbientais,
-        caracteristicasLocal, setCaracteristicasLocal,
-        arquivosReconhecimentoArea, setArquivosReconhecimentoArea,
+        analisePreliminar, setAnalisePreliminar,
         documentacao, setDocumentacao,
         observacoesDocumentacao, setObservacoesDocumentacao,
         vestigiosDocumentacao, setVestigiosDocumentacao,
@@ -196,7 +207,7 @@ export const useForensic = () => {
         vestigiosPerinecroscopia, setVestigiosPerinecroscopia,
         materialOutroDescricao, setMaterialOutroDescricao,
         informacoes, setInformacoes,
-        adicionarCampo, atualizarCampo, removerCampo,
+        adicionarCampo, atualizarCampo, removerCampo, atualizarObjeto,
         errors, setErrors, clearFieldError,
         riscoAPR, setRiscoAPR,
         dadosPreliminares, setDadosPreliminares,

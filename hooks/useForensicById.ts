@@ -50,6 +50,8 @@ export function useForensicById(forensicId: string) {
 
                 const examsData = examsSnap.data() || {};
 
+                const analysisData = analysisSnap.data();
+
                 const fullData: ForensicModel = {
                     id: forensicId,
                     usuario: mainData.usuario || '',
@@ -58,13 +60,17 @@ export function useForensicById(forensicId: string) {
                     equipePericial: mainData.equipePericial || [],
                     materiais,
                     analisePreliminar: {
-                        reconhecimentoArea: analysisSnap.data()?.reconhecimentoArea || '',
-                        condicoesAmbientais: analysisSnap.data()?.condicoesAmbientais || '',
-                        caracteristicasLocal: analysisSnap.data()?.caracteristicasLocal || '',
-                        informacoes: analysisSnap.data()?.informacoes || [],
-                        arquivosReconhecimentoArea: analysisSnap.data()?.arquivosReconhecimentoArea || [],
+                        reconhecimentoArea: analysisData?.reconhecimentoArea ?? '',
+                        condicoesAmbientais: analysisData?.condicoesAmbientais ?? '',
+                        caracteristicasLocal: analysisData?.caracteristicasLocal ?? '',
+                        informacoes: analysisData?.informacoes ?? [],
+                        arquivosReconhecimentoArea: analysisData?.arquivosReconhecimentoArea ?? [],
+                        localizacao: analysisData?.localizacao ?? {
+                            address: '',
+                            latitude: null,
+                            longitude: null,
+                        },
                     },
-
                     risco: {
                         riscoAPR: riskSnap.data()?.riscoAPR || {
                             peritoResponsavel: '',
@@ -102,6 +108,7 @@ export function useForensicById(forensicId: string) {
                             relatorioRiaArquivos: [],
                             outro: '',
                             outroArquivos: [],
+                            dataHora: examsData.documentacao?.dataHora ?? null,
                         },
                         observacoesDocumentacao: examsData.observacoesDocumentacao || '',
                         vestigiosDocumentacao,
@@ -117,6 +124,17 @@ export function useForensicById(forensicId: string) {
                             sistemaEletrico: examsData.equipamentosExame?.sistemaEletrico || [],
                             sensores: examsData.equipamentosExame?.sensores || [],
                             pocoElevador: examsData.equipamentosExame?.pocoElevador || [],
+                            dataHoraMaquinaTracao: examsData.equipamentosExame?.dataHoraMaquinaTracao ?? null,
+                            dataHoraLimitador: examsData.equipamentosExame?.dataHoraLimitador ?? null,
+                            dataHoraCabos: examsData.equipamentosExame?.dataHoraCabos ?? null,
+                            dataHoraContrapeso: examsData.equipamentosExame?.dataHoraContrapeso ?? null,
+                            dataHoraCabine: examsData.equipamentosExame?.dataHoraCabine ?? null,
+                            dataHoraPortas: examsData.equipamentosExame?.dataHoraPortas ?? null,
+                            dataHoraFreios: examsData.equipamentosExame?.dataHoraFreios ?? null,
+                            dataHoraSistemaControle: examsData.equipamentosExame?.dataHoraSistemaControle ?? null,
+                            dataHoraSistemaEletrico: examsData.equipamentosExame?.dataHoraSistemaEletrico ?? null,
+                            dataHoraSensores: examsData.equipamentosExame?.dataHoraSensores ?? null,
+                            dataHoraPocoElevador: examsData.equipamentosExame?.dataHoraPocoElevador ?? null,
                         },
                         vestigiosEquipamentos,
                         depoimentos: examsData.depoimentos || [],
@@ -134,6 +152,7 @@ export function useForensicById(forensicId: string) {
                             arquivosTanatologicos: examsData.perinecroscopia?.arquivosTanatologicos || [],
                             descricaoLesoesCadaver: examsData.perinecroscopia?.descricaoLesoesCadaver || '',
                             arquivosLesoesCadaver: examsData.perinecroscopia?.arquivosLesoesCadaver || [],
+                            dataHora: examsData.perinecroscopia?.dataHora ?? null,
                         },
                         vestigiosPerinecroscopia,
                     },

@@ -25,7 +25,7 @@ export type Depoimento = {
   descricaoLesoes: string;
   depoimentoRelato: string;
   arquivoLesoes: UploadWithMeta[];
-  dataHoraEntrevista?: Date;
+  dataHoraEntrevista?: Date | null;
 };
 
 export type Documentacao = {
@@ -47,6 +47,7 @@ export type Documentacao = {
   relatorioRiaArquivos: UploadWithMeta[];
   outro: string;
   outroArquivos: UploadWithMeta[];
+  dataHora?: Date | null;
 };
 
 export type EquipamentosExame = {
@@ -61,6 +62,17 @@ export type EquipamentosExame = {
   sistemaEletrico: CampoChecklist[];
   sensores: CampoChecklist[];
   pocoElevador: CampoChecklist[];
+  dataHoraMaquinaTracao?: Date | null; 
+  dataHoraLimitador?: Date | null;
+  dataHoraCabos?: Date | null; 
+  dataHoraContrapeso?: Date | null; 
+  dataHoraCabine?: Date | null; 
+  dataHoraPortas?: Date | null; 
+  dataHoraFreios?: Date | null; 
+  dataHoraSistemaControle?: Date | null; 
+  dataHoraSistemaEletrico?: Date | null; 
+  dataHoraSensores?: Date | null; 
+  dataHoraPocoElevador?: Date | null; 
 }
 
 export type Perinecroscopia = {
@@ -76,6 +88,7 @@ export type Perinecroscopia = {
   arquivosTanatologicos: UploadWithMeta[];
   descricaoLesoesCadaver: string;
   arquivosLesoesCadaver: UploadWithMeta[];
+  dataHora?: Date | null;
 }
 
 export type DadosIniciais = {
@@ -124,6 +137,19 @@ export type RiscoAPR = {
   medidasMitigatoria: string;
 };
 
+export type AnalisePreliminar ={
+  reconhecimentoArea: string;
+    condicoesAmbientais: string;
+    caracteristicasLocal: string;
+    informacoes: InformacaoFato[];
+    arquivosReconhecimentoArea: UploadWithMeta[];
+    localizacao?: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  }
+}
+
 export type MembroSimples = {
   nome: string;
   matricula: string;
@@ -136,13 +162,8 @@ export type ForensicModel = {
   dadosIniciais: DadosIniciais;
   equipePericial: MembroEquipe[];
   materiais: Materiais;
-  analisePreliminar: {
-    reconhecimentoArea: string;
-    condicoesAmbientais: string;
-    caracteristicasLocal: string;
-    informacoes: InformacaoFato[];
-    arquivosReconhecimentoArea: UploadWithMeta[];
-  };
+  analisePreliminar: AnalisePreliminar;
+  
   risco: {
     riscoAPR: RiscoAPR;
     peritoAuxiliar: MembroSimples[];

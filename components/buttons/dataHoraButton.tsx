@@ -1,24 +1,28 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { colors, fontSize } from '~/theme';
 
 interface DataHoraButtonProps {
   value?: Date | null;
-  onChange?: (data: Date) => void;
+  onChange?: (data: Date | null) => void;
 }
 
 export default function DataHoraButton({ value, onChange }: DataHoraButtonProps) {
   const [dataHora, setDataHora] = useState<Date | null>(value ?? null);
 
   useEffect(() => {
-    if (value) setDataHora(value);
+    setDataHora(value ?? null);
   }, [value]);
 
-  const registrarDataHora = () => {
+  const registrarOuRemoverDataHora = () => {
     if (!dataHora) {
       const agora = new Date();
       setDataHora(agora);
       onChange?.(agora);
+    } else {
+      setDataHora(null);
+      onChange?.(null);
     }
   };
 
@@ -33,13 +37,15 @@ export default function DataHoraButton({ value, onChange }: DataHoraButtonProps)
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.botao} onPress={registrarDataHora}>
-        <Feather name="clock" size={20  } color="#173A64" style={styles.icone} />
-        <Text style={styles.texto}>Adicionar data/hora</Text>
+      <TouchableOpacity style={styles.botao} onPress={registrarOuRemoverDataHora}>
+        <Feather name="clock" size={20} color="#173A64" style={styles.icone} />
+        <Text style={styles.texto}>
+          {dataHora ? 'Remover data/hora' : 'Adicionar data/hora'}
+        </Text>
       </TouchableOpacity>
 
       {dataHora && (
-        <Text style={styles.dataHoraTexto}>Dada e hora: {formatarDataHora(dataHora)}</Text>
+        <Text style={styles.dataHoraTexto}>Data e hora: {formatarDataHora(dataHora)}</Text>
       )}
     </View>
   );
@@ -47,7 +53,7 @@ export default function DataHoraButton({ value, onChange }: DataHoraButtonProps)
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 8,
+    marginVertical: 8
   },
   botao: {
     flexDirection: 'row',
@@ -63,11 +69,11 @@ const styles = StyleSheet.create({
   texto: {
     color: '#173A64',
     fontWeight: '500',
-    fontSize: 16,
+    fontSize: fontSize.label,
   },
   dataHoraTexto: {
-    marginTop: 8,
-    fontSize: 16,
-    color: '#333',
+    marginTop: 13,
+    fontSize: 18,
+    color: colors.primaryDark,
   },
 });

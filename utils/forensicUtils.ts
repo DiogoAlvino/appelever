@@ -33,22 +33,19 @@ export function isMateriaisRespondido(dados: ForensicModel): boolean {
 }
 
 export function isAnalisePreliminarRespondido(dados: ForensicModel): boolean {
-  const { analisePreliminar } = dados;
-
-  const {
-    reconhecimentoArea,
-    condicoesAmbientais,
-    caracteristicasLocal,
-    informacoes,
-    arquivosReconhecimentoArea
-  } = analisePreliminar;
+  const analise = dados.analisePreliminar;
 
   return (
-    reconhecimentoArea.trim() !== '' ||
-    condicoesAmbientais.trim() !== '' ||
-    caracteristicasLocal.trim() !== '' ||
-    arquivosReconhecimentoArea.length > 0 ||
-    informacoes.some(info => info.descricao.trim() !== '' || info.observacao.trim() !== '')
+    analise.reconhecimentoArea?.trim() !== '' ||
+    analise.condicoesAmbientais?.trim() !== '' ||
+    analise.caracteristicasLocal?.trim() !== '' ||
+    analise.arquivosReconhecimentoArea?.length > 0 ||
+    !!analise.localizacao?.address?.trim() ||
+    analise.informacoes?.some(
+      info =>
+        info.descricao?.trim() !== '' ||
+        info.observacao?.trim() !== ''
+    )
   );
 }
 
@@ -113,7 +110,8 @@ export function isExamesRespondido(dados: ForensicModel): boolean {
     documentacao.relatorioRia?.trim() !== '' ||
     documentacao.relatorioRiaArquivos.length > 0 ||
     documentacao.outro?.trim() !== '' ||
-    documentacao.outroArquivos.length > 0;
+    documentacao.outroArquivos.length > 0 || 
+    documentacao.dataHora !== null && documentacao.dataHora !== undefined
 
   const algumDepoimentoPreenchido = exames.depoimentos.some((dep) =>
     dep.tipoEntrevistado?.trim() !== '' ||
@@ -124,7 +122,8 @@ export function isExamesRespondido(dados: ForensicModel): boolean {
     dep.idade?.trim() !== '' ||
     dep.descricaoLesoes?.trim() !== '' ||
     dep.depoimentoRelato?.trim() !== '' ||
-    dep.arquivoLesoes.length > 0
+    dep.arquivoLesoes.length > 0 || 
+    dep.dataHoraEntrevista
   );
 
   const p = exames.perinecroscopia;

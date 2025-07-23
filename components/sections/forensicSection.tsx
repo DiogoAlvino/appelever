@@ -36,6 +36,7 @@ import { getDoc, doc, collection, getDocs, query, where } from 'firebase/firesto
 import { db } from '~/utils/firebase';
 import { useEffect } from 'react';
 
+import DataHoraButton from '../buttons/dataHoraButton';
 
 export default function ForensicSection() {
 
@@ -61,10 +62,8 @@ export default function ForensicSection() {
         informacoes, setInformacoes,
 
         // 3. Análise do local
-        reconhecimentoArea, setReconhecimentoArea,
-        condicoesAmbientais, setCondicoesAmbientais,
-        caracteristicasLocal, setCaracteristicasLocal,
         observacoesDocumentacao, setObservacoesDocumentacao,
+        analisePreliminar, setAnalisePreliminar,
 
         // 4. APR
         riscoAPR, setRiscoAPR,
@@ -83,10 +82,9 @@ export default function ForensicSection() {
         acondicionamento, setAcondicionamento,
 
         // Utilitários
-        adicionarCampo, atualizarCampo, removerCampo,
+        adicionarCampo, atualizarCampo, removerCampo, atualizarObjeto,
 
         equipamentosExame, setEquipamentosExame,
-        arquivosReconhecimentoArea, setArquivosReconhecimentoArea,
     } = useForensic();
 
     useEffect(() => {
@@ -112,11 +110,15 @@ export default function ForensicSection() {
                 const analiseSnap = await getDoc(doc(db, 'forensic_analysis', forensicId));
                 if (analiseSnap.exists()) {
                     const analise = analiseSnap.data();
-                    setReconhecimentoArea(analise.reconhecimentoArea || '');
-                    setCondicoesAmbientais(analise.condicoesAmbientais || '');
-                    setCaracteristicasLocal(analise.caracteristicasLocal || '');
-                    setInformacoes(analise.informacoes || '');
-                    setArquivosReconhecimentoArea(analise.arquivosReconhecimentoArea || []);
+                    setAnalisePreliminar({
+                        reconhecimentoArea: analise.reconhecimentoArea || '',
+                        condicoesAmbientais: analise.condicoesAmbientais || '',
+                        caracteristicasLocal: analise.caracteristicasLocal || '',
+                        informacoes: analise.informacoes || [],
+                        arquivosReconhecimentoArea: analise.arquivosReconhecimentoArea || [],
+                        localizacao: analise.localizacao || undefined,
+                    });
+
                 }
 
                 // 4. Risco APR
@@ -198,13 +200,7 @@ export default function ForensicSection() {
     } as any);
 
     const analiseRespondida = isAnalisePreliminarRespondido({
-        analisePreliminar: {
-            reconhecimentoArea,
-            condicoesAmbientais,
-            caracteristicasLocal,
-            informacoes,
-            arquivosReconhecimentoArea,
-        }
+        analisePreliminar
     } as any);
 
     const riscoRespondido = isRiscoAPRRespondido({
@@ -229,7 +225,6 @@ export default function ForensicSection() {
             vestigiosPerinecroscopia,
         }
     } as any);
-
 
     function cleanObject<T>(obj: T): T {
         if (typeof obj !== 'object' || obj === null) return obj;
@@ -261,12 +256,13 @@ export default function ForensicSection() {
     }
 
 
-
     const handleSave = async () => {
 
         setFeedbackType('loading');
         setFeedbackMessage('Salvando análise forense...');
         setFeedbackVisible(true);
+
+        console.warn("analise preliminar >>>>>>>> ", analisePreliminar)
 
         try {
             const payload: ForensicModel = {
@@ -279,13 +275,7 @@ export default function ForensicSection() {
                     selecionados: materiaisSelecionados,
                     outroDescricao: materialOutroDescricao,
                 },
-                analisePreliminar: {
-                    reconhecimentoArea,
-                    condicoesAmbientais,
-                    caracteristicasLocal,
-                    informacoes,
-                    arquivosReconhecimentoArea,
-                },
+                analisePreliminar,
                 risco: {
                     riscoAPR,
                     peritoAuxiliar,
@@ -386,10 +376,6 @@ export default function ForensicSection() {
         perinecroscopia: 'Perinecroscopia',
     };
 
-
-    function atualizarObjeto(setPerinecroscopia: Dispatch<SetStateAction<Perinecroscopia>>, arg1: string, arg2: string): void {
-        throw new Error('Function not implemented.');
-    }
 
     useEffect(() => {
         async function fetchData() {
@@ -625,24 +611,30 @@ export default function ForensicSection() {
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Reconhecimento da área imediata e mediata</Text>
                         <FileUpload
-                            value={arquivosReconhecimentoArea}
-                            onChange={setArquivosReconhecimentoArea}
+                            value={analisePreliminar.arquivosReconhecimentoArea}
+                            onChange={(arquivos) => setAnalisePreliminar({ ...analisePreliminar, arquivosReconhecimentoArea: arquivos })}
                         />
-                        <VoiceInput value={reconhecimentoArea} onChangeText={setReconhecimentoArea} />
+                       
+                        <VoiceInput value={analisePreliminar.reconhecimentoArea} onChangeText={(text) => atualizarObjeto(setAnalisePreliminar, 'reconhecimentoArea', text)} />
                     </View>
 
                     {/* Condições ambientais */}
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Condições ambientais</Text>
                         <Text>Descreva as condições como: barulho, fumaça, iluminação e etc</Text>
-                        <VoiceInput value={condicoesAmbientais} onChangeText={setCondicoesAmbientais} />
+                        <VoiceInput value={analisePreliminar.condicoesAmbientais} onChangeText={(text) => atualizarObjeto(setAnalisePreliminar, 'condicoesAmbientais', text)}  />
                     </View>
 
                     {/* Características do local */}
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Características do local</Text>
                         <Text>Condições especiais relevantes</Text>
-                        <VoiceInput value={caracteristicasLocal} onChangeText={setCaracteristicasLocal} />
+                        <VoiceInput value={analisePreliminar.caracteristicasLocal} onChangeText={(text) => atualizarObjeto(setAnalisePreliminar, 'caracteristicasLocal', text)} />
+                        
+                        <LocationButton
+                            value={analisePreliminar.localizacao || null}
+                            onChange={(loc) => setAnalisePreliminar((prev) => ({ ...prev, localizacao: loc }))}
+                        />
                     </View>
 
                     {/* Informações do fato */}
@@ -683,7 +675,6 @@ export default function ForensicSection() {
 
                 </View>
             </PrimaryList>
-
 
             <PrimaryList title="4. Análise preliminar de risco (APR)" respondido={!!riscoRespondido}>
                 <View style={styles.campos}>
@@ -902,7 +893,6 @@ export default function ForensicSection() {
                 </View>
             </PrimaryList>
 
-
             <PrimaryList
                 title="5. Exames"
                 respondido={!!examesRespondido}
@@ -1021,6 +1011,10 @@ export default function ForensicSection() {
                                         value={documentacao.outroArquivos}
                                         onChange={(arquivos) => setDocumentacao({ ...documentacao, outroArquivos: arquivos })}
                                     />
+                                    <DataHoraButton
+                                        value={documentacao.dataHora ?? null}
+                                        onChange={(data) => setDocumentacao({ ...documentacao, dataHora: data })}
+                                    />
                                 </>
                             )}
 
@@ -1093,7 +1087,6 @@ export default function ForensicSection() {
                         </View>
                     </View>
 
-
                     <View style={styles.campoInternoSecundario}>
                         <View style={styles.campoInternoSecundario}>
                             <Text style={styles.titulos}>5.2 Equipamentos</Text>
@@ -1111,6 +1104,7 @@ export default function ForensicSection() {
                                                         valor={equipamentosExame.maquinaTracao}
                                                         onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, maquinaTracao: novo }))}
                                                     />
+                                                    <Text>tesre</Text>
                                                 </View>
                                                 <View style={styles.nivel2}>
                                                     <FormDrawer
@@ -1124,7 +1118,6 @@ export default function ForensicSection() {
                                             </View>
                                         </PrimaryList>
                                     </View>
-
 
                                     <View style={styles.sectionSpacing}>
                                         <PrimaryList title="7.2 Cabos e Contrapeso">
@@ -1414,7 +1407,6 @@ export default function ForensicSection() {
 
                             </View>
 
-
                             <View style={styles.campoInternoSecundario}>
                                 <Text style={styles.titulos}>5.4. Perinecroscopia</Text>
 
@@ -1424,7 +1416,6 @@ export default function ForensicSection() {
                                     icon={mostrarPerinecroscopia ? 'minus' : 'plus'}
                                     onPress={() => setMostrarPerinecroscopia(prev => !prev)}
                                 />
-
 
                                 {mostrarPerinecroscopia && (
                                     <>
@@ -1437,10 +1428,9 @@ export default function ForensicSection() {
                                             options={['Masculino', 'Feminino']}
                                         />
 
-
-
                                         <PrimaryInput
                                             label="Cor da pele"
+                                            placeholder="Informe"
                                             value={perinecroscopia.cadaverCorPele}
                                             onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'cadaverCorPele', text)}
                                         />
@@ -1501,6 +1491,10 @@ export default function ForensicSection() {
                                         <VoiceInput
                                             value={perinecroscopia.descricaoLesoesCadaver}
                                             onChangeText={(text) => atualizarObjeto(setPerinecroscopia, 'descricaoLesoesCadaver', text)}
+                                        />
+                                        <DataHoraButton
+                                            value={perinecroscopia.dataHora ?? null}
+                                            onChange={(data) => setPerinecroscopia({ ...perinecroscopia, dataHora: data })}
                                         />
 
                                         {vestigiosPerinecroscopia.map((vestigio, index) => (
@@ -1567,7 +1561,6 @@ export default function ForensicSection() {
                                 )}
 
                             </View>
-
 
                             {origemVestigio && (
                                 <>
@@ -1885,7 +1878,6 @@ export default function ForensicSection() {
                                 </>
                             )}
 
-
                         </View>
                     </View>
                 </View>
@@ -1962,18 +1954,15 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         elevation: 2,
     },
-
     subsecao: {
         gap: 16,
     },
-
     tituloGrupo: {
         fontSize: 16,
         fontWeight: '600',
         color: colors.primaryDark,
         marginTop: 12,
     },
-
     campoObservacao: {
         marginBottom: 20,
         gap: 12,
@@ -1991,5 +1980,4 @@ const styles = StyleSheet.create({
 
     },
     campos: {}
-
 });

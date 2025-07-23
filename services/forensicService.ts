@@ -51,6 +51,7 @@ export async function saveForensicModular(data: ForensicModel) {
       caracteristicasLocal: data.analisePreliminar.caracteristicasLocal,
       informacoes: data.analisePreliminar.informacoes,
       arquivosReconhecimentoArea: data.analisePreliminar.arquivosReconhecimentoArea,
+      localizacao: data.analisePreliminar.localizacao ?? null, // ou undefined, se preferir
     });
 
     // Riscos
@@ -78,6 +79,7 @@ export async function saveForensicModular(data: ForensicModel) {
         sistemaEletrico: data.exames.equipamentosExame.sistemaEletrico,
         sensores: data.exames.equipamentosExame.sensores,
         pocoElevador: data.exames.equipamentosExame.pocoElevador,
+        
       },
 
       depoimentos: data.exames.depoimentos,
