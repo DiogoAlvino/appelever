@@ -238,11 +238,11 @@ export default function ForensicSection() {
             if (Array.isArray(value)) {
                 const cleanedArray = value.map(item => cleanObject(item)).filter(item => item !== undefined);
                 newObj[key] = cleanedArray;
-            } else if (typeof value === 'object') {
+            } else if (typeof value === 'object' && value !== null) {
                 const cleaned = cleanObject(value);
                 if (
                     (Array.isArray(cleaned) && cleaned.length > 0) ||
-                    (typeof cleaned === 'object' && Object.keys(cleaned).length > 0)
+                    (typeof cleaned === 'object' && cleaned !== null && Object.keys(cleaned).length > 0)
                 ) {
                     newObj[key] = cleaned;
                 } else if (!Array.isArray(cleaned)) {
@@ -261,8 +261,6 @@ export default function ForensicSection() {
         setFeedbackType('loading');
         setFeedbackMessage('Salvando análise forense...');
         setFeedbackVisible(true);
-
-        console.warn("analise preliminar >>>>>>>> ", analisePreliminar)
 
         try {
             const payload: ForensicModel = {
@@ -303,11 +301,6 @@ export default function ForensicSection() {
                 peritoResponsavel: undefined
             };
 
-            console.warn("VESITGIOS DOCUMENTACAO >>>>>>> ", payload.exames.vestigiosDocumentacao)
-            console.warn("VESITGIOS EQUIPAMENTOS >>>>>>> ", payload.exames.vestigiosEquipamentos)
-            console.warn("VESITGIOS ENTREVISTAS >>>>>>> ", payload.exames.vestigiosEntrevistas)
-            console.warn("VESITGIOS PERINECROSCOPIA >>>>>>> ", payload.exames.vestigiosPerinecroscopia)
-
             const cleanedPayload = cleanObject(payload);
 
             if (mode === 'edit' && forensicId) {
@@ -333,6 +326,39 @@ export default function ForensicSection() {
         setVestigioSelecionado(vestigio);
         setOrigemVestigio(vestigio.origem);
         setVestigioIndex(index);
+
+        // Preencher dadosPreliminares com segurança
+        if (vestigio.dadosCompletos?.dadosPreliminares) {
+            setDadosPreliminares(prev => {
+                const atual = Array.isArray(prev[vestigio.origem])
+                    ? [...prev[vestigio.origem]]
+                    : [];
+
+                atual[index] = vestigio.dadosCompletos.dadosPreliminares;
+
+                return {
+                    ...prev,
+                    [vestigio.origem]: atual
+                };
+            });
+        }
+
+        // Preencher acondicionamento com segurança
+        if (vestigio.dadosCompletos?.acondicionamento) {
+            setAcondicionamento(prev => {
+                const atual = Array.isArray(prev[vestigio.origem])
+                    ? [...prev[vestigio.origem]]
+                    : [];
+
+                atual[index] = vestigio.dadosCompletos.acondicionamento;
+
+                return {
+                    ...prev,
+                    [vestigio.origem]: atual
+                };
+            });
+        }
+
         setModalVestigioVisible(true);
     }
 
@@ -614,7 +640,7 @@ export default function ForensicSection() {
                             value={analisePreliminar.arquivosReconhecimentoArea}
                             onChange={(arquivos) => setAnalisePreliminar({ ...analisePreliminar, arquivosReconhecimentoArea: arquivos })}
                         />
-                       
+
                         <VoiceInput value={analisePreliminar.reconhecimentoArea} onChangeText={(text) => atualizarObjeto(setAnalisePreliminar, 'reconhecimentoArea', text)} />
                     </View>
 
@@ -622,7 +648,7 @@ export default function ForensicSection() {
                     <View style={styles.campoInterno}>
                         <Text style={styles.titulos}>Condições ambientais</Text>
                         <Text>Descreva as condições como: barulho, fumaça, iluminação e etc</Text>
-                        <VoiceInput value={analisePreliminar.condicoesAmbientais} onChangeText={(text) => atualizarObjeto(setAnalisePreliminar, 'condicoesAmbientais', text)}  />
+                        <VoiceInput value={analisePreliminar.condicoesAmbientais} onChangeText={(text) => atualizarObjeto(setAnalisePreliminar, 'condicoesAmbientais', text)} />
                     </View>
 
                     {/* Características do local */}
@@ -630,7 +656,7 @@ export default function ForensicSection() {
                         <Text style={styles.titulos}>Características do local</Text>
                         <Text>Condições especiais relevantes</Text>
                         <VoiceInput value={analisePreliminar.caracteristicasLocal} onChangeText={(text) => atualizarObjeto(setAnalisePreliminar, 'caracteristicasLocal', text)} />
-                        
+
                         <LocationButton
                             value={analisePreliminar.localizacao || null}
                             onChange={(loc) => setAnalisePreliminar((prev) => ({ ...prev, localizacao: loc }))}
@@ -1260,8 +1286,7 @@ export default function ForensicSection() {
                                     onPress={() => {
                                         const origem = 'equipamentos';
 
-                                        // Gera o novo índice com base na quantidade de vestígios já existentes para essa origem
-                                        const novoIndex = Object.keys(dadosPreliminares[origem] || {}).length;
+                                        const novoIndex = vestigiosEquipamentos.length;
 
                                         setDadosPreliminares(prev => ({
                                             ...prev,
@@ -1300,9 +1325,6 @@ export default function ForensicSection() {
                                         setModalVestigioVisible(true);
                                     }}
                                 />
-
-
-
 
                             </View>
 
@@ -1364,7 +1386,7 @@ export default function ForensicSection() {
                                     onPress={() => {
                                         const origem = 'entrevistas';
 
-                                        const novoIndex = Object.keys(dadosPreliminares[origem] || {}).length;
+                                        const novoIndex = vestigiosEntrevistas.length;
 
                                         setDadosPreliminares(prev => ({
                                             ...prev,
@@ -1516,7 +1538,7 @@ export default function ForensicSection() {
                                             onPress={() => {
                                                 const origem = 'perinecroscopia';
 
-                                                const novoIndex = Object.keys(dadosPreliminares[origem] || {}).length;
+                                                const novoIndex = vestigiosPerinecroscopia.length;
 
                                                 setDadosPreliminares(prev => ({
                                                     ...prev,

@@ -38,14 +38,29 @@ export const useForensic = () => {
         perinecroscopia: [],
     });
 
+    type AcondicionamentoItem = {
+        responsavelColeta: string;
+        matricula: string;
+        tipoAcondicionamento: string;
+        tipoAcondicionamentoOutros: string;
+        numeroLacre: string;
+        arquivos: UploadWithMeta[];
+        localizacao?: {
+            address: string;
+            latitude: number;
+            longitude: number;
+        };
+    };
+
     const [acondicionamento, setAcondicionamento] = useState<{
-        [origem: string]: typeof initialAcondicionamento;
+        [origem: string]: AcondicionamentoItem[];
     }>({
         equipamentos: [],
         documentacao: [],
         entrevistas: [],
         perinecroscopia: [],
     });
+
 
     const initialDadosPreliminares = [{
         numeroVestigio: '',
