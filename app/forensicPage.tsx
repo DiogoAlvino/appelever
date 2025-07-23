@@ -3,8 +3,25 @@ import AlertMessage from "~/components/messages/alertMessage";
 import { colors, fontSize } from '~/theme';
 import ForensicSection from "~/components/sections/forensicSection";
 import TabBar from "~/components/layout/tabBar";
+import { useEffect, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
 
 export default function ForensicPage() {
+  const [showSection, setShowSection] = useState(false);
+  const { mode } = useLocalSearchParams();
+  const timeLoading = 4500; //4,5 segundos
+
+  useEffect(() => {
+    if (mode === 'edit') {
+      const timer = setTimeout(() => {
+        setShowSection(true);
+      }, timeLoading);
+
+      return () => clearTimeout(timer);
+    } else {
+      setShowSection(true);
+    }
+  }, [mode]);
 
   return (
     <>
@@ -20,9 +37,18 @@ export default function ForensicPage() {
           message="Os módulos não possuem uma ordem obrigatória de preenchimento. Preencha conforme a sua necessidade."
         />
 
-        <ForensicSection />
+        <View style={{ display: showSection ? 'flex' : 'none', width: '100%' }}>
+          <ForensicSection />
+        </View>
 
+        {!showSection && (
+          <>
+            <ActivityIndicator size="large" color="#173A64" style={{ marginTop: 20 }} />
+            <Text style={[styles.text, { marginTop: 10 }]}>Carregando análise...</Text>
+          </>
+        )}
       </ScrollView>
+
       <TabBar
         tabs={[
           { icon: 'home', label: 'Inicio', route: '/' },
