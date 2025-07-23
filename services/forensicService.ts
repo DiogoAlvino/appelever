@@ -3,6 +3,10 @@ import {
   addDoc,
   setDoc,
   doc,
+  where,
+  query,
+  getDocs,
+  deleteDoc,
 } from 'firebase/firestore';
 import { db } from '~/utils/firebase';
 import { ForensicModel } from '~/models/forensicModel';
@@ -87,6 +91,36 @@ export async function saveForensicModular(data: ForensicModel) {
     return forensicId;
   } catch (error) {
     console.error('Erro ao salvar perícia modular:', error);
+    throw error;
+  }
+}
+
+export async function deleteForensicById(forensicId: string) {
+  try {
+    const collectionsWithDocId = [
+      'forensic',
+      'forensic_materials',
+      'forensic_analysis',
+      'forensic_risk',
+      'forensic_exams',
+    ];
+
+    await Promise.all(
+      collectionsWithDocId.map((col) => deleteDoc(doc(db, col, forensicId)))
+    );
+
+    const vestigiosRef = collection(db, 'forensic_vestigios');
+    const q = query(vestigiosRef, where('forensicId', '==', forensicId));
+    const snapshot = await getDocs(q);
+
+    const deleteVestigios = snapshot.docs.map((docSnap) =>
+      deleteDoc(docSnap.ref)
+    );
+    await Promise.all(deleteVestigios);
+
+    console.log(`Análise forense ${forensicId} excluída com sucesso.`);
+  } catch (error) {
+    console.error('Erro ao excluir análise forense:', error);
     throw error;
   }
 }

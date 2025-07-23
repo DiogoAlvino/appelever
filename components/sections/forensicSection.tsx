@@ -1,7 +1,7 @@
 import PrimaryList from '~/components/lists/primaryList';
 import PrimaryInput from '../inputs/primaryInput';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { colors, fontSize, border, width, heigth, margin, padding, gap } from '~/theme';
+import { colors, fontSize} from '~/theme';
 import RemoveButton from '../buttons/removeButton';
 import AddButton from '../buttons/addButton';
 import LocationButton from '../buttons/locationButton';
@@ -20,7 +20,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import ResumoVestigio from './vestigioSection';
 import Modal from 'react-native-modal';
 
-import { saveForensicModular } from '~/services/saveForensic';
+import { saveForensicModular } from '~/services/forensicService';
 import MainButton from '../buttons/mainButton';
 import { ForensicModel } from '~/models/forensicModel';
 import FeedbackModal from '../modal/feedbackModal';
@@ -28,7 +28,6 @@ import { getAuth } from 'firebase/auth';
 import { router } from 'expo-router';
 import { DepoimentoItem } from './depoimentoItem';
 import { VestigioResumo } from '~/models/forensicModel';
-import { DadosPreliminares, Acondicionamento } from '~/models/forensicModel';
 
 import { isDadosIniciaisRespondido, isMateriaisRespondido, isAnalisePreliminarRespondido, isRiscoAPRRespondido, isExamesRespondido } from '~/utils/forensicUtils';
 import { Perinecroscopia } from '~/types/forensicTypes';

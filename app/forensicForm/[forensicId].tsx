@@ -11,10 +11,11 @@ import { Image } from 'react-native';
 import { materials } from '~/data/materials';
 import { useNavigation } from '@react-navigation/native';
 
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import HeaderMenu from "~/components/buttons/headerMenu";
 import TabBar from "~/components/layout/tabBar";
 import { auth } from "~/utils/firebase";
+import { deleteForensicById } from '~/services/forensicService';
 
 
 export default function ForensicForm() {
@@ -22,6 +23,39 @@ export default function ForensicForm() {
     const { forensic: data, loading } = useForensicById(String(forensicId));
 
     const navigation = useNavigation();
+
+    const [feedbackVisible, setFeedbackVisible] = useState(false);
+    const [feedbackType, setFeedbackType] = useState<'confirm' | 'loading' | 'success' | 'error'>('confirm');
+    const [feedbackMessage, setFeedbackMessage] = useState('');
+
+    const handleDeleteForensic = () => {
+        setFeedbackType('confirm');
+        setFeedbackMessage('Deseja realmente excluir esta análise forense?');
+        setFeedbackVisible(true);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            setFeedbackType('loading');
+            setFeedbackMessage('Excluindo análise...');
+
+            await deleteForensicById(String(forensicId));
+
+            setFeedbackType('success');
+            setFeedbackMessage('Análise excluída com sucesso!');
+
+            setTimeout(() => {
+                setFeedbackVisible(false);
+                router.replace('/forensics');
+            }, 1000);
+        } catch (error) {
+            console.error(error);
+            setFeedbackType('error');
+            setFeedbackMessage('Erro ao excluir a análise forense.');
+        }
+    };
+
+
 
     useLayoutEffect(() => {
         if (!data) return;
@@ -36,10 +70,7 @@ export default function ForensicForm() {
                         })
                     }
                     onGeneratePDF={() => generateForensicPDF(data)}
-                    onDelete={() => {
-                        // coloque aqui a função que irá excluir a análise forense
-                        // ex: handleDeleteForensic();
-                    }}
+                    onDelete={handleDeleteForensic}
                 />
             ),
         });
@@ -643,6 +674,14 @@ export default function ForensicForm() {
                     { icon: 'plus-circle', label: 'Nova análise', route: '/forensicPage' },
                     { icon: 'list', label: 'Inpeções', route: '/inspections' },
                 ]}
+            />
+
+            <FeedbackModal
+                visible={feedbackVisible}
+                type={feedbackType}
+                message={feedbackMessage}
+                onClose={() => setFeedbackVisible(false)}
+                onConfirm={confirmDelete}
             />
 
 
