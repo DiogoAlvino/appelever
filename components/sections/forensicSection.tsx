@@ -131,12 +131,26 @@ export default function ForensicSection() {
                 if (examesSnap.exists()) {
                     const exames = examesSnap.data();
                     const docu = exames.documentacao || {};
+                    const equip = exames.equipamentosExame || {};
                     setDocumentacao({
                         ...docu,
                         dataHora: docu.dataHora?.toDate?.() || null,
                     });
                     setObservacoesDocumentacao(exames.observacoesDocumentacao || '');
-                    setEquipamentosExame(exames.equipamentosExame || {});
+                    setEquipamentosExame({
+                        ...equip,
+                        dataHoraMaquinaTracao: equip.dataHoraMaquinaTracao?.toDate?.() || null,
+                        dataHoraLimitadorVelocidade: equip.dataHoraLimitadorVelocidade?.toDate?.() || null,
+                        dataHoraCabos: equip.dataHoraCabos?.toDate?.() || null,
+                        dataHoraContrapeso: equip.dataHoraContrapeso?.toDate?.() || null,
+                        dataHoraCabine: equip.dataHoraCabine?.toDate?.() || null,
+                        dataHoraPortas: equip.dataHoraPortas?.toDate?.() || null,
+                        dataHoraFreiosEmergencia: equip.dataHoraFreiosEmergencia?.toDate?.() || null,
+                        dataHoraSistemaControle: equip.dataHoraSistemaControle?.toDate?.() || null,
+                        dataHoraSistemaEletrico: equip.dataHoraSistemaEletrico?.toDate?.() || null,
+                        dataHoraSensores: equip.dataHoraSensores?.toDate?.() || null,
+                        dataHoraPocoElevador: equip.dataHoraPocoElevador?.toDate?.() || null,
+                    });
                     setDepoimentos(exames.depoimentos || []);
                     setPerinecroscopia(exames.perinecroscopia || {});
                 }

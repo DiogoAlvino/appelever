@@ -78,6 +78,17 @@ export async function saveForensicModular(data: ForensicModel) {
         sensores: data.exames.equipamentosExame.sensores,
         pocoElevador: data.exames.equipamentosExame.pocoElevador,
 
+        dataHoraMaquinaTracao: formatarTimestamp(data.exames.equipamentosExame.dataHoraMaquinaTracao),
+        dataHoraLimitador: formatarTimestamp(data.exames.equipamentosExame.dataHoraLimitador),
+        dataHoraCabos: formatarTimestamp(data.exames.equipamentosExame.dataHoraCabos),
+        dataHoraContrapeso: formatarTimestamp(data.exames.equipamentosExame.dataHoraContrapeso),
+        dataHoraCabine: formatarTimestamp(data.exames.equipamentosExame.dataHoraCabine),
+        dataHoraPortas: formatarTimestamp(data.exames.equipamentosExame.dataHoraPortas),
+        dataHoraFreios: formatarTimestamp(data.exames.equipamentosExame.dataHoraFreios),
+        dataHoraSistemaControle: formatarTimestamp(data.exames.equipamentosExame.dataHoraSistemaControle),
+        dataHoraSistemaEletrico: formatarTimestamp(data.exames.equipamentosExame.dataHoraSistemaEletrico),
+        dataHoraSensores: formatarTimestamp(data.exames.equipamentosExame.dataHoraSensores),
+        dataHoraPocoElevador: formatarTimestamp(data.exames.equipamentosExame.dataHoraPocoElevador),
       },
 
       depoimentos: data.exames.depoimentos,
@@ -163,3 +174,17 @@ export async function deleteForensicById(forensicId: string) {
     throw error;
   }
 }
+
+function formatarTimestamp(data: any): Timestamp | null {
+  if (data instanceof Date) {
+    return Timestamp.fromDate(data);
+  } else if (typeof data === 'string') {
+    const parsed = new Date(data);
+    return !isNaN(parsed.getTime()) ? Timestamp.fromDate(parsed) : null;
+  } else if (data && typeof data === 'object' && 'seconds' in data) {
+    const seconds = (data as any).seconds;
+    return Timestamp.fromMillis(seconds * 1000);
+  }
+  return null;
+}
+
