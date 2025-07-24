@@ -1,10 +1,11 @@
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import PrimaryInput from '~/components/inputs/primaryInput';
 import PrimarySelect from '~/components/inputs/primarySelect';
 import CheckBox from '../inputs/CheckBox';
 import AddButton from '~/components/buttons/addButton';
 import RemoveButton from '~/components/buttons/removeButton';
 import { APRModel } from '~/types/forensicTypes';
+import { fontSize, colors } from '~/theme';
 
 interface APRItemProps {
   apr: APRModel;
@@ -19,7 +20,12 @@ export default function APRItem({ apr, index, onUpdate, onRemove }: APRItemProps
     onUpdate(index, nova);
   };
 
-  const atualizarLista = (tipo: 'peritoAuxiliar' | 'tecnico' | 'outros', i: number, campo: 'nome' | 'matricula', valor: string) => {
+  const atualizarLista = (
+    tipo: 'peritoAuxiliar' | 'tecnico' | 'outros',
+    i: number,
+    campo: 'nome' | 'matricula',
+    valor: string
+  ) => {
     const novaLista = [...apr[tipo]];
     novaLista[i][campo] = valor;
     onUpdate(index, { ...apr, [tipo]: novaLista });
@@ -35,30 +41,43 @@ export default function APRItem({ apr, index, onUpdate, onRemove }: APRItemProps
     onUpdate(index, { ...apr, [tipo]: novaLista });
   };
 
-  return (
-    <View style={{ marginBottom: 24 }}>
-      <Text style={{ fontWeight: 'bold' }}>APR {index + 1}</Text>
+  const capitalizar = (texto: string) =>
+    texto === 'peritoAuxiliar'
+      ? 'Perito Auxiliar'
+      : texto === 'tecnico'
+      ? 'Técnico'
+      : 'Outro';
 
-      <PrimaryInput
-        label="Perito responsável"
-        placeholder="Informe"
-        value={apr.riscoAPR.peritoResponsavel}
-        onChangeText={(text) => atualizarCampo('peritoResponsavel', text)}
-      />
-      <PrimaryInput
-        label="Matrícula"
-        placeholder="Informe"
-        value={apr.riscoAPR.peritoMatricula}
-        onChangeText={(text) => atualizarCampo('peritoMatricula', text)}
-      />
+  return (
+    <View style={styles.sectionSpacing}>
+      <Text style={styles.tituloGrupo}>APR {index + 1}</Text>
+
+      <View style={styles.campoInterno}>
+        <Text style={styles.titulos}>Perito responsável</Text>
+
+        <PrimaryInput
+          label="Nome completo"
+          placeholder="Informe"
+          value={apr.riscoAPR.peritoResponsavel}
+          onChangeText={(text) => atualizarCampo('peritoResponsavel', text)}
+        />
+
+        <PrimaryInput
+          label="Matrícula"
+          placeholder="Informe"
+          value={apr.riscoAPR.peritoMatricula}
+          onChangeText={(text) => atualizarCampo('peritoMatricula', text)}
+        />
+      </View>
 
       {(['peritoAuxiliar', 'tecnico', 'outros'] as const).map((tipo) => (
-        <View key={tipo} style={{ marginTop: 12 }}>
-          <Text style={{ fontWeight: 'bold' }}>{tipo}</Text>
+        <View key={tipo} style={styles.campoInterno}>
           {apr[tipo].map((p, i) => (
-            <View key={i} style={{ gap: 8, marginBottom: 12 }}>
+            <View key={i} style={{ gap: 12 }}>
+              <Text style={styles.titulos}>{`${capitalizar(tipo)} ${i + 1}`}</Text>
+
               <PrimaryInput
-                label={`${tipo} ${i + 1}`}
+                label="Nome completo"
                 value={p.nome}
                 placeholder="Nome"
                 onChangeText={(text) => atualizarLista(tipo, i, 'nome', text)}
@@ -69,69 +88,110 @@ export default function APRItem({ apr, index, onUpdate, onRemove }: APRItemProps
                 placeholder="Matrícula"
                 onChangeText={(text) => atualizarLista(tipo, i, 'matricula', text)}
               />
+
               {i > 0 && <RemoveButton label="Remover" onPress={() => removerDaLista(tipo, i)} />}
             </View>
           ))}
-          <AddButton label={`Adicionar ${tipo}`} onPress={() => adicionarNaLista(tipo)} />
+
+          <AddButton label={`Adicionar ${capitalizar(tipo)}`} onPress={() => adicionarNaLista(tipo)} />
         </View>
       ))}
 
-      <PrimarySelect
-        label="Risco de acidente"
-        selected={apr.riscoAPR.riscoAcidente}
-        onSelect={(v) => atualizarCampo('riscoAcidente', v)}
-        placeholder="Selecione"
-        options={['Queda', 'Lesão', 'Choque elétrico']}
-      />
+      <View style={styles.campoInterno}>
+        <Text style={styles.titulos}>Riscos</Text>
 
-      <PrimarySelect
-        label="Risco físico"
-        selected={apr.riscoAPR.riscoFisico}
-        onSelect={(v) => atualizarCampo('riscoFisico', v)}
-        placeholder="Selecione"
-        options={['Temperatura', 'Vibração', 'Irradiação', 'Ruído', 'Pressão', 'Umidade']}
-      />
-
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
-        <CheckBox
-          checked={apr.riscoAPR.riscoQuimico}
-          onPress={() => atualizarCampo('riscoQuimico', !apr.riscoAPR.riscoQuimico)}
+        <PrimarySelect
+          label="Risco de acidente"
+          selected={apr.riscoAPR.riscoAcidente}
+          onSelect={(v) => atualizarCampo('riscoAcidente', v)}
+          placeholder="Selecione"
+          options={['Queda', 'Lesão', 'Choque elétrico']}
         />
-        <Text>Risco Químico</Text>
-      </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
-        <CheckBox
-          checked={apr.riscoAPR.riscoBiologico}
-          onPress={() => atualizarCampo('riscoBiologico', !apr.riscoAPR.riscoBiologico)}
+        <PrimarySelect
+          label="Risco físico"
+          selected={apr.riscoAPR.riscoFisico}
+          onSelect={(v) => atualizarCampo('riscoFisico', v)}
+          placeholder="Selecione"
+          options={['Temperatura', 'Vibração', 'Irradiação', 'Ruído', 'Pressão', 'Umidade']}
         />
-        <Text>Risco Biológico</Text>
+
+        <View style={styles.checkboxRow}>
+          <CheckBox
+            checked={apr.riscoAPR.riscoQuimico}
+            onPress={() => atualizarCampo('riscoQuimico', !apr.riscoAPR.riscoQuimico)}
+          />
+          <Text style={styles.checkboxLabel}>Risco Químico</Text>
+        </View>
+
+        <View style={styles.checkboxRow}>
+          <CheckBox
+            checked={apr.riscoAPR.riscoBiologico}
+            onPress={() => atualizarCampo('riscoBiologico', !apr.riscoAPR.riscoBiologico)}
+          />
+          <Text style={styles.checkboxLabel}>Risco Biológico</Text>
+        </View>
+
+        <PrimarySelect
+          label="Gravidade"
+          selected={apr.riscoAPR.gravidade}
+          onSelect={(v) => atualizarCampo('gravidade', v)}
+          placeholder="Selecione"
+          options={['Baixo', 'Moderado', 'Alto']}
+        />
+
+        <PrimarySelect
+          label="Probabilidade"
+          selected={apr.riscoAPR.probabilidade}
+          onSelect={(v) => atualizarCampo('probabilidade', v)}
+          placeholder="Selecione"
+          options={['Baixa', 'Moderada', 'Alta']}
+        />
+
+        <PrimaryInput
+          label="Medidas Mitigatórias"
+          placeholder="Informe"
+          value={apr.riscoAPR.medidasMitigatoria}
+          onChangeText={(text) => atualizarCampo('medidasMitigatoria', text)}
+        />
       </View>
-
-      <PrimarySelect
-        label="Gravidade"
-        selected={apr.riscoAPR.gravidade}
-        onSelect={(v) => atualizarCampo('gravidade', v)}
-        placeholder="Selecione"
-        options={['Baixo', 'Moderado', 'Alto']}
-      />
-
-      <PrimarySelect
-        label="Probabilidade"
-        selected={apr.riscoAPR.probabilidade}
-        onSelect={(v) => atualizarCampo('probabilidade', v)}
-        placeholder="Selecione"
-        options={['Baixa', 'Moderada', 'Alta']}
-      />
-
-      <PrimaryInput
-        label="Medidas Mitigatórias"
-        placeholder="Informe"
-        value={apr.riscoAPR.medidasMitigatoria}
-        onChangeText={(text) => atualizarCampo('medidasMitigatoria', text)}
-      />
 
       {index > 0 && <RemoveButton label="Remover APR" onPress={() => onRemove(index)} />}
     </View>
   );
 }
+
+// Reaproveitando estilos do seu layout principal
+const styles = StyleSheet.create({
+  campoInterno: {
+    gap: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#D0CECE",
+    borderStyle: "dashed",
+    paddingBottom: 20,
+    marginBottom: 16,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  checkboxLabel: {
+    fontSize: fontSize.placeholder,
+    color: colors.primaryDark,
+  },
+  tituloGrupo: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.primaryDark,
+    marginBottom: 12,
+  },
+  titulos: {
+    color: "#000",
+    fontWeight: '600',
+    fontSize: fontSize.label,
+  },
+  sectionSpacing: {
+    marginBottom: 32,
+  },
+});
