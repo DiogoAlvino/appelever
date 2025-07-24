@@ -123,7 +123,7 @@ export type DadosIniciais = {
   peritoResponsavel: string;
   cargoPerito: string;
   matriculaPerito: string;
-  dataHora: Date;
+  dataHora?: string;
   tipoOcorrencia: string;
   autoridadePolicialNome: string;
   viatura: string;

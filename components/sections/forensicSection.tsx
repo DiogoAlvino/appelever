@@ -80,7 +80,7 @@ export default function ForensicSection() {
         acondicionamento, setAcondicionamento,
 
         // Utilitários
-        adicionarCampo, atualizarCampo, removerCampo, atualizarObjeto,
+        adicionarCampo, atualizarCampo, removerCampo, atualizarObjeto, formatarDataHora,
 
         equipamentosExame, setEquipamentosExame,
         dataHoraVestigio, setDataHoraVestigio,
@@ -251,7 +251,9 @@ export default function ForensicSection() {
 
     const riscoRespondido = aprs.some(apr =>
         isRiscoAPRRespondido({
-            risco: apr
+            risco: {
+                aprs: [apr]
+            }
         } as any)
     );
 
@@ -470,6 +472,8 @@ export default function ForensicSection() {
         fetchData();
     }, [mode, forensicId]);
 
+const [dataHoraTexto, setDataHoraTexto] = useState(dadosIniciais.dataHora || '');
+
 
     return (
         <View style={styles.section}>
@@ -576,12 +580,26 @@ export default function ForensicSection() {
 
                         <PrimaryInput
                             label="Data e hora"
-                            placeholder="Informe"
-                            value={dadosIniciais.dataHora.toLocaleString()}
-                            onChangeText={(text) =>
-                                setDadosIniciais((prev) => ({ ...prev, dataHora: new Date() }))
-                            }
+                            placeholder="dd/mm/aaaa hh:mm"
+                            value={dataHoraTexto}
+                            onChangeText={(text) => {
+                                setDataHoraTexto(text); // permite digitação
+
+                                const [data, hora] = text.split(' ');
+                                const [dia, mes, ano] = data?.split('/') || [];
+                                const [h, m] = hora?.split(':') || [];
+
+                                if (dia && mes && ano && h && m && text.length === 16) {
+                                    const isoString = `${ano}-${mes}-${dia}T${h}:${m}:00`;
+                                    setDadosIniciais((prev) => ({ ...prev, dataHora: isoString }));
+                                } else {
+                                    setDadosIniciais((prev) => ({ ...prev, dataHora: undefined }));
+                                }
+                            }}
+                            mask="99/99/9999 99:99"
                         />
+
+
 
                         <PrimaryInput
                             label="Tipo de ocorrência"

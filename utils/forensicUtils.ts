@@ -50,19 +50,23 @@ export function isAnalisePreliminarRespondido(dados: ForensicModel): boolean {
 }
 
 export function isRiscoAPRRespondido(dados: ForensicModel): boolean {
-  const risco = dados.risco?.riscoAPR;
+  if (!Array.isArray(dados.risco?.aprs)) return false;
 
-  return (
-    risco?.peritoResponsavel?.trim() !== '' ||
-    risco?.peritoMatricula?.trim() !== '' ||
-    risco?.riscoAcidente?.trim() !== '' ||
-    risco?.riscoFisico?.trim() !== '' ||
-    risco?.riscoQuimico === true ||
-    risco?.riscoBiologico === true ||
-    risco?.gravidade?.trim() !== '' ||
-    risco?.probabilidade?.trim() !== '' ||
-    risco?.medidasMitigatoria?.trim() !== ''
-  );
+  return dados.risco.aprs.some((r) => {
+    const risco = r.riscoAPR;
+
+    return (
+      risco?.peritoResponsavel?.trim() !== '' ||
+      risco?.peritoMatricula?.trim() !== '' ||
+      risco?.riscoAcidente?.trim() !== '' ||
+      risco?.riscoFisico?.trim() !== '' ||
+      risco?.riscoQuimico === true ||
+      risco?.riscoBiologico === true ||
+      risco?.gravidade?.trim() !== '' ||
+      risco?.probabilidade?.trim() !== '' ||
+      risco?.medidasMitigatoria?.trim() !== ''
+    );
+  });
 }
 
 export function isExamesRespondido(dados: ForensicModel): boolean {

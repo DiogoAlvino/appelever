@@ -12,19 +12,33 @@ import {
 import { UploadWithMeta } from '~/models/uploadModel';
 
 export const useForensic = () => {
-  const [dadosIniciais, setDadosIniciais] = useState<DadosIniciais>({
-    peritoResponsavel: '',
-    cargoPerito: '',
-    matriculaPerito: '',
-    dataHora: new Date(),
-    tipoOcorrencia: '',
-    autoridadePolicialNome: '',
-    viatura: '',
-    numeroVitimas: '',
-    condicaoVitimas: '',
-    autoridadePolicial: '',
-    localizacao: undefined,
-  });
+
+    function formatarDataHora(dateString: string): string {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '';
+
+        const dia = String(date.getDate()).padStart(2, '0');
+        const mes = String(date.getMonth() + 1).padStart(2, '0');
+        const ano = date.getFullYear();
+        const horas = String(date.getHours()).padStart(2, '0');
+        const minutos = String(date.getMinutes()).padStart(2, '0');
+        return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+    }
+
+
+    const [dadosIniciais, setDadosIniciais] = useState<DadosIniciais>({
+        peritoResponsavel: '',
+        cargoPerito: '',
+        matriculaPerito: '',
+        dataHora: undefined,
+        tipoOcorrencia: '',
+        autoridadePolicialNome: '',
+        viatura: '',
+        numeroVitimas: '',
+        condicaoVitimas: '',
+        autoridadePolicial: '',
+        localizacao: undefined,
+    });
 
   const [aprs, setAprs] = useState<APRModel[]>([
     {
@@ -206,38 +220,40 @@ export const useForensic = () => {
     }));
   };
 
-  const removerCampo = <T,>(setter: React.Dispatch<React.SetStateAction<T[]>>, indexToRemove: number) => {
-    setter(prev => prev.filter((_, index) => index !== indexToRemove));
-  };
 
-  const clearFieldError = (field: string) => {
-    if (errors[field]) {
-      const updatedErrors = { ...errors };
-      delete updatedErrors[field];
-      setErrors(updatedErrors);
-    }
-  };
 
-  return {
-    dadosIniciais, setDadosIniciais,
-    equipePericial, setEquipePericial,
-    analisePreliminar, setAnalisePreliminar,
-    documentacao, setDocumentacao,
-    observacoesDocumentacao, setObservacoesDocumentacao,
-    vestigiosDocumentacao, setVestigiosDocumentacao,
-    equipamentosExame, setEquipamentosExame,
-    vestigiosEquipamentos, setVestigiosEquipamentos,
-    depoimentos, setDepoimentos,
-    vestigiosEntrevistas, setVestigiosEntrevistas,
-    perinecroscopia, setPerinecroscopia,
-    vestigiosPerinecroscopia, setVestigiosPerinecroscopia,
-    materialOutroDescricao, setMaterialOutroDescricao,
-    informacoes, setInformacoes,
-    dadosPreliminares, setDadosPreliminares,
-    acondicionamento, setAcondicionamento,
-    aprs, setAprs,
-    adicionarCampo, atualizarCampo, removerCampo, atualizarObjeto,
-    errors, setErrors, clearFieldError,
-    dataHoraVestigio, setDataHoraVestigio,
-  };
+    const removerCampo = <T,>(setter: React.Dispatch<React.SetStateAction<T[]>>, indexToRemove: number) => {
+        setter(prev => prev.filter((_, index) => index !== indexToRemove));
+    };
+
+    const clearFieldError = (field: string) => {
+        if (errors[field]) {
+            const updatedErrors = { ...errors };
+            delete updatedErrors[field];
+            setErrors(updatedErrors);
+        }
+    };
+
+    return {
+        dadosIniciais, setDadosIniciais,
+        equipePericial, setEquipePericial,
+        analisePreliminar, setAnalisePreliminar,
+        documentacao, setDocumentacao,
+        observacoesDocumentacao, setObservacoesDocumentacao,
+        vestigiosDocumentacao, setVestigiosDocumentacao,
+        equipamentosExame, setEquipamentosExame,
+        vestigiosEquipamentos, setVestigiosEquipamentos,
+        depoimentos, setDepoimentos,
+        vestigiosEntrevistas, setVestigiosEntrevistas,
+        perinecroscopia, setPerinecroscopia,
+        vestigiosPerinecroscopia, setVestigiosPerinecroscopia,
+        materialOutroDescricao, setMaterialOutroDescricao,
+        informacoes, setInformacoes,
+        adicionarCampo, atualizarCampo, removerCampo, atualizarObjeto, formatarDataHora,
+        errors, setErrors, clearFieldError,
+        dadosPreliminares, setDadosPreliminares,
+        acondicionamento, setAcondicionamento,
+        aprs, setAprs,
+        dataHoraVestigio, setDataHoraVestigio,
+    };
 };
