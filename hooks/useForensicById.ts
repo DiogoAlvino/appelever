@@ -72,22 +72,10 @@ export function useForensicById(forensicId: string) {
                         },
                     },
                     risco: {
-                        riscoAPR: riskSnap.data()?.riscoAPR || {
-                            peritoResponsavel: '',
-                            peritoMatricula: '',
-                            riscoAcidente: '',
-                            riscoFisico: '',
-                            riscoQuimico: false,
-                            riscoBiologico: false,
-                            gravidade: '',
-                            probabilidade: '',
-                            medidasMitigatoria: '',
-                        },
-                        peritoAuxiliar: riskSnap.data()?.peritoAuxiliar || [],
-                        tecnico: riskSnap.data()?.tecnico || [],
-                        outros: riskSnap.data()?.outros || [],
+                        aprs: Array.isArray(riskSnap.data()?.aprs)
+                            ? riskSnap.data()?.aprs
+                            : [],
                     },
-
                     exames: {
                         documentacao: examsData.documentacao || {
                             projetos: '',
