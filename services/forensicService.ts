@@ -7,6 +7,7 @@ import {
   query,
   getDocs,
   deleteDoc,
+  Timestamp,
 } from 'firebase/firestore';
 import { db } from '~/utils/firebase';
 import { ForensicModel } from '~/models/forensicModel';
@@ -76,7 +77,7 @@ export async function saveForensicModular(data: ForensicModel) {
         sistemaEletrico: data.exames.equipamentosExame.sistemaEletrico,
         sensores: data.exames.equipamentosExame.sensores,
         pocoElevador: data.exames.equipamentosExame.pocoElevador,
-        
+
       },
 
       depoimentos: data.exames.depoimentos,
@@ -101,12 +102,29 @@ export async function saveForensicModular(data: ForensicModel) {
     }
 
     // Adiciona os vestígios novos
-    const vestigioPromises = vestigiosTotais.map((vestigio) =>
-      addDoc(collection(db, 'forensic_vestigios'), {
+    const vestigioPromises = vestigiosTotais.map((vestigio) => {
+      let dataHoraFormatada: Timestamp | null = null;
+
+      if (vestigio.dataHora instanceof Date) {
+        dataHoraFormatada = Timestamp.fromDate(vestigio.dataHora);
+      } else if (typeof vestigio.dataHora === 'string') {
+        const parsed = new Date(vestigio.dataHora);
+        if (!isNaN(parsed.getTime())) dataHoraFormatada = Timestamp.fromDate(parsed);
+      } else if (
+        vestigio.dataHora &&
+        typeof vestigio.dataHora === 'object' &&
+        'seconds' in (vestigio.dataHora as any)
+      ) {
+        const seconds = (vestigio.dataHora as any).seconds;
+        dataHoraFormatada = Timestamp.fromMillis(seconds * 1000);
+      }
+
+      return addDoc(collection(db, 'forensic_vestigios'), {
         forensicId,
         ...vestigio,
-      })
-    );
+        dataHora: dataHoraFormatada,
+      });
+    });
     await Promise.all(vestigioPromises);
 
     return forensicId;

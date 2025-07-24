@@ -117,7 +117,6 @@ export default function ForensicSection() {
                         arquivosReconhecimentoArea: analise.arquivosReconhecimentoArea || [],
                         localizacao: analise.localizacao || undefined,
                     });
-
                 }
 
                 // 4. Risco APR
@@ -134,7 +133,7 @@ export default function ForensicSection() {
                     const docu = exames.documentacao || {};
                     setDocumentacao({
                         ...docu,
-                        dataHora: docu.dataHora?.toDate?.() || null, // Corrige Timestamp
+                        dataHora: docu.dataHora?.toDate?.() || null,
                     });
                     setObservacoesDocumentacao(exames.observacoesDocumentacao || '');
                     setEquipamentosExame(exames.equipamentosExame || {});
@@ -148,10 +147,46 @@ export default function ForensicSection() {
                 const snapshot = await getDocs(q);
                 const vestigios = snapshot.docs.map(doc => doc.data() as VestigioResumo);
 
-                setVestigiosDocumentacao(vestigios.filter(v => v.origem === 'documentacao'));
-                setVestigiosEquipamentos(vestigios.filter(v => v.origem === 'equipamentos'));
-                setVestigiosEntrevistas(vestigios.filter(v => v.origem === 'entrevistas'));
-                setVestigiosPerinecroscopia(vestigios.filter(v => v.origem === 'perinecroscopia'));
+                const vestigiosDocumentacao = vestigios.filter(v => v.origem === 'documentacao');
+                const vestigiosEquipamentos = vestigios.filter(v => v.origem === 'equipamentos');
+                const vestigiosEntrevistas = vestigios.filter(v => v.origem === 'entrevistas');
+                const vestigiosPerinecroscopia = vestigios.filter(v => v.origem === 'perinecroscopia');
+
+                setVestigiosDocumentacao(vestigiosDocumentacao);
+                setVestigiosEquipamentos(vestigiosEquipamentos);
+                setVestigiosEntrevistas(vestigiosEntrevistas);
+                setVestigiosPerinecroscopia(vestigiosPerinecroscopia);
+
+                const converterData = (valor: any) => {
+                    if (!valor) return undefined;
+                    return typeof valor.toDate === 'function' ? valor.toDate().toISOString() : new Date(valor).toISOString();
+                };
+
+                setDataHoraVestigio({
+                    documentacao: vestigiosDocumentacao.reduce((acc, v, i) => {
+                        const data = converterData(v.dataHora);
+                        if (data) acc[i] = data;
+                        return acc;
+                    }, {} as Record<number, string>),
+
+                    equipamentos: vestigiosEquipamentos.reduce((acc, v, i) => {
+                        const data = converterData(v.dataHora);
+                        if (data) acc[i] = data;
+                        return acc;
+                    }, {} as Record<number, string>),
+
+                    entrevistas: vestigiosEntrevistas.reduce((acc, v, i) => {
+                        const data = converterData(v.dataHora);
+                        if (data) acc[i] = data;
+                        return acc;
+                    }, {} as Record<number, string>),
+
+                    perinecroscopia: vestigiosPerinecroscopia.reduce((acc, v, i) => {
+                        const data = converterData(v.dataHora);
+                        if (data) acc[i] = data;
+                        return acc;
+                    }, {} as Record<number, string>),
+                });
 
             } catch (err) {
                 console.error('Erro ao carregar dados da análise forense:', err);
@@ -162,6 +197,7 @@ export default function ForensicSection() {
             carregarDadosForense(forensicId);
         }
     }, [modoEdicao, forensicId]);
+
 
     const [modalVestigioVisible, setModalVestigioVisible] = useState(false);
     const [origemVestigio, setOrigemVestigio] = useState<'equipamentos' | 'documentacao' | 'entrevistas' | 'perinecroscopia' | null>(null);
