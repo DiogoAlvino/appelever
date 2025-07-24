@@ -925,6 +925,13 @@ export default function ForensicSection() {
                                     setVestigioIndex(novoIndex);
                                     setOrigemVestigio(origem);
                                     setModalVestigioVisible(true);
+                                    setDataHoraVestigio(prev => ({
+                                        ...prev,
+                                        [origem]: {
+                                            ...(prev[origem] || {}),
+                                            [novoIndex]: '',
+                                        }
+                                    }));
                                 }}
                             />
 
@@ -1279,6 +1286,13 @@ export default function ForensicSection() {
                                         setVestigioIndex(novoIndex);
                                         setOrigemVestigio(origem);
                                         setModalVestigioVisible(true);
+                                        setDataHoraVestigio(prev => ({
+                                            ...prev,
+                                            [origem]: {
+                                                ...(prev[origem] || {}),
+                                                [novoIndex]: '',
+                                            }
+                                        }));
                                     }}
                                 />
 
@@ -1379,6 +1393,13 @@ export default function ForensicSection() {
                                         setVestigioIndex(novoIndex);
                                         setOrigemVestigio(origem);
                                         setModalVestigioVisible(true);
+                                        setDataHoraVestigio(prev => ({
+                                            ...prev,
+                                            [origem]: {
+                                                ...(prev[origem] || {}),
+                                                [novoIndex]: '',
+                                            }
+                                        }));
                                     }}
                                 />
 
@@ -1531,6 +1552,13 @@ export default function ForensicSection() {
                                                 setVestigioIndex(novoIndex);
                                                 setOrigemVestigio(origem);
                                                 setModalVestigioVisible(true);
+                                                setDataHoraVestigio(prev => ({
+                                                    ...prev,
+                                                    [origem]: {
+                                                        ...(prev[origem] || {}),
+                                                        [novoIndex]: '',
+                                                    }
+                                                }));
                                             }}
                                         />
 
