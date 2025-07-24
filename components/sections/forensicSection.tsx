@@ -83,6 +83,7 @@ export default function ForensicSection() {
         adicionarCampo, atualizarCampo, removerCampo, atualizarObjeto,
 
         equipamentosExame, setEquipamentosExame,
+        dataHoraVestigio, setDataHoraVestigio,
     } = useForensic();
 
     useEffect(() => {
@@ -199,10 +200,10 @@ export default function ForensicSection() {
     } as any);
 
     const riscoRespondido = aprs.some(apr =>
-  isRiscoAPRRespondido({
-    risco: apr
-  } as any)
-);
+        isRiscoAPRRespondido({
+            risco: apr
+        } as any)
+    );
 
     const examesRespondido = isExamesRespondido({
         exames: {
@@ -267,8 +268,8 @@ export default function ForensicSection() {
                 },
                 analisePreliminar,
                 risco: {
-  aprs
-},
+                    aprs
+                },
                 exames: {
                     documentacao,
                     observacoesDocumentacao,
@@ -356,10 +357,13 @@ export default function ForensicSection() {
 
         const dados = dadosPreliminares[origemVestigio] || [];
         const acond = acondicionamento[origemVestigio] || [];
+        const dataHoraRaw = dataHoraVestigio[origemVestigio]?.[vestigioIndex] || null;
+        const dataHora = typeof dataHoraRaw === 'string' ? new Date(dataHoraRaw) : dataHoraRaw;
 
         const resumoVestigio: VestigioResumo = {
             numeroVestigio: dados[vestigioIndex]?.numeroVestigio || '',
             naturezaVestigio: dados[vestigioIndex]?.naturezaVestigio || '',
+            dataHora,
             origem: origemVestigio,
             dadosCompletos: {
                 dadosPreliminares: dados[vestigioIndex],
@@ -943,17 +947,41 @@ export default function ForensicSection() {
                                                         buttonLabel="Máquina de tração"
                                                         campos={inspecaoCampos.maquinaTracao}
                                                         valor={equipamentosExame.maquinaTracao}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, maquinaTracao: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame(prev => ({
+                                                                ...prev,
+                                                                maquinaTracao: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraMaquinaTracao}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame(prev => ({
+                                                                ...prev,
+                                                                dataHoraMaquinaTracao: novaData,
+                                                            }))
+                                                        }
                                                     />
-                                                    <Text>tesre</Text>
                                                 </View>
+
                                                 <View style={styles.nivel2}>
                                                     <FormDrawer
                                                         title="Limitador de Velocidade"
                                                         buttonLabel="Limitador de Velocidade"
                                                         campos={inspecaoCampos.limitadorVelocidade}
                                                         valor={equipamentosExame.limitadorVelocidade}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, limitadorVelocidade: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame(prev => ({
+                                                                ...prev,
+                                                                limitadorVelocidade: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraLimitador}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame(prev => ({
+                                                                ...prev,
+                                                                dataHoraLimitador: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
                                             </View>
@@ -969,21 +997,47 @@ export default function ForensicSection() {
                                                         buttonLabel="Cabos"
                                                         campos={inspecaoCampos.cabos}
                                                         valor={equipamentosExame.cabos}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, cabos: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                cabos: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraCabos}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                dataHoraCabos: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
+
                                                 <View style={styles.nivel2}>
                                                     <FormDrawer
                                                         title="Contrapeso"
                                                         buttonLabel="Contrapeso"
                                                         campos={inspecaoCampos.contrapeso}
                                                         valor={equipamentosExame.contrapeso}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, contrapeso: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                contrapeso: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraContrapeso}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                dataHoraContrapeso: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
                                             </View>
                                         </PrimaryList>
                                     </View>
+
 
 
                                     <View style={styles.sectionSpacing}>
@@ -995,7 +1049,19 @@ export default function ForensicSection() {
                                                         buttonLabel="Cabine"
                                                         campos={inspecaoCampos.cabine}
                                                         valor={equipamentosExame.cabine}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, cabine: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                cabine: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraCabine}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                dataHoraCabine: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
 
@@ -1005,12 +1071,25 @@ export default function ForensicSection() {
                                                         buttonLabel="Portas"
                                                         campos={inspecaoCampos.portas}
                                                         valor={equipamentosExame.portas}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, portas: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                portas: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraPortas}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                dataHoraPortas: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
                                             </View>
                                         </PrimaryList>
                                     </View>
+
 
 
                                     <View style={styles.sectionSpacing}>
@@ -1022,12 +1101,25 @@ export default function ForensicSection() {
                                                         buttonLabel="Freios de Emergência"
                                                         campos={inspecaoCampos.freiosEmergencia}
                                                         valor={equipamentosExame.freiosEmergencia}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, freiosEmergencia: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                freiosEmergencia: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraFreios}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                dataHoraFreios: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
                                             </View>
                                         </PrimaryList>
                                     </View>
+
 
 
                                     <View style={styles.sectionSpacing}>
@@ -1040,7 +1132,19 @@ export default function ForensicSection() {
                                                         buttonLabel="Sistema de Controle"
                                                         campos={inspecaoCampos.sistemaControle}
                                                         valor={equipamentosExame.sistemaControle}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, sistemaControle: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                sistemaControle: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraSistemaControle}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                dataHoraSistemaControle: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
 
@@ -1050,7 +1154,19 @@ export default function ForensicSection() {
                                                         buttonLabel="Sistema Elétrico"
                                                         campos={inspecaoCampos.sistemaEletrico}
                                                         valor={equipamentosExame.sistemaEletrico}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, sistemaEletrico: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                sistemaEletrico: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraSistemaEletrico}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                dataHoraSistemaEletrico: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
 
@@ -1060,7 +1176,19 @@ export default function ForensicSection() {
                                                         buttonLabel="Sensores"
                                                         campos={inspecaoCampos.sensores}
                                                         valor={equipamentosExame.sensores}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, sensores: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                sensores: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraSensores}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                dataHoraSensores: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
 
@@ -1070,9 +1198,22 @@ export default function ForensicSection() {
                                                         buttonLabel="Poço do Elevador"
                                                         campos={inspecaoCampos.pocoElevador}
                                                         valor={equipamentosExame.pocoElevador}
-                                                        onChange={(novo) => setEquipamentosExame(prev => ({ ...prev, pocoElevador: novo }))}
+                                                        onChange={(novo) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                pocoElevador: novo,
+                                                            }))
+                                                        }
+                                                        dataHora={equipamentosExame.dataHoraPocoElevador}
+                                                        onChangeDataHora={(novaData) =>
+                                                            setEquipamentosExame((prev) => ({
+                                                                ...prev,
+                                                                dataHoraPocoElevador: novaData,
+                                                            }))
+                                                        }
                                                     />
                                                 </View>
+
 
                                             </View>
                                         </PrimaryList>
@@ -1691,6 +1832,24 @@ export default function ForensicSection() {
                                                             });
                                                         }}
                                                     />
+
+                                                    <DataHoraButton
+                                                        value={
+                                                            dataHoraVestigio[origemVestigio]?.[vestigioIndex]
+                                                                ? new Date(dataHoraVestigio[origemVestigio][vestigioIndex])
+                                                                : null
+                                                        }
+                                                        onChange={(novaData) => {
+                                                            setDataHoraVestigio((prev) => {
+                                                                const copia = { ...prev };
+                                                                const grupo = { ...(copia[origemVestigio] || {}) };
+                                                                grupo[vestigioIndex] = novaData?.toISOString() ?? '';
+                                                                copia[origemVestigio] = grupo;
+                                                                return copia;
+                                                            });
+                                                        }}
+                                                    />
+
 
                                                 </View>
                                             </View>

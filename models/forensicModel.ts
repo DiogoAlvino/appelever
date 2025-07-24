@@ -40,6 +40,7 @@ export type VestigioResumo = {
     dadosPreliminares: DadosPreliminares;
     acondicionamento: Acondicionamento;
   };
+  dataHora?: Date | null;
 };
 export type Depoimento = {
   tipoEntrevistado?: string;

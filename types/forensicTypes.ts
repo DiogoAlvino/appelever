@@ -7,12 +7,14 @@ export type CampoChecklist = {
   observacao?: string;
   audio?: string;
   arquivos?: UploadWithMeta[];
+  dataHora?: Date | null;
 };
 
 export type VestigioResumo = {
   numeroVestigio: string;
   naturezaVestigio?: string;
   origem: 'equipamentos' | 'entrevistas' | 'documentacao' | 'perinecroscopia';
+  dataHora?: Date | null;
 };
 
 export type Depoimento = {

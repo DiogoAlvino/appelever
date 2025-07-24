@@ -6,6 +6,7 @@ import VoiceInput from '../inputs/voiceInput';
 import FileUpload from '../inputs/fileUpload';
 import { CampoChecklist } from '~/types/forensicTypes';
 import { UploadWithMeta } from '~/models/uploadModel';
+import DataHoraButton from '../buttons/dataHoraButton';
 
 interface Campo {
   id: number;
@@ -18,9 +19,19 @@ interface Props {
   campos: Campo[];
   valor: CampoChecklist[];
   onChange: (valores: CampoChecklist[]) => void;
+  dataHora?: Date | null;
+  onChangeDataHora?: (data: Date | null) => void;
 }
 
-export default function FormDrawer({ title, buttonLabel, campos, valor, onChange }: Props) {
+export default function FormDrawer({
+  title,
+  buttonLabel,
+  campos,
+  valor,
+  onChange,
+  dataHora,
+  onChangeDataHora,
+}: Props) {
   const [visible, setVisible] = useState(false);
   const [preenchido, setPreenchido] = useState(false);
 
@@ -41,7 +52,7 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
       campo.id === id
         ? {
             ...valor.find(v => v.id === id) || { id, titulo: campo.titulo },
-            observacao: texto
+            observacao: texto,
           }
         : valor.find(v => v.id === campo.id) || { id: campo.id, titulo: campo.titulo }
     );
@@ -53,7 +64,7 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
       campo.id === id
         ? {
             ...valor.find(v => v.id === id) || { id, titulo: campo.titulo },
-            arquivos
+            arquivos,
           }
         : valor.find(v => v.id === campo.id) || { id: campo.id, titulo: campo.titulo }
     );
@@ -102,10 +113,12 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
               return (
                 <View key={campo.id} style={{ marginBottom: 20, gap: 10 }}>
                   <Text style={styles.label}>{campo.titulo}</Text>
+
                   <VoiceInput
                     value={entrada?.observacao || ''}
                     onChangeText={(texto) => atualizarTexto(campo.id, texto)}
                   />
+
                   <FileUpload
                     value={entrada?.arquivos || []}
                     onChange={(arquivos) => atualizarArquivos(campo.id, arquivos)}
@@ -113,6 +126,16 @@ export default function FormDrawer({ title, buttonLabel, campos, valor, onChange
                 </View>
               );
             })}
+
+            {onChangeDataHora && (
+              <View style={{ marginTop: 12 }}>
+                <Text style={styles.label}>Registro de data/hora</Text>
+                <DataHoraButton
+                  value={dataHora ?? null}
+                  onChange={onChangeDataHora}
+                />
+              </View>
+            )}
           </ScrollView>
         </View>
       </Modal>

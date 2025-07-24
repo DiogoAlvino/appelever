@@ -139,18 +139,21 @@ export const useForensic = () => {
     sistemaEletrico: [] as CampoChecklist[],
     sensores: [] as CampoChecklist[],
     pocoElevador: [] as CampoChecklist[],
-    dataHoraCabos: undefined,
-    dataHoraContrapeso: undefined,
-    dataHoraCabine: undefined,
-    dataHoraPortas: undefined,
-    dataHoraFreios: undefined,
-    dataHoraSistemaControle: undefined,
-    dataHoraSistemaEletrico: undefined,
-    dataHoraSensores: undefined,
-    dataHoraPocoElevador: undefined,
+    dataHoraMaquinaTracao: null as Date | null,
+    dataHoraLimitador: null as Date | null,
+    dataHoraCabos: null as Date | null,
+    dataHoraContrapeso: null as Date | null,
+    dataHoraCabine: null as Date | null,
+    dataHoraPortas: null as Date | null,
+    dataHoraFreios: null as Date | null,
+    dataHoraSistemaControle: null as Date | null,
+    dataHoraSistemaEletrico: null as Date | null,
+    dataHoraSensores: null as Date | null,
+    dataHoraPocoElevador: null as Date | null,
   });
 
   const [vestigiosEquipamentos, setVestigiosEquipamentos] = useState<VestigioResumo[]>([]);
+  const [dataHoraVestigio, setDataHoraVestigio] = useState<{ [origem: string]: { [index: number]: string } }>({});
 
   const [depoimentos, setDepoimentos] = useState<Depoimento[]>([{
     tipoEntrevistado: '', genero: '', nomeEntrevistado: '', identificacao: '', endereco: '', idade: '',
@@ -235,5 +238,6 @@ export const useForensic = () => {
     aprs, setAprs,
     adicionarCampo, atualizarCampo, removerCampo, atualizarObjeto,
     errors, setErrors, clearFieldError,
+    dataHoraVestigio, setDataHoraVestigio,
   };
 };
