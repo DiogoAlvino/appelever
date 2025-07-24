@@ -56,10 +56,7 @@ export async function saveForensicModular(data: ForensicModel) {
 
     // Riscos
     await setDoc(doc(db, 'forensic_risk', forensicId), {
-      riscoAPR: data.risco.riscoAPR,
-      peritoAuxiliar: data.risco.peritoAuxiliar,
-      tecnico: data.risco.tecnico,
-      outros: data.risco.outros,
+      aprs: data.risco.aprs || [],
     });
 
     // Exames

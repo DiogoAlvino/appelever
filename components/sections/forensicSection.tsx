@@ -37,6 +37,7 @@ import { db } from '~/utils/firebase';
 import { useEffect } from 'react';
 
 import DataHoraButton from '../buttons/dataHoraButton';
+import APRItem from './AprItem';
 
 export default function ForensicSection() {
 
@@ -54,9 +55,6 @@ export default function ForensicSection() {
         // 1. Dados Iniciais
         dadosIniciais, setDadosIniciais,
         equipePericial, setEquipePericial,
-        peritoAuxiliar, setPeritoAuxiliar,
-        tecnico, setTecnico,
-        outros, setOutros,
 
         // 2. Informações Gerais
         informacoes, setInformacoes,
@@ -66,7 +64,7 @@ export default function ForensicSection() {
         analisePreliminar, setAnalisePreliminar,
 
         // 4. APR
-        riscoAPR, setRiscoAPR,
+        aprs, setAprs,
 
         // 5. Exames e Documentação
         documentacao, setDocumentacao,
@@ -125,10 +123,7 @@ export default function ForensicSection() {
                 const riscoSnap = await getDoc(doc(db, 'forensic_risk', forensicId));
                 if (riscoSnap.exists()) {
                     const risco = riscoSnap.data();
-                    setRiscoAPR(risco.riscoAPR || {});
-                    setPeritoAuxiliar(risco.peritoAuxiliar || []);
-                    setTecnico(risco.tecnico || []);
-                    setOutros(risco.outros || []);
+                    setAprs(risco.aprs || []);
                 }
 
                 // 5. Exames
@@ -203,14 +198,11 @@ export default function ForensicSection() {
         analisePreliminar
     } as any);
 
-    const riscoRespondido = isRiscoAPRRespondido({
-        risco: {
-            riscoAPR,
-            peritoAuxiliar: [],
-            tecnico: [],
-            outros: []
-        }
-    } as any);
+    const riscoRespondido = aprs.some(apr =>
+  isRiscoAPRRespondido({
+    risco: apr
+  } as any)
+);
 
     const examesRespondido = isExamesRespondido({
         exames: {
@@ -275,11 +267,8 @@ export default function ForensicSection() {
                 },
                 analisePreliminar,
                 risco: {
-                    riscoAPR,
-                    peritoAuxiliar,
-                    tecnico,
-                    outros,
-                },
+  aprs
+},
                 exames: {
                     documentacao,
                     observacoesDocumentacao,
@@ -415,9 +404,7 @@ export default function ForensicSection() {
 
                         setDadosIniciais(data.dadosIniciais || {});
                         setEquipePericial(data.equipePericial || []);
-                        setPeritoAuxiliar(data.peritoAuxiliar || []);
-                        setTecnico(data.tecnico || []);
-                        setOutros(data.outros || []);
+                        setAprs(data.risco?.aprs || []);
                         // Adicione os demais estados conforme estrutura
                     }
                 } catch (error) {
@@ -704,218 +691,46 @@ export default function ForensicSection() {
 
             <PrimaryList title="4. Análise preliminar de risco (APR)" respondido={!!riscoRespondido}>
                 <View style={styles.campos}>
-                    <View style={styles.campoInterno}>
-                        <Text style={styles.titulos}>Composição da Equipe</Text>
-                        <PrimaryInput
-                            label="Perito responsável"
-                            placeholder="Informe"
-                            value={riscoAPR.peritoResponsavel}
-                            onChangeText={(text) => setRiscoAPR({ ...riscoAPR, peritoResponsavel: text })}
+                    {aprs.map((apr, index) => (
+                        <APRItem
+                            key={index}
+                            apr={apr}
+                            index={index}
+                            onUpdate={(i, novo) => {
+                                const copia = [...aprs];
+                                copia[i] = novo;
+                                setAprs(copia);
+                            }}
+                            onRemove={(i) => {
+                                setAprs((prev) => prev.filter((_, j) => j !== i));
+                            }}
                         />
-                        <PrimaryInput
-                            label="Matrícula"
-                            placeholder="Informe"
-                            value={riscoAPR.peritoMatricula}
-                            onChangeText={(text) => setRiscoAPR({ ...riscoAPR, peritoMatricula: text })}
-                        />
-                    </View>
+                    ))}
 
-                    <View style={styles.campoInterno}>
-                        <View style={styles.campoInternoSecundario}>
-                            <Text style={styles.titulos}>Peritos auxiliares</Text>
-                            {peritoAuxiliar.map((auxiliar, index) => (
-                                <View key={index} style={{ marginBottom: 12, gap: 12 }}>
-                                    <PrimaryInput
-                                        label={`Perito auxiliar ${index + 1}`}
-                                        placeholder="Informe o nome"
-                                        value={auxiliar.nome}
-                                        onChangeText={(text) => {
-                                            const copia = [...peritoAuxiliar];
-                                            copia[index].nome = text;
-                                            setPeritoAuxiliar(copia);
-                                        }}
-                                    />
-                                    <PrimaryInput
-                                        label="Matrícula"
-                                        placeholder="Informe a matrícula"
-                                        value={auxiliar.matricula}
-                                        onChangeText={(text) => {
-                                            const copia = [...peritoAuxiliar];
-                                            copia[index].matricula = text;
-                                            setPeritoAuxiliar(copia);
-                                        }}
-                                    />
-                                    {index > 0 && (
-                                        <RemoveButton
-                                            label="Remover perito auxiliar"
-                                            onPress={() =>
-                                                setPeritoAuxiliar((prev) => prev.filter((_, i) => i !== index))
-                                            }
-                                        />
-                                    )}
-                                </View>
-                            ))}
-                            <AddButton
-                                label="Adicionar outro perito auxiliar"
-                                onPress={() =>
-                                    setPeritoAuxiliar((prev) => [...prev, { nome: '', matricula: '' }])
-                                }
-                            />
-                        </View>
-                    </View>
-
-                    <View style={styles.campoInterno}>
-                        <Text style={styles.titulos}>Técnicos</Text>
-                        {tecnico.map((item, index) => (
-                            <View key={index} style={{ marginBottom: 12, gap: 12 }}>
-                                <PrimaryInput
-                                    label={`Técnico ${index + 1}`}
-                                    placeholder="Informe o nome"
-                                    value={item.nome}
-                                    onChangeText={(text) => {
-                                        const copia = [...tecnico];
-                                        copia[index].nome = text;
-                                        setTecnico(copia);
-                                    }}
-                                />
-                                <PrimaryInput
-                                    label="Matrícula"
-                                    placeholder="Informe a matrícula"
-                                    value={item.matricula}
-                                    onChangeText={(text) => {
-                                        const copia = [...tecnico];
-                                        copia[index].matricula = text;
-                                        setTecnico(copia);
-                                    }}
-                                />
-                                {index > 0 && (
-                                    <RemoveButton
-                                        label="Remover técnico"
-                                        onPress={() =>
-                                            setTecnico((prev) => prev.filter((_, i) => i !== index))
-                                        }
-                                    />
-                                )}
-                            </View>
-                        ))}
-                        <AddButton
-                            label="Adicionar outro técnico"
-                            onPress={() => setTecnico((prev) => [...prev, { nome: '', matricula: '' }])}
-                        />
-                    </View>
-
-                    <View style={styles.campoInterno}>
-                        <Text style={styles.titulos}>Outros</Text>
-                        {outros.map((item, index) => (
-                            <View key={index} style={{ marginBottom: 12, gap: 12 }}>
-                                <PrimaryInput
-                                    label={`Outros ${index + 1}`}
-                                    placeholder="Informe o nome"
-                                    value={item.nome}
-                                    onChangeText={(text) => {
-                                        const copia = [...outros];
-                                        copia[index].nome = text;
-                                        setOutros(copia);
-                                    }}
-                                />
-                                <PrimaryInput
-                                    label="Matrícula"
-                                    placeholder="Informe a matrícula"
-                                    value={item.matricula}
-                                    onChangeText={(text) => {
-                                        const copia = [...outros];
-                                        copia[index].matricula = text;
-                                        setOutros(copia);
-                                    }}
-                                />
-                                {index > 0 && (
-                                    <RemoveButton
-                                        label="Remover"
-                                        onPress={() =>
-                                            setOutros((prev) => prev.filter((_, i) => i !== index))
-                                        }
-                                    />
-                                )}
-                            </View>
-                        ))}
-                        <AddButton
-                            label="Adicionar outros"
-                            onPress={() => setOutros((prev) => [...prev, { nome: '', matricula: '' }])}
-                        />
-                    </View>
-
-                    <View style={styles.campoInternoSecundario}>
-                        <Text style={styles.titulos}>Detalhamento das Etapas do Trabalho</Text>
-                        <Text>Descrição da atividade</Text>
-
-                        <View style={styles.campoInterno}>
-                            <Text style={styles.titulos}>Identificação do Risco</Text>
-
-                            <PrimarySelect
-                                label="Risco de acidente"
-                                selected={riscoAPR.riscoAcidente}
-                                onSelect={(value) => setRiscoAPR({ ...riscoAPR, riscoAcidente: value })}
-                                placeholder="Selecione"
-                                options={['Queda', 'Lesão', 'Choque elétrico']}
-                            />
-
-                            <PrimarySelect
-                                label="Risco físico"
-                                selected={riscoAPR.riscoFisico}
-                                onSelect={(value) => setRiscoAPR({ ...riscoAPR, riscoFisico: value })}
-                                placeholder="Selecione"
-                                options={['Temperatura', 'Vibração', 'Irradiação', 'Ruído', 'Pressão', 'Umidade']}
-                            />
-
-                            <Text style={styles.textos}>Tipo de Risco</Text>
-
-                            <View style={styles.checkboxRow}>
-                                <CheckBox
-                                    checked={riscoAPR.riscoQuimico}
-                                    onPress={() => setRiscoAPR({ ...riscoAPR, riscoQuimico: !riscoAPR.riscoQuimico })}
-                                />
-                                <Text style={styles.checkboxLabel}>Risco Químico</Text>
-                            </View>
-
-                            <View style={styles.checkboxRow}>
-                                <CheckBox
-                                    checked={riscoAPR.riscoBiologico}
-                                    onPress={() => setRiscoAPR({ ...riscoAPR, riscoBiologico: !riscoAPR.riscoBiologico })}
-                                />
-                                <Text style={styles.checkboxLabel}>Risco Biológico</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.campoInterno}>
-                            <Text style={styles.titulos}>Avaliação do risco</Text>
-
-                            <PrimarySelect
-                                label="Gravidade"
-                                selected={riscoAPR.gravidade}
-                                onSelect={(value) => setRiscoAPR({ ...riscoAPR, gravidade: value })}
-                                placeholder="Selecione"
-                                options={['Baixo', 'Moderado', 'Alto']}
-                            />
-
-                            <PrimarySelect
-                                label="Probabilidade"
-                                selected={riscoAPR.probabilidade}
-                                onSelect={(value) => setRiscoAPR({ ...riscoAPR, probabilidade: value })}
-                                placeholder="Selecione"
-                                options={['Baixa', 'Moderada', 'Alta']}
-                            />
-                        </View>
-
-                        <View style={styles.campoInternoSecundario}>
-                            <Text style={styles.titulos}>Medidas Mitigatórias</Text>
-                            <PrimaryInput
-                                label="(Isolamento do Local, uso de EPI, EPC;)"
-                                placeholder="Informe"
-                                value={riscoAPR.medidasMitigatoria}
-                                onChangeText={(text) => setRiscoAPR({ ...riscoAPR, medidasMitigatoria: text })}
-                            />
-                        </View>
-                    </View>
+                    <AddButton
+                        label="Adicionar nova APR"
+                        onPress={() =>
+                            setAprs((prev) => [
+                                ...prev,
+                                {
+                                    riscoAPR: {
+                                        peritoResponsavel: '',
+                                        peritoMatricula: '',
+                                        riscoAcidente: '',
+                                        riscoFisico: '',
+                                        riscoQuimico: false,
+                                        riscoBiologico: false,
+                                        gravidade: '',
+                                        probabilidade: '',
+                                        medidasMitigatoria: '',
+                                    },
+                                    peritoAuxiliar: [{ nome: '', matricula: '' }],
+                                    tecnico: [{ nome: '', matricula: '' }],
+                                    outros: [{ nome: '', matricula: '' }],
+                                },
+                            ])
+                        }
+                    />
                 </View>
             </PrimaryList>
 

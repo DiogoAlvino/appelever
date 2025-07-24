@@ -164,6 +164,13 @@ export type RiscoAPR = {
   medidasMitigatoria: string;
 };
 
+export type APRModel = {
+  riscoAPR: RiscoAPR;
+  peritoAuxiliar: MembroSimples[];
+  tecnico: MembroSimples[];
+  outros: MembroSimples[];
+};
+
 export type MembroSimples = {
   nome: string;
   matricula: string;
@@ -202,10 +209,7 @@ export type ForensicModel = {
   };
   analisePreliminar: AnalisePreliminar;
   risco: {
-    riscoAPR: RiscoAPR;
-    peritoAuxiliar: MembroSimples[];
-    tecnico: MembroSimples[];
-    outros: MembroSimples[];
+    aprs: APRModel[];
   };
 
   exames: {
