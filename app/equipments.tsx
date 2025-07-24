@@ -86,7 +86,7 @@ export default function Equipments() {
             message="Selecione apenas um equipamento para realizar a inspeção."
           />
           <View style={styles.bar}>
-            <Text>Total: {equipments.length}</Text>
+            <Text>Total: {filteredEquipments.length}</Text>
           </View>
           <EquipmentList
             equipments={filteredEquipments}

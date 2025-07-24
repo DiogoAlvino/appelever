@@ -416,18 +416,21 @@ export async function generateForensicPDF(forensic: ForensicModel) {
       return 'Data inválida';
     }
 
-    function renderEquipamentoPDF(lista: any[], titulo: string) {
+    function renderEquipamentoPDF(lista: any[], titulo: string, dataHora?: Date | string | null) {
       if (!Array.isArray(lista)) return '';
 
       const itensValidos = lista.filter(item =>
         item.observacao?.trim() || (Array.isArray(item.arquivos) && item.arquivos.length > 0)
       );
 
-      if (itensValidos.length === 0) return '';
+      if (itensValidos.length === 0 && !dataHora) return '';
+
+      const dataHoraFormatada = dataHora ? `<p><strong>Data e hora:</strong> ${formatarData(dataHora)}</p>` : '';
 
       return `
     <div style="margin-bottom: 24px;">
       <h3>${titulo}</h3>
+      ${dataHoraFormatada}
       ${itensValidos.map((item, idx) => {
         const imagens = Array.isArray(item.arquivos) && item.arquivos.length > 0
           ? item.arquivos.map((file: { arquivo: any; nome: any; }) => `
@@ -454,6 +457,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
 
 
 
+
     const html = `
       <html>
       <head>
@@ -470,7 +474,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
           .section {
             border: 1px solid #ccc;
             border-radius: 10px;
-            padding: 20px;
+            padding: 10px 20px;
             margin-bottom: 40px;
           }
           .label {
@@ -511,6 +515,16 @@ export async function generateForensicPDF(forensic: ForensicModel) {
             padding: 15px;
             margin-bottom: 10px;
           }
+          hr {
+          display: block;
+          margin-top: 0.5em;
+          margin-bottom: 0.5em;
+          margin-left: auto;
+          margin-right: auto;
+          border-style: insed;
+          border-width: 1px;
+          color: #ccc;
+        }
         </style>
       </head>
       <body>
@@ -518,8 +532,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
 
         <div class="section">
           <h2>Responsável</h2>
-          <p><span class="label">Usuário:</span> ${forensic.usuario}</p>
-          <p><span class="label">Data:</span> ${new Date(forensic.dataCriacao).toLocaleDateString('pt-BR')}</p>
+          <p><span class="label">Usuário:</span>${auth.currentUser?.displayName || 'usuário'}</p>
+          <p><span class="label">Data:</span> ${formatarData(forensic.dataCriacao)}</p>
         </div>
 
         ${mostrarDadosIniciais ? `
@@ -611,7 +625,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
 
       ${mostrarRiscos ? `
   <div class="section">
-    <h2>Riscos</h2>
+    <h2>Análise Preliminar de Risco (APR)</h2>
 
     ${aprs.map((item, index) => {
               const risco = item.riscoAPR || {};
@@ -712,6 +726,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
               <div class="section">
               
               <h2>Documentação</h2>
+              <hr>
               ${doc.projetos ? `<p><span class="label">Projetos:</span> ${doc.projetos}</p>` : ''}
               ${doc.memorialCalculo ? `<p><span class="label">Memorial de Cálculo:</span> ${doc.memorialCalculo}</p>` : ''}
               ${doc.licencaAlvara ? `<p><span class="label">Licença/Alvará:</span> ${doc.licencaAlvara}</p>` : ''}
@@ -735,7 +750,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
             .filter(({ arquivos }) => Array.isArray(arquivos) && arquivos.length > 0)
             .map(({ titulo, arquivos }) => `
           <div>
-            <p class="fonfont-size: 12px; margin-top: 10" >📎 ${titulo}:</p>
+            <p class="label" >Arquivos de ${titulo}:</p>
             <div class="image-grid">
               ${arquivos
                 .filter(f => !!f.arquivo)
@@ -768,8 +783,9 @@ export async function generateForensicPDF(forensic: ForensicModel) {
 
                   return `
       <div class="vestigio-block">
-        <p><strong>Vestígio nº ${idx + 1} (Documentação)</strong></p>
-        <p><strong>Dados preliminares</strong></p>
+        <h3><strong>Vestígio nº ${idx + 1} (Documentação)</strong></h3>
+        ${dp.numeroVestigio && dp.naturezaVestigio && dp.unidadeOrigem && dp.procedimento && dp.descricaoDetalhada &&
+                      (Array.isArray(dp.descricaoDetalhadaArquivos) && vestigio.dataHora && dp.descricaoDetalhadaArquivos.length > 0) ? `<p><strong>Dados preliminares</strong></p>` : ''}
         ${dp.numeroVestigio ? `<p>• Nº ${dp.numeroVestigio}</p>` : ''}
         ${dp.naturezaVestigio ? `<p>• Natureza: ${dp.naturezaVestigio}</p>` : ''}
         ${dp.unidadeOrigem ? `<p>• Unidade de origem: ${dp.unidadeOrigem}</p>` : ''}
@@ -789,7 +805,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
           ` : ''
                     }
 
-        <p><strong>Acondicionamento</strong></p>
+        ${ac.matricula && ac.tipoAcondicionamento && ac.tipoAcondicionamentoOutros &&
+                      (ac.localizacao?.address) && vestigio.dataHora && (Array.isArray(ac.arquivos) && ac.arquivos.length > 0) ? `<p><strong>Acondicionamento</strong></p>` : ''}
         ${ac.responsavelColeta ? `<p>• Responsável: ${ac.responsavelColeta}</p>` : ''}
         ${ac.matricula ? `<p>• Matrícula: ${ac.matricula}</p>` : ''}
         ${ac.tipoAcondicionamento ? `<p>• Tipo: ${ac.tipoAcondicionamento}</p>` : ''}
@@ -817,18 +834,20 @@ export async function generateForensicPDF(forensic: ForensicModel) {
       ${temEquipamentos ? `
   <div class="section">
     <h2>Equipamentos</h2>
+    <hr>
 
-    ${renderEquipamentoPDF(eq.maquinaTracao, "Casa de Máquinas - Máquina de Tração")}
-    ${renderEquipamentoPDF(eq.limitadorVelocidade, "Casa de Máquinas - Limitador de Velocidade")}
-    ${renderEquipamentoPDF(eq.cabos, "Cabos")}
-    ${renderEquipamentoPDF(eq.contrapeso, "Contrapeso")}
-    ${renderEquipamentoPDF(eq.cabine, "Cabine")}
-    ${renderEquipamentoPDF(eq.portas, "Portas")}
-    ${renderEquipamentoPDF(eq.freiosEmergencia, "Freios de Emergência")}
-    ${renderEquipamentoPDF(eq.sistemaControle, "Sistema de Controle")}
-    ${renderEquipamentoPDF(eq.sistemaEletrico, "Sistema Elétrico")}
-    ${renderEquipamentoPDF(eq.sensores, "Sensores")}
-    ${renderEquipamentoPDF(eq.pocoElevador, "Poço do Elevador")}
+    ${renderEquipamentoPDF(eq.maquinaTracao, "Casa de Máquinas - Máquina de Tração", eq.dataHoraMaquinaTracao)}
+${renderEquipamentoPDF(eq.limitadorVelocidade, "Casa de Máquinas - Limitador de Velocidade", eq.dataHoraLimitador)}
+${renderEquipamentoPDF(eq.cabos, "Cabos", eq.dataHoraCabos)}
+${renderEquipamentoPDF(eq.contrapeso, "Contrapeso", eq.dataHoraContrapeso)}
+${renderEquipamentoPDF(eq.cabine, "Cabine", eq.dataHoraCabine)}
+${renderEquipamentoPDF(eq.portas, "Portas", eq.dataHoraPortas)}
+${renderEquipamentoPDF(eq.freiosEmergencia, "Freios de Emergência", eq.dataHoraFreios)}
+${renderEquipamentoPDF(eq.sistemaControle, "Quadro de Comando - Sistema de Controle", eq.dataHoraSistemaControle)}
+${renderEquipamentoPDF(eq.sistemaEletrico, "Quadro de Comando -  Sistema Elétrico", eq.dataHoraSistemaEletrico)}
+${renderEquipamentoPDF(eq.sensores, "Quadro de Comando -  Sensores", eq.dataHoraSensores)}
+${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador", eq.dataHoraPocoElevador)}
+
   </div>
         ${Array.isArray(forensic.exames.vestigiosEquipamentos) && forensic.exames.vestigiosEquipamentos.length > 0 ? `
   ${forensic.exames.vestigiosEquipamentos.map((vestigio, idx) => {
@@ -839,7 +858,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
                   const temDados =
                     dp.numeroVestigio || dp.naturezaVestigio || dp.unidadeOrigem || dp.procedimento || dp.descricaoDetalhada ||
                     ac.responsavelColeta || ac.matricula || ac.tipoAcondicionamento || ac.tipoAcondicionamentoOutros ||
-                    (ac.localizacao?.address) ||
+                    (ac.localizacao?.address) || vestigio.dataHora ||
                     (Array.isArray(dp.descricaoDetalhadaArquivos) && dp.descricaoDetalhadaArquivos.length > 0) ||
                     (Array.isArray(ac.arquivos) && ac.arquivos.length > 0);
 
@@ -847,9 +866,11 @@ export async function generateForensicPDF(forensic: ForensicModel) {
 
                   return `
       <div class="vestigio-block">
-        <p><strong>Vestígio nº ${idx + 1} (Equipamento)</strong></p>
-        <p><strong>Dados preliminares</strong></p>
+        <h3><strong>Vestígio nº ${idx + 1} (Equipamentos)</strong></h3>
+        ${dp.numeroVestigio && dp.naturezaVestigio && dp.unidadeOrigem && dp.procedimento && dp.descricaoDetalhada &&
+                      (Array.isArray(dp.descricaoDetalhadaArquivos) && vestigio.dataHora && dp.descricaoDetalhadaArquivos.length > 0) ? `<p><strong>Dados preliminares</strong></p>` : ''}
         ${dp.numeroVestigio ? `<p>• Nº ${dp.numeroVestigio}</p>` : ''}
+        ${vestigio.dataHora ? `<p>• Registro: ${formatarData(vestigio.dataHora)}</p>` : ''}
         ${dp.naturezaVestigio ? `<p>• Natureza: ${dp.naturezaVestigio}</p>` : ''}
         ${dp.unidadeOrigem ? `<p>• Unidade de origem: ${dp.unidadeOrigem}</p>` : ''}
         ${dp.procedimento ? `<p>• Procedimento: ${dp.procedimento}</p>` : ''}
@@ -868,7 +889,9 @@ export async function generateForensicPDF(forensic: ForensicModel) {
           ` : ''
                     }
 
-        <p><strong>Acondicionamento</strong></p>
+    
+        ${ac.matricula && ac.tipoAcondicionamento && ac.tipoAcondicionamentoOutros &&
+                      (ac.localizacao?.address) && vestigio.dataHora && (Array.isArray(ac.arquivos) && ac.arquivos.length > 0) ? `<p><strong>Acondicionamento</strong></p>` : ''}
         ${ac.responsavelColeta ? `<p>• Responsável: ${ac.responsavelColeta}</p>` : ''}
         ${ac.matricula ? `<p>• Matrícula: ${ac.matricula}</p>` : ''}
         ${ac.tipoAcondicionamento ? `<p>• Tipo: ${ac.tipoAcondicionamento}</p>` : ''}
@@ -900,7 +923,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
     ${temDepoimentos ? `
 
       <div class="section">
-      <h3>Entrevistas</h3>
+      <h2>Entrevistas</h2>
+      <hr>
       ${depoimentos.map((dep, index) => `
         <div style="margin-bottom: 16px;">
           <h4>Entrevista ${index + 1}</h4>
@@ -946,8 +970,9 @@ export async function generateForensicPDF(forensic: ForensicModel) {
 
                   return `
       <div class="vestigio-block">
-        <p><strong>Vestígio nº ${idx + 1} (Entrevista) </strong></p>
-        <p><strong>Dados preliminares</strong></p>
+        <h3><strong>Vestígio nº ${idx + 1} (Entrevistas) </strong></h3>
+        ${dp.numeroVestigio && dp.naturezaVestigio && dp.unidadeOrigem && dp.procedimento && dp.descricaoDetalhada &&
+                      (Array.isArray(dp.descricaoDetalhadaArquivos) && vestigio.dataHora && dp.descricaoDetalhadaArquivos.length > 0) ? `<p><strong>Dados preliminares</strong></p>` : ''}
         ${dp.numeroVestigio ? `<p>• Nº ${dp.numeroVestigio}</p>` : ''}
         ${dp.naturezaVestigio ? `<p>• Natureza: ${dp.naturezaVestigio}</p>` : ''}
         ${dp.unidadeOrigem ? `<p>• Unidade de origem: ${dp.unidadeOrigem}</p>` : ''}
@@ -967,7 +992,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
           ` : ''
                     }
 
-        <p><strong>Acondicionamento</strong></p>
+        ${ac.matricula && ac.tipoAcondicionamento && ac.tipoAcondicionamentoOutros &&
+                      (ac.localizacao?.address) && vestigio.dataHora && (Array.isArray(ac.arquivos) && ac.arquivos.length > 0) ? `<p><strong>Acondicionamento</strong></p>` : ''}
         ${ac.responsavelColeta ? `<p>• Responsável: ${ac.responsavelColeta}</p>` : ''}
         ${ac.matricula ? `<p>• Matrícula: ${ac.matricula}</p>` : ''}
         ${ac.tipoAcondicionamento ? `<p>• Tipo: ${ac.tipoAcondicionamento}</p>` : ''}
@@ -999,7 +1025,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
       ${temPerinecroscopia ? `
 
         <div class="section">
-        <h3>Perinecroscopia</h3>
+        <h2>Perinecroscopia</h2>
+        <hr>
       
         ${forensic.exames.perinecroscopia?.dataHora ? `<p><span class="label">Data do registro:</span> ${formatarData(forensic.exames.perinecroscopia.dataHora)}</p>` : ''}
         ${forensic.exames.perinecroscopia?.cadaverSexo ? `<p><span class="label">Sexo:</span> ${forensic.exames.perinecroscopia.cadaverSexo}</p>` : ''}
@@ -1011,7 +1038,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
       
         ${forensic.exames.perinecroscopia?.analiseDisposicaoCadaver || (forensic.exames.perinecroscopia?.arquivosDisposicaoCadaver?.length > 0) ? `
           <h4>Análise da disposição do cadáver</h4>
-          ${forensic.exames.perinecroscopia.analiseDisposicaoCadaver ? `<p>${forensic.exames.perinecroscopia.analiseDisposicaoCadaver}</p>` : ''}
+          ${forensic.exames.perinecroscopia.analiseDisposicaoCadaver ? `<p>Análise: ${forensic.exames.perinecroscopia.analiseDisposicaoCadaver}</p>` : ''}
           ${forensic.exames.perinecroscopia.arquivosDisposicaoCadaver?.length > 0 ? `
             <div class="image-grid">
               ${forensic.exames.perinecroscopia.arquivosDisposicaoCadaver.map(file => `
@@ -1026,7 +1053,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
       
         ${forensic.exames.perinecroscopia?.sinaisTanatologicos || (forensic.exames.perinecroscopia?.arquivosTanatologicos?.length > 0) ? `
           <h4>Sinais tanatológicos</h4>
-          ${forensic.exames.perinecroscopia.sinaisTanatologicos ? `<p>${forensic.exames.perinecroscopia.sinaisTanatologicos}</p>` : ''}
+          ${forensic.exames.perinecroscopia.sinaisTanatologicos ? `<p>Sinais: ${forensic.exames.perinecroscopia.sinaisTanatologicos}</p>` : ''}
           ${forensic.exames.perinecroscopia.arquivosTanatologicos?.length > 0 ? `
             <div class="image-grid">
               ${forensic.exames.perinecroscopia.arquivosTanatologicos.map(file => `
@@ -1041,7 +1068,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
       
         ${forensic.exames.perinecroscopia?.descricaoLesoesCadaver || (forensic.exames.perinecroscopia?.arquivosLesoesCadaver?.length > 0) ? `
           <h4>Descrição das lesões</h4>
-          ${forensic.exames.perinecroscopia.descricaoLesoesCadaver ? `<p>${forensic.exames.perinecroscopia.descricaoLesoesCadaver}</p>` : ''}
+          ${forensic.exames.perinecroscopia.descricaoLesoesCadaver ? `<p>Descrição: ${forensic.exames.perinecroscopia.descricaoLesoesCadaver}</p>` : ''}
           ${forensic.exames.perinecroscopia.arquivosLesoesCadaver?.length > 0 ? `
             <div class="image-grid">
               ${forensic.exames.perinecroscopia.arquivosLesoesCadaver.map(file => `
@@ -1066,7 +1093,7 @@ ${Array.isArray(forensic.exames.vestigiosPerinecroscopia) && forensic.exames.ves
                   const temDados =
                     dp.numeroVestigio || dp.naturezaVestigio || dp.unidadeOrigem || dp.procedimento || dp.descricaoDetalhada ||
                     ac.responsavelColeta || ac.matricula || ac.tipoAcondicionamento || ac.tipoAcondicionamentoOutros ||
-                    (ac.localizacao?.address) ||
+                    (ac.localizacao?.address) || vestigio.dataHora ||
                     (Array.isArray(dp.descricaoDetalhadaArquivos) && dp.descricaoDetalhadaArquivos.length > 0) ||
                     (Array.isArray(ac.arquivos) && ac.arquivos.length > 0);
 
@@ -1074,9 +1101,11 @@ ${Array.isArray(forensic.exames.vestigiosPerinecroscopia) && forensic.exames.ves
 
                   return `
       <div class="vestigio-block">
-        <p><strong>Vestígio nº ${idx + 1} (Perinecroscopia) </strong></p>
-        <p><strong>Dados preliminares</strong></p>
+        <h3><strong>Vestígio nº ${idx + 1} (Perinecroscopia) </strong></h3>
+        ${dp.numeroVestigio && dp.naturezaVestigio && dp.unidadeOrigem && dp.procedimento && dp.descricaoDetalhada &&
+                      (Array.isArray(dp.descricaoDetalhadaArquivos) && vestigio.dataHora && dp.descricaoDetalhadaArquivos.length > 0) ? `<p><strong>Dados preliminares</strong></p>` : ''}
         ${dp.numeroVestigio ? `<p>• Nº ${dp.numeroVestigio}</p>` : ''}
+        ${vestigio.dataHora ? `<p>• Registro: ${formatarData(vestigio.dataHora)}</p>` : ''}
         ${dp.naturezaVestigio ? `<p>• Natureza: ${dp.naturezaVestigio}</p>` : ''}
         ${dp.unidadeOrigem ? `<p>• Unidade de origem: ${dp.unidadeOrigem}</p>` : ''}
         ${dp.procedimento ? `<p>• Procedimento: ${dp.procedimento}</p>` : ''}
@@ -1095,7 +1124,8 @@ ${Array.isArray(forensic.exames.vestigiosPerinecroscopia) && forensic.exames.ves
           ` : ''
                     }
 
-        <p><strong>Acondicionamento</strong></p>
+        ${ac.matricula && ac.tipoAcondicionamento && ac.tipoAcondicionamentoOutros &&
+                      (ac.localizacao?.address) && vestigio.dataHora && (Array.isArray(ac.arquivos) && ac.arquivos.length > 0) ? `<p><strong>Acondicionamento</strong></p>` : ''}
         ${ac.responsavelColeta ? `<p>• Responsável: ${ac.responsavelColeta}</p>` : ''}
         ${ac.matricula ? `<p>• Matrícula: ${ac.matricula}</p>` : ''}
         ${ac.tipoAcondicionamento ? `<p>• Tipo: ${ac.tipoAcondicionamento}</p>` : ''}

@@ -5,6 +5,7 @@ import SecondarySection from '../sections/secondarySection';
 import { colors } from '~/theme/colors';
 import { router } from 'expo-router';
 import { InspectionModel } from '~/models/inspectionModel';
+import { auth } from '~/utils/firebase';
 
 interface InspectionListProps {
   inspections: InspectionModel[];
@@ -26,46 +27,51 @@ export default function InspectionList({ inspections, selectedId, onSelect, onEr
   };
 
   function formatarData(rawData: any): string {
-    if (rawData instanceof Date) {
-      return rawData.toLocaleDateString('pt-BR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
-    } else if (typeof rawData === 'object' && rawData?.seconds) {
-      const parsed = new Date(rawData.seconds * 1000);
-      return parsed.toLocaleDateString('pt-BR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
-    } else if (typeof rawData === 'string' || typeof rawData === 'number') {
-      const parsed = new Date(rawData);
-      if (!isNaN(parsed.getTime())) {
-        return parsed.toLocaleDateString('pt-BR', {
+      if (rawData instanceof Date) {
+        return rawData.toLocaleString('pt-BR', {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
         });
+      } else if (typeof rawData === 'object' && rawData?.seconds) {
+        const parsed = new Date(rawData.seconds * 1000);
+        return parsed.toLocaleString('pt-BR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } else if (typeof rawData === 'string' || typeof rawData === 'number') {
+        const parsed = new Date(rawData);
+        if (!isNaN(parsed.getTime())) {
+          return parsed.toLocaleString('pt-BR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        }
       }
+      return 'Data inválida';
     }
-
-    return 'Data inválida';
-  }
 
 
   return (
     <View style={styles.wrapper}>
-      {inspections.slice().reverse().map((inspection, index) => (
+      {inspections.map((inspection, index) => (
         <SecondarySection
           key={inspection.id}
           icon={null}
-          title={`Inspeção #${index + 1}`}
+          title={`Inspeção nº ${index + 1}`}
           onPress={() => handleViewInspection(inspection.id)}
           backgroundColor={colors.primaryLight}
         >
           <Text style={{ color: colors.primaryDark }}>
-            Responsável: {inspection.usuario}
+            Responsável: {auth.currentUser?.displayName || 'usuário'}
           </Text>
           <Text style={{ color: colors.primaryDark }}>
             Data: {formatarData(inspection.dataCriacao)}

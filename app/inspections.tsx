@@ -62,7 +62,7 @@ useEffect(() => {
       <ScrollView contentContainerStyle={styles.container}>
         <SearchInput onSearch={setSearchText} />
         <View style={styles.bar}>
-          <Text>Total: {inspections.length}</Text>
+          <Text>Total: {filteredInspections.length}</Text>
         </View>
 
         <InspectionList

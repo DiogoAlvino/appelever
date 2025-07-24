@@ -711,12 +711,16 @@ export default function ForensicForm() {
                                                                         {!!vestigio.naturezaVestigio && (
                                                                             <Text style={styles.itemText}>• Natureza: {vestigio.naturezaVestigio}</Text>
                                                                         )}
+                                                                        {!!vestigio.dataHora && (
+                                                                            <Text style={styles.itemText}>• Data e hora: {formatarData(vestigio.dataHora)}</Text>
+                                                                        )}
                                                                     </View>
 
                                                                     {/* Detalhes visíveis somente se expandido */}
                                                                     {expandido && (
                                                                         <>
                                                                             <View style={styles.campoInterno}>
+                                    
                                                                                 {!!vestigio.dadosCompletos?.dadosPreliminares?.unidadeOrigem && (
                                                                                     <Text style={styles.itemText}>• Unidade de origem: {vestigio.dadosCompletos.dadosPreliminares.unidadeOrigem}</Text>
                                                                                 )}
@@ -883,7 +887,10 @@ export default function ForensicForm() {
 
                                     const mostrarEquipamentos =
                                         temDadosMaquinaTracao || temDadosLimitadorVelocidade || temDadosCabos || temDadosContrapeso || temDadosCabine || temDadosPortas ||
-                                        temDadosFreios || temDadosControle || temDadoEletrico || temDadoSensores || temDadoPoco;
+                                        temDadosFreios || temDadosControle || temDadoEletrico || temDadoSensores || temDadoPoco || !!data.exames.equipamentosExame.dataHoraMaquinaTracao || 
+                                        !!data.exames.equipamentosExame.dataHoraLimitador || !! !!data.exames.equipamentosExame.dataHoraCabine || !!data.exames.equipamentosExame.dataHoraCabos 
+                                        || !!data.exames.equipamentosExame.dataHoraPocoElevador || !!data.exames.equipamentosExame.dataHoraFreios || !!data.exames.equipamentosExame.dataHoraSistemaControle || !!data.exames.equipamentosExame.dataHoraSistemaEletrico
+                                        || !!data.exames.equipamentosExame.dataHoraSensores || !!data.exames.equipamentosExame.dataHoraPocoElevador;
 
                                     if (!mostrarEquipamentos) return null;
 
@@ -900,10 +907,16 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Casa de Maquinas - Maquina tração</Text>
+                                                    {data.exames.equipamentosExame.dataHoraMaquinaTracao && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraMaquinaTracao)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.maquinaTracao.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
                                                             const temArquivos = Array.isArray(item.arquivos) && item.arquivos.length > 0;
+                                                            
 
                                                             if (!temObservacao && !temArquivos) return null; // ignora item sem observação e sem arquivos
 
@@ -939,6 +952,9 @@ export default function ForensicForm() {
                                                                 </View>
                                                             );
                                                         })}
+                                                       
+
+                                                        
                                                     </View>
                                                 )}
 
@@ -949,6 +965,11 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Casa de Maquinas - Limitador de Velocidade</Text>
+                                                         {data.exames.equipamentosExame.dataHoraLimitador && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraLimitador)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.limitadorVelocidade.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -999,6 +1020,11 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Cabos e contrapeso - Cabos</Text>
+                                                         {data.exames.equipamentosExame.dataHoraCabos && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraCabos)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.cabos.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -1049,6 +1075,11 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Cabos e contrapeso - Contrapeso</Text>
+                                                         {data.exames.equipamentosExame.dataHoraContrapeso && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraContrapeso)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.contrapeso.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -1099,6 +1130,11 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Cabine e portas - Cabine</Text>
+                                                         {data.exames.equipamentosExame.dataHoraMaquinaTracao && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraCabine)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.cabine.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -1149,6 +1185,11 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Cabine e portas - Portas</Text>
+                                                         {data.exames.equipamentosExame.dataHoraPortas && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraPortas)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.portas.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -1199,6 +1240,11 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Freios de Emergência</Text>
+                                                         {data.exames.equipamentosExame.dataHoraFreios && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraFreios)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.freiosEmergencia.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -1248,6 +1294,11 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Quadro de comando - Sistema de controle</Text>
+                                                         {data.exames.equipamentosExame.dataHoraSistemaControle && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraSistemaControle)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.sistemaControle.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -1297,6 +1348,11 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Quadro de comando - Sistema elétrico</Text>
+                                                         {data.exames.equipamentosExame.dataHoraSistemaEletrico && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraSistemaEletrico)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.sistemaEletrico.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -1347,6 +1403,11 @@ export default function ForensicForm() {
                                                 ) && (
                                                     <View style={styles.campoInterno}>
                                                         <Text style={styles.itemTitle}>Quandro de comando - Sensores</Text>
+                                                         {data.exames.equipamentosExame.dataHoraSensores && (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraSensores)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.sensores.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -1396,7 +1457,12 @@ export default function ForensicForm() {
                                                     (Array.isArray(item.arquivos) && item.arquivos.length > 0)
                                                 ) && (
                                                     <View style={styles.campoInterno}>
-                                                        <Text style={styles.itemTitle}>Quadro de comando - Elevador</Text>
+                                                        <Text style={styles.itemTitle}>Quadro de comando - Poço elevador</Text>
+                                                         {data.exames.equipamentosExame.dataHoraPocoElevador&& (
+                                                        <Text style={styles.itemText}>
+                                                            Data e hora: {formatarData(data.exames.equipamentosExame.dataHoraPocoElevador)}
+                                                        </Text>
+                                                    )}
                                                         {data.exames.equipamentosExame.pocoElevador.map((item, index) => {
                                                             const temTitulo = item.titulo?.trim();
                                                             const temObservacao = item.observacao?.trim();
@@ -1465,6 +1531,9 @@ export default function ForensicForm() {
                                                                         )}
                                                                         {!!vestigio.naturezaVestigio && (
                                                                             <Text style={styles.itemText}>• Natureza: {vestigio.naturezaVestigio}</Text>
+                                                                        )}
+                                                                        {!!vestigio.dataHora && (
+                                                                            <Text style={styles.itemText}>• Data e hora: {formatarData(vestigio.dataHora)}</Text>
                                                                         )}
                                                                     </View>
 
@@ -1725,6 +1794,9 @@ export default function ForensicForm() {
                                                                                 {!!vestigio.naturezaVestigio && (
                                                                                     <Text style={styles.itemText}>• Natureza: {vestigio.naturezaVestigio}</Text>
                                                                                 )}
+                                                                                {!!vestigio.dataHora && (
+                                                                            <Text style={styles.itemText}>• Data e hora: {formatarData(vestigio.dataHora)}</Text>
+                                                                        )}
                                                                             </View>
 
                                                                             {/* Detalhes visíveis somente se expandido */}
@@ -2070,6 +2142,9 @@ export default function ForensicForm() {
                                                                         )}
                                                                         {!!vestigio.naturezaVestigio && (
                                                                             <Text style={styles.itemText}>• Natureza: {vestigio.naturezaVestigio}</Text>
+                                                                        )}
+                                                                        {!!vestigio.dataHora && (
+                                                                            <Text style={styles.itemText}>• Data e hora: {formatarData(vestigio.dataHora)}</Text>
                                                                         )}
                                                                     </View>
 

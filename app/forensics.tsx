@@ -60,7 +60,7 @@ export default function Forensics() {
       <ScrollView contentContainerStyle={styles.container}>
         <SearchInput onSearch={setSearchText} />
         <View style={styles.bar}>
-          <Text>Total: {forensics.length}</Text>
+          <Text>Total: {filteredForensics.length}</Text>
         </View>
 
         <ForensicList
