@@ -308,6 +308,12 @@ export default function ForensicSection() {
         setFeedbackVisible(true);
 
         try {
+
+            const analisePreliminarCompleta = {
+                ...analisePreliminar,
+                informacoes,
+            };
+
             const payload: ForensicModel = {
                 id: '',
                 dataCriacao: new Date(),
@@ -318,7 +324,7 @@ export default function ForensicSection() {
                     selecionados: materiaisSelecionados,
                     outroDescricao: materialOutroDescricao,
                 },
-                analisePreliminar,
+                analisePreliminar: analisePreliminarCompleta,
                 risco: {
                     aprs
                 },

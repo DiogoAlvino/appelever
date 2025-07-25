@@ -337,8 +337,9 @@ export async function generateForensicPDF(forensic: ForensicModel) {
       if (risco.peritoMatricula?.trim()) temMatricula = true;
       if (risco.riscoAcidente?.trim()) temRiscoAcidente = true;
       if (risco.riscoFisico?.trim()) temRiscoFisico = true;
-      if (typeof risco.riscoBiologico === 'boolean') temRiscoBiologico = true;
-      if (typeof risco.riscoQuimico === 'boolean') temRiscoQuimico = true;
+       if (risco.riscoBiologico === true) temRiscoBiologico = true;
+      if (risco.riscoQuimico === true) temRiscoQuimico = true;
+
       if (risco.gravidade?.trim()) temGravidade = true;
       if (risco.probabilidade?.trim()) temProbabilidade = true;
       if (risco.medidasMitigatoria?.trim()) temMedidas = true;
@@ -425,7 +426,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
 
       if (itensValidos.length === 0 && !dataHora) return '';
 
-      const dataHoraFormatada = dataHora ? `<p><strong>Data e hora:</strong> ${formatarData(dataHora)}</p>` : '';
+      const dataHoraFormatada = dataHora ? `<p><strong>Data do registro:</strong> ${formatarData(dataHora)}</p>` : '';
 
       return `
     <div style="margin-bottom: 24px;">
@@ -454,6 +455,11 @@ export async function generateForensicPDF(forensic: ForensicModel) {
     }
 
 
+    function gerarNumeroFicha(): string {
+  const numero = Math.floor(1000 + Math.random() * 9000); 
+  return numero.toString();
+}
+  const numeroFicha = gerarNumeroFicha();
 
 
 
@@ -468,14 +474,18 @@ export async function generateForensicPDF(forensic: ForensicModel) {
             margin: 40px;
             color: #333;
           }
-          h1, h2 {
+          h2 {
             text-align: center;
+          }
+          h1 {
+            text-align: center;
+            margin-bottom: 35px;
           }
           .section {
             border: 1px solid #ccc;
             border-radius: 10px;
             padding: 10px 20px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
           }
           .label {
             font-weight: bold;
@@ -515,35 +525,28 @@ export async function generateForensicPDF(forensic: ForensicModel) {
             padding: 15px;
             margin-bottom: 10px;
           }
-          hr {
-          display: block;
-          margin-top: 0.5em;
-          margin-bottom: 0.5em;
-          margin-left: auto;
-          margin-right: auto;
-          border-style: insed;
-          border-width: 1px;
-          color: #ccc;
-        }
+          .subsection {
+          margin-bottom: 15px;
+          }
         </style>
       </head>
       <body>
-        <h1>Ficha de Análise Forense</h1>
+        <h1>Ficha de Análise Forense nº ${numeroFicha}</h1>
 
         <div class="section">
           <h2>Responsável</h2>
           <p><span class="label">Usuário:</span>${auth.currentUser?.displayName || 'usuário'}</p>
-          <p><span class="label">Data:</span> ${formatarData(forensic.dataCriacao)}</p>
+          <p><span class="label">Data do registro:</span> ${formatarData(forensic.dataCriacao)}</p>
         </div>
 
         ${mostrarDadosIniciais ? `
   <div class="section">
     <h2>Dados Iniciais</h2>
 
-    ${temPeritoResponsavel ? `<p><span class="label">Responsável:</span> ${di.peritoResponsavel}</p>` : ''}
-    ${temCargoPerito ? `<p><span class="label">Cargo do Perito:</span> ${di.cargoPerito}</p>` : ''}
+    ${temDataHora ? `<p><span class="label">Data do registro:</span> ${formatarData(di.dataHora)}</p>` : ''}
+    ${temPeritoResponsavel ? `<p><span class="label">Períto Responsável:</span> ${di.peritoResponsavel}</p>` : ''}
+    ${temCargoPerito ? `<p><span class="label">Cargo do Períto:</span> ${di.cargoPerito}</p>` : ''}
     ${temMatriculaPerito ? `<p><span class="label">Matrícula:</span> ${di.matriculaPerito}</p>` : ''}
-    ${temDataHora ? `<p><span class="label">Data/Hora:</span> ${formatarData(di.dataHora)}</p>` : ''}
     ${temTipoOcorrencia ? `<p><span class="label">Tipo de Ocorrência:</span> ${di.tipoOcorrencia}</p>` : ''}
     ${temAutoridadeNome ? `<p><span class="label">Nome da Autoridade:</span> ${di.autoridadePolicialNome}</p>` : ''}
     ${temAutoridade ? `<p><span class="label">Autoridade Policial:</span> ${di.autoridadePolicial}</p>` : ''}
@@ -551,7 +554,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
     ${temNumeroVitimas ? `<p><span class="label">Número de Vítimas:</span> ${di.numeroVitimas}</p>` : ''}
     ${temCondicaoVitimas ? `<p><span class="label">Condição das Vítimas:</span> ${di.condicaoVitimas}</p>` : ''}
 
-    ${temEndereco ? `<p><span class="label">Endereço:</span> ${di.localizacao?.address}</p>` : ''}
+    ${temEndereco ? `<p><span class="label">Endereço:</span> ${di.localizacao?.address}, lat.: ${di.localizacao?.latitude}, lgt.:${di.localizacao?.longitude} </p>` : ''}
    
 
     ${temEquipe ? `
@@ -580,6 +583,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
       <p><span class="label">Reconhecimento da área:</span> ${ap.reconhecimentoArea}</p>
     ` : ''}
     ${temImagens ? `
+      <p class="label">Arquivos: </p>
       <div class="image-grid">
         ${imagensAnalise.map(f => `
           <div class="image-item">
@@ -599,12 +603,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
     ` : ''}
 
     ${temLocalizacao && ap.localizacao ? `
-  <p><span class="label">Endereço:</span> ${ap.localizacao.address}</p>
-  <p><span class="label">Latitude:</span> ${ap.localizacao.latitude}</p>
-  <p><span class="label">Longitude:</span> ${ap.localizacao.longitude}</p>
+  <p><span class="label">Endereço:</span> ${ap.localizacao.address}, lat.: ${ap.localizacao.latitude}, lgt.: ${ap.localizacao.longitude}</p>
 ` : ''}
-
-
 
     ${temInformacoes ? `
       <h3>Informações do Fato</h3>
@@ -635,8 +635,9 @@ export async function generateForensicPDF(forensic: ForensicModel) {
               const temMatricula = risco.peritoMatricula?.trim();
               const temRiscoAcidente = risco.riscoAcidente?.trim();
               const temRiscoFisico = risco.riscoFisico?.trim();
-              const temRiscoBiologico = typeof risco.riscoBiologico === 'boolean';
-              const temRiscoQuimico = typeof risco.riscoQuimico === 'boolean';
+              const temRiscoBiologico = risco.riscoBiologico === true;
+              const temRiscoQuimico = risco.riscoQuimico === true;
+
               const temGravidade = risco.gravidade?.trim();
               const temProbabilidade = risco.probabilidade?.trim();
               const temMedidas = risco.medidasMitigatoria?.trim();
@@ -659,7 +660,7 @@ export async function generateForensicPDF(forensic: ForensicModel) {
 
               return `
         <div class="subsection">
-          <h3>Risco ${index + 1}</h3>
+          <h3>APR nº ${index + 1}</h3>
 
           ${temResponsavel ? `<p><span class="label">Perito responsável:</span> ${risco.peritoResponsavel}</p>` : ''}
           ${temMatricula ? `<p><span class="label">Matrícula:</span> ${risco.peritoMatricula}</p>` : ''}
@@ -687,8 +688,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
 
           ${temRiscoAcidente ? `<p><span class="label">Risco Acidente:</span> ${risco.riscoAcidente}</p>` : ''}
           ${temRiscoFisico ? `<p><span class="label">Risco Físico:</span> ${risco.riscoFisico}</p>` : ''}
-          ${temRiscoBiologico ? `<p><span class="label">Risco Biológico:</span> ${risco.riscoBiologico ? 'Sim' : 'Não'}</p>` : ''}
-          ${temRiscoQuimico ? `<p><span class="label">Risco Químico:</span> ${risco.riscoQuimico ? 'Sim' : 'Não'}</p>` : ''}
+          ${temRiscoBiologico ? `<p><span class="label">Risco Biológico:</span> Sim</p>` : ''}
+          ${temRiscoQuimico ? `<p><span class="label">Risco Químico:</span> Sim</p>` : ''}
           ${temGravidade ? `<p><span class="label">Gravidade:</span> ${risco.gravidade}</p>` : ''}
           ${temProbabilidade ? `<p><span class="label">Probabilidade:</span> ${risco.probabilidade}</p>` : ''}
           ${temMedidas ? `<p><span class="label">Medidas Mitigatórias:</span> ${risco.medidasMitigatoria}</p>` : ''}
@@ -726,7 +727,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
               <div class="section">
               
               <h2>Documentação</h2>
-              <hr>
+
+              ${doc.dataHora ? `<p><span class="label">Data do registro:</span> ${formatarData(doc.dataHora)}</p>` : ''}
               ${doc.projetos ? `<p><span class="label">Projetos:</span> ${doc.projetos}</p>` : ''}
               ${doc.memorialCalculo ? `<p><span class="label">Memorial de Cálculo:</span> ${doc.memorialCalculo}</p>` : ''}
               ${doc.licencaAlvara ? `<p><span class="label">Licença/Alvará:</span> ${doc.licencaAlvara}</p>` : ''}
@@ -793,8 +795,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
         ${dp.descricaoDetalhada ? `<p>• Descrição: ${dp.descricaoDetalhada}</p>` : ''}
 
         ${Array.isArray(dp.descricaoDetalhadaArquivos) && dp.descricaoDetalhadaArquivos.length > 0 ? `
-            <p class="label">📎 Arquivos da descrição:</p>
-            <div class="image-grid">
+          <p class="label">Arquivos da descrição:</p>
+          <div class="image-grid">
               ${dp.descricaoDetalhadaArquivos.map(file => `
                 <div class="image-item">
                   <img src="${file.arquivo}" />
@@ -814,8 +816,8 @@ export async function generateForensicPDF(forensic: ForensicModel) {
         ${ac.localizacao?.address ? `<p>• Localização: ${ac.localizacao.address}, Lat: ${ac.localizacao.latitude}, Lng: ${ac.localizacao.longitude}</p>` : ''}
 
         ${Array.isArray(ac.arquivos) && ac.arquivos.length > 0 ? `
-            <p class="label">📎 Arquivos do acondicionamento:</p>
-            <div class="image-grid">
+          <p class="label">Arquivos do acondicionamento:</p>
+          <div class="image-grid">
               ${ac.arquivos.map(file => `
                 <div class="image-item">
                   <img src="${file.arquivo}" />
@@ -834,7 +836,6 @@ export async function generateForensicPDF(forensic: ForensicModel) {
       ${temEquipamentos ? `
   <div class="section">
     <h2>Equipamentos</h2>
-    <hr>
 
     ${renderEquipamentoPDF(eq.maquinaTracao, "Casa de Máquinas - Máquina de Tração", eq.dataHoraMaquinaTracao)}
 ${renderEquipamentoPDF(eq.limitadorVelocidade, "Casa de Máquinas - Limitador de Velocidade", eq.dataHoraLimitador)}
@@ -877,8 +878,8 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
         ${dp.descricaoDetalhada ? `<p>• Descrição: ${dp.descricaoDetalhada}</p>` : ''}
 
         ${Array.isArray(dp.descricaoDetalhadaArquivos) && dp.descricaoDetalhadaArquivos.length > 0 ? `
-            <p class="label">📎 Arquivos da descrição:</p>
-            <div class="image-grid">
+          <p class="label">Arquivos da descrição:</p>
+          <div class="image-grid">
               ${dp.descricaoDetalhadaArquivos.map(file => `
                 <div class="image-item">
                   <img src="${file.arquivo}" />
@@ -899,8 +900,8 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
         ${ac.localizacao?.address ? `<p>• Localização: ${ac.localizacao.address}, Lat: ${ac.localizacao.latitude}, Lng: ${ac.localizacao.longitude}</p>` : ''}
 
         ${Array.isArray(ac.arquivos) && ac.arquivos.length > 0 ? `
-            <p class="label">📎 Arquivos do acondicionamento:</p>
-            <div class="image-grid">
+          <p class="label">Arquivos do acondicionamento:</p>
+          <div class="image-grid">
               ${ac.arquivos.map(file => `
                 <div class="image-item">
                   <img src="${file.arquivo}" />
@@ -924,10 +925,10 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
 
       <div class="section">
       <h2>Entrevistas</h2>
-      <hr>
+  
       ${depoimentos.map((dep, index) => `
         <div style="margin-bottom: 16px;">
-          <h4>Entrevista ${index + 1}</h4>
+          <h3>Entrevista nº ${index + 1}</h3>
           ${dep.dataHoraEntrevista ? `<p><span class="label">Data do registro:</span> ${formatarData(dep.dataHoraEntrevista)}</p>` : ''}
           ${dep.tipoEntrevistado ? `<p><span class="label">Categoria:</span> ${dep.tipoEntrevistado}</p>` : ''}
           ${dep.nomeEntrevistado ? `<p><span class="label">Nome:</span> ${dep.nomeEntrevistado}</p>` : ''}
@@ -939,6 +940,7 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
           ${dep.descricaoLesoes ? `<p><span class="label">Descrição das lesões:</span> ${dep.descricaoLesoes}</p>` : ''}
     
           ${Array.isArray(dep.arquivoLesoes) && dep.arquivoLesoes.length > 0 ? `
+            <p class="label">Arquivos:</p>
             <div class="image-grid">
               ${dep.arquivoLesoes.map(file => `
                 <div class="image-item">
@@ -980,8 +982,8 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
         ${dp.descricaoDetalhada ? `<p>• Descrição: ${dp.descricaoDetalhada}</p>` : ''}
 
         ${Array.isArray(dp.descricaoDetalhadaArquivos) && dp.descricaoDetalhadaArquivos.length > 0 ? `
-            <p class="label">📎 Arquivos da descrição:</p>
-            <div class="image-grid">
+          <p class="label">Arquivos da descrição:</p>
+          <div class="image-grid">
               ${dp.descricaoDetalhadaArquivos.map(file => `
                 <div class="image-item">
                   <img src="${file.arquivo}" />
@@ -1001,8 +1003,8 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
         ${ac.localizacao?.address ? `<p>• Localização: ${ac.localizacao.address}, Lat: ${ac.localizacao.latitude}, Lng: ${ac.localizacao.longitude}</p>` : ''}
 
         ${Array.isArray(ac.arquivos) && ac.arquivos.length > 0 ? `
-            <p class="label">📎 Arquivos do acondicionamento:</p>
-            <div class="image-grid">
+          <p class="label">Arquivos do acondicionamento:</p>
+          <div class="image-grid">
               ${ac.arquivos.map(file => `
                 <div class="image-item">
                   <img src="${file.arquivo}" />
@@ -1017,16 +1019,13 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
                 }).join('')}
 ` : ''}
 
-
 ` : ''}
-
 
 
       ${temPerinecroscopia ? `
 
         <div class="section">
         <h2>Perinecroscopia</h2>
-        <hr>
       
         ${forensic.exames.perinecroscopia?.dataHora ? `<p><span class="label">Data do registro:</span> ${formatarData(forensic.exames.perinecroscopia.dataHora)}</p>` : ''}
         ${forensic.exames.perinecroscopia?.cadaverSexo ? `<p><span class="label">Sexo:</span> ${forensic.exames.perinecroscopia.cadaverSexo}</p>` : ''}
@@ -1040,6 +1039,7 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
           <h4>Análise da disposição do cadáver</h4>
           ${forensic.exames.perinecroscopia.analiseDisposicaoCadaver ? `<p>Análise: ${forensic.exames.perinecroscopia.analiseDisposicaoCadaver}</p>` : ''}
           ${forensic.exames.perinecroscopia.arquivosDisposicaoCadaver?.length > 0 ? `
+            <p class="label">Arquivos: </p>
             <div class="image-grid">
               ${forensic.exames.perinecroscopia.arquivosDisposicaoCadaver.map(file => `
                 <div class="image-item">
@@ -1055,6 +1055,7 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
           <h4>Sinais tanatológicos</h4>
           ${forensic.exames.perinecroscopia.sinaisTanatologicos ? `<p>Sinais: ${forensic.exames.perinecroscopia.sinaisTanatologicos}</p>` : ''}
           ${forensic.exames.perinecroscopia.arquivosTanatologicos?.length > 0 ? `
+            <p class="label">Arquivos: </p>
             <div class="image-grid">
               ${forensic.exames.perinecroscopia.arquivosTanatologicos.map(file => `
                 <div class="image-item">
@@ -1070,6 +1071,7 @@ ${renderEquipamentoPDF(eq.pocoElevador, "Quadro de Comando -  Poço do Elevador"
           <h4>Descrição das lesões</h4>
           ${forensic.exames.perinecroscopia.descricaoLesoesCadaver ? `<p>Descrição: ${forensic.exames.perinecroscopia.descricaoLesoesCadaver}</p>` : ''}
           ${forensic.exames.perinecroscopia.arquivosLesoesCadaver?.length > 0 ? `
+            <p class="label">Arquivos: </p>
             <div class="image-grid">
               ${forensic.exames.perinecroscopia.arquivosLesoesCadaver.map(file => `
                 <div class="image-item">
@@ -1112,8 +1114,8 @@ ${Array.isArray(forensic.exames.vestigiosPerinecroscopia) && forensic.exames.ves
         ${dp.descricaoDetalhada ? `<p>• Descrição: ${dp.descricaoDetalhada}</p>` : ''}
 
         ${Array.isArray(dp.descricaoDetalhadaArquivos) && dp.descricaoDetalhadaArquivos.length > 0 ? `
-            <p class="label">📎 Arquivos da descrição:</p>
-            <div class="image-grid">
+          <p class="label">Arquivos da descrição:</p>
+          <div class="image-grid">
               ${dp.descricaoDetalhadaArquivos.map(file => `
                 <div class="image-item">
                   <img src="${file.arquivo}" />
@@ -1133,8 +1135,8 @@ ${Array.isArray(forensic.exames.vestigiosPerinecroscopia) && forensic.exames.ves
         ${ac.localizacao?.address ? `<p>• Localização: ${ac.localizacao.address}, Lat: ${ac.localizacao.latitude}, Lng: ${ac.localizacao.longitude}</p>` : ''}
 
         ${Array.isArray(ac.arquivos) && ac.arquivos.length > 0 ? `
-            <p class="label">📎 Arquivos do acondicionamento:</p>
-            <div class="image-grid">
+          <p class="label">Arquivos do acondicionamento:</p>
+          <div class="image-grid">
               ${ac.arquivos.map(file => `
                 <div class="image-item">
                   <img src="${file.arquivo}" />
@@ -1149,11 +1151,6 @@ ${Array.isArray(forensic.exames.vestigiosPerinecroscopia) && forensic.exames.ves
                 }).join('')}
 ` : ''}
 
-      
-  
-
-
-  
           </div>
           
           ` : ''}
