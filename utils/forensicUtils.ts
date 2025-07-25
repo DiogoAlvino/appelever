@@ -115,7 +115,8 @@ export function isExamesRespondido(dados: ForensicModel): boolean {
     documentacao.relatorioRiaArquivos.length > 0 ||
     documentacao.outro?.trim() !== '' ||
     documentacao.outroArquivos.length > 0 || 
-    documentacao.dataHora !== null && documentacao.dataHora !== undefined
+    documentacao.croquiBase64?.trim() !== '' ||
+    (documentacao.dataHora !== null && documentacao.dataHora !== undefined)
 
   const algumDepoimentoPreenchido = exames.depoimentos.some((dep) =>
     dep.tipoEntrevistado?.trim() !== '' ||

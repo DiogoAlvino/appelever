@@ -823,7 +823,15 @@ export default function ForensicSection() {
                         <View style={styles.campoInternoSecundario}>
                             <Text style={styles.titulos}>5.1 Documentação</Text>
                             <Text style={styles.textos}>Croqui (detalhamento ou observações)</Text>
-                            <CroquiModal />
+                            <CroquiModal
+                                value={documentacao.croquiBase64 || null}
+                                onChange={(base64) =>
+                                    setDocumentacao((prev) => ({
+                                        ...prev,
+                                        croquiBase64: base64 ?? '', // ← Aqui: se null, salva como string vazia
+                                    }))
+                                }
+                            />
 
                             <Text style={styles.textos}>Registros</Text>
                             <AddButton

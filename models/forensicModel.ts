@@ -75,6 +75,7 @@ export type Documentacao = {
   outro: string;
   outroArquivos: UploadWithMeta[];
   dataHora?: Date | null;
+  croquiBase64: string | null;
 };
 
 export type EquipamentosExame = {

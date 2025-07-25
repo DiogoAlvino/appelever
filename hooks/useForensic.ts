@@ -136,6 +136,7 @@ export const useForensic = () => {
     registroManutencao: '', registroManutencaoArquivos: [],
     relatorioRia: '', relatorioRiaArquivos: [],
     outro: '', outroArquivos: [],
+    croquiBase64: '',
   });
 
   const [observacoesDocumentacao, setObservacoesDocumentacao] = useState('');

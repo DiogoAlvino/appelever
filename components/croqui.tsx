@@ -3,25 +3,29 @@ import SignatureScreen from 'react-native-signature-canvas';
 import { useRef, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 
-export default function CroquiModal() {
+interface CroquiModalProps {
+  value: string | null;
+  onChange: (base64: string | null) => void;
+}
+
+export default function CroquiModal({ value, onChange }: CroquiModalProps) {
   const [visible, setVisible] = useState(false);
-  const [signatureImage, setSignatureImage] = useState<string | null>(null);
   const signRef = useRef<any>(null);
 
   function handleOK(signature: string) {
-    setSignatureImage(signature);
+    onChange(signature);
     setVisible(false);
   }
 
   function handleDelete() {
-    setSignatureImage(null);
+    onChange(null);
   }
 
   return (
     <View style={styles.container}>
-      <Button title="Abrir Croqui" onPress={() => setVisible(true)} color="#173A64"/>
+      <Button title="Abrir Croqui" onPress={() => setVisible(true)} color="#173A64" />
 
-      {signatureImage && (
+      {value && (
         <View style={styles.previewContainer}>
           <View style={styles.previewHeader}>
             <Text style={styles.label}>Croqui salvo:</Text>
@@ -30,7 +34,7 @@ export default function CroquiModal() {
             </TouchableOpacity>
           </View>
           <Image
-            source={{ uri: signatureImage }}
+            source={{ uri: value }}
             style={styles.image}
             resizeMode="contain"
           />
