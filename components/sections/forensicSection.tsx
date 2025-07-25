@@ -117,6 +117,8 @@ export default function ForensicSection() {
                         arquivosReconhecimentoArea: analise.arquivosReconhecimentoArea || [],
                         localizacao: analise.localizacao || undefined,
                     });
+
+                    setInformacoes(analise.informacoes || []);
                 }
 
                 // 4. Risco APR
@@ -478,7 +480,7 @@ export default function ForensicSection() {
         fetchData();
     }, [mode, forensicId]);
 
-const [dataHoraTexto, setDataHoraTexto] = useState(dadosIniciais.dataHora || '');
+    const [dataHoraTexto, setDataHoraTexto] = useState(dadosIniciais.dataHora || '');
 
 
     return (
