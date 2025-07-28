@@ -729,6 +729,14 @@ export async function generateForensicPDF(forensic: ForensicModel) {
               <h2>Documentação</h2>
 
               ${doc.dataHora ? `<p><span class="label">Data do registro:</span> ${formatarData(doc.dataHora)}</p>` : ''}
+              ${doc.croquiBase64 ? `
+              <div>
+                <p class="label">Croqui:</p>
+                <div class="image-item">
+                  <img src="${doc.croquiBase64}" />
+                </div>
+              </div>
+            ` : ''}
               ${doc.projetos ? `<p><span class="label">Projetos:</span> ${doc.projetos}</p>` : ''}
               ${doc.memorialCalculo ? `<p><span class="label">Memorial de Cálculo:</span> ${doc.memorialCalculo}</p>` : ''}
               ${doc.licencaAlvara ? `<p><span class="label">Licença/Alvará:</span> ${doc.licencaAlvara}</p>` : ''}

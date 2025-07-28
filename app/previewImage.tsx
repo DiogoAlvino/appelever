@@ -16,7 +16,7 @@ export default function PreviewImageScreen() {
   return (
     <View style={styles.container}>
       <Image
-        source={{ uri }}
+        source={{ uri: String(uri) }}
         style={styles.image}
         resizeMode="contain"
       />
