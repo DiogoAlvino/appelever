@@ -1,18 +1,24 @@
 import { useState } from 'react';
-import { Text, TextInput, View, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  TextInput,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  TextInputProps,
+} from 'react-native';
 import { MaskedTextInput } from 'react-native-mask-text';
 import { Feather } from '@expo/vector-icons';
-import { colors, fontSize, border, heigth, margin, padding } from '~/theme';
+import { colors, fontSize, border, margin, padding } from '~/theme';
 
-interface PrimaryInputProps {
+interface PrimaryInputProps extends Omit<TextInputProps, 'value' | 'onChangeText'> {
   label: string;
   value: string;
   onChangeText: (text: string) => void;
-  placeholder?: string;
   error?: boolean;
   errorMessage?: string;
   mask?: string;
-  type?: 'text' | 'password'; // 👈 nova prop
+  type?: 'text' | 'password';
 }
 
 export default function PrimaryInput({
@@ -24,6 +30,7 @@ export default function PrimaryInput({
   errorMessage,
   mask,
   type = 'text',
+  ...rest // ← adiciona suporte a props nativas
 }: PrimaryInputProps) {
   const InputComponent = mask ? MaskedTextInput : TextInput;
   const [showPassword, setShowPassword] = useState(false);
@@ -37,12 +44,17 @@ export default function PrimaryInput({
 
       <View style={styles.inputWrapper}>
         <InputComponent
+          {...rest}
           mask={mask}
-          style={[styles.input, error && styles.errorInput, isPassword && { paddingRight: 40 }]}
+          style={[
+            styles.input,
+            error && styles.errorInput,
+            isPassword && { paddingRight: 40 },
+          ]}
           placeholder={placeholder}
           value={value}
           onChangeText={onChangeText}
-          keyboardType={mask ? 'numeric' : 'default'}
+          keyboardType={mask ? 'numeric' : rest.keyboardType || 'default'}
           secureTextEntry={secureTextEntry}
         />
         {isPassword && (
@@ -82,7 +94,6 @@ const styles = StyleSheet.create({
     color: colors.primaryDark,
     borderWidth: 1,
     borderColor: '#ccc',
-    
   },
   iconButton: {
     position: 'absolute',

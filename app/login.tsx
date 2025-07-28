@@ -1,7 +1,7 @@
 import { router, Link } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
-import { ScrollView, Text, View, StyleSheet, ImageBackground, Alert } from "react-native";
+import { ScrollView, Text, View, StyleSheet, ImageBackground, Alert, TouchableOpacity } from "react-native";
 import MainButton from "~/components/buttons/mainButton";
 import PrimaryInput from "~/components/inputs/primaryInput";
 import { colors, fontSize } from '~/theme';
@@ -12,10 +12,8 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-
     const handleLogin = () => {
         setLoading(true);
-
         signInWithEmailAndPassword(auth, email, password)
             .then(userCredential => {
                 console.log("Usuário logado:", userCredential.user);
@@ -27,6 +25,21 @@ export default function Login() {
             }).finally(() => {
                 setLoading(false);
             });
+    };
+
+    const handleForgotPassword = async () => {
+        if (!email) {
+            Alert.alert("Digite seu e-mail", "Para redefinir sua senha, primeiro informe seu e-mail.");
+            return;
+        }
+
+        try {
+            await sendPasswordResetEmail(auth, email);
+            Alert.alert("E-mail enviado", "Verifique sua caixa de entrada para redefinir sua senha.");
+        } catch (error: any) {
+            console.error("Erro ao enviar e-mail de recuperação:", error.message);
+            Alert.alert("Erro", "Não foi possível enviar o e-mail de recuperação.");
+        }
     };
 
     return (
@@ -51,12 +64,18 @@ export default function Login() {
                     value={password}
                     onChangeText={setPassword}
                 />
+
+                <Link href="/forgotPassword" style={styles.forgotPassword}>
+                    <Text style={styles.linkText}>Esqueci minha senha</Text>
+                </Link>
+
                 <View style={styles.cardLink}>
                     <Text>Não possui uma conta?</Text>
                     <Link href="/signUp" style={styles.linkText}>Cadastre-se aqui!</Link>
                 </View>
+
                 <View style={styles.buttons}>
-                    <MainButton title="Acessar" type="primary" onPress={handleLogin} loading={loading}/>
+                    <MainButton title="Acessar" type="primary" onPress={handleLogin} loading={loading} />
                 </View>
             </View>
         </ScrollView>
@@ -99,6 +118,11 @@ const styles = StyleSheet.create({
         gap: 5,
         justifyContent: "center",
         paddingBottom: 15
+    },
+    forgotPassword: {
+        alignSelf: "flex-end",
+        marginTop: -10,
+        marginBottom: 5,
     },
     linkText: {
         color: colors.bgLink,

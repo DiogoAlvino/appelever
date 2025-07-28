@@ -17,7 +17,9 @@ export default function RootLayout() {
           router.replace("/");
         }
       } else {
-        if (pathname !== "/login" && pathname !== "/signUp") {
+        const publicRoutes = ["/login", "/signUp", "/forgotPassword"];
+
+        if (!publicRoutes.includes(pathname)) {
           router.replace("/login");
         }
       }
@@ -63,6 +65,7 @@ export default function RootLayout() {
             <Stack.Screen name="reportInspection/[equipmentId]" options={{ title: 'Relatório de Inspeção' }} />
             <Stack.Screen name="forensicPage" options={{ title: 'Análise Forense' }} />
             <Stack.Screen name="previewImage" options={{ title: 'Imagem' }} />
+            <Stack.Screen name="forgotPassword" options={{ title: 'Recuperação de Senha' }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           </Stack>
         </KeyboardAvoidingView>
